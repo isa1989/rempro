@@ -1,0 +1,152 @@
+{% load static %}
+{% include 'base.html' %}
+{% block content %}
+    <div class="loader-wrapper">
+      <div class="loader"> 
+        <div class="loader4"></div>
+      </div>
+    </div>
+    <!-- loader ends-->
+    <!-- tap on top starts-->
+    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
+    <!-- tap on tap ends-->
+    <!-- page-wrapper Start-->
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+      <!-- Page Header Start-->
+      {% include 'header.html' %}
+      <!-- Page Header Ends                              -->
+      <!-- Page Body Start-->
+      <div class="page-body-wrapper">
+        {% include 'sidebar.html' %}
+        <!-- Page Sidebar Start-->
+       
+        <!-- Page Sidebar Ends-->
+        <div class="page-body">
+          <div class="container-fluid">
+            <div class="page-title">
+              <div class="row">
+                <div class="col-6">
+                  <h4>
+                     Binalar</h4>
+                </div>
+                <div class="col-6">
+                  <ol class="breadcrumb">
+                      {% for crumb in breadcrumbs %}
+                          <li class="breadcrumb-item">
+                              <a href="{{ crumb.url }}">
+                                  {% if crumb.url %}
+                                      {{ crumb.title }}
+                                  {% else %}
+                                      <span>{{ crumb.title }}</span>
+                                  {% endif %}
+                              </a>
+                          </li>
+                      {% endfor %}
+                  </ol>
+              </div>
+              </div>
+            </div>
+          </div>
+          <!-- Container-fluid starts-->
+          <div class="container-fluid">
+            <div class="row"> 
+              <div class="col-sm-12"> 
+                <div class="card"> 
+                  <div class="card-body">
+                    <div class="list-product-header">
+                      <div> 
+                        <div class="light-box"><a data-bs-toggle="collapse" href="#collapseProduct" role="button" aria-expanded="false" aria-controls="collapseProduct"><i class="filter-icon show" data-feather="filter"></i><i class="icon-close filter-close hide"></i></a></div><a class="btn btn-primary" href="{% url 'building-add' branch_id=branch_id %}"><i class="fa fa-plus"></i>Bina əlavə et</a>
+                      </div>
+                   
+                    </div>
+                    <div class="list-product">
+                      <table class="table" id="project-status">
+                        <thead> 
+                          <tr> 
+                                <th> <span class="f-light f-w-600">Binanın adı</span></th>
+                                <th> <span class="f-light f-w-600">Binanın adresi</span></th>
+                                <th> <span class="f-light f-w-600">Bloklar</span></th>
+                                <th> <span class="f-light f-w-600">Mənzillər</span></th>
+                                <th> <span class="f-light f-w-600">Sakinlər</span></th>
+                          
+                          </tr>
+                        </thead>
+                        <tbody> 
+                            {% for building in buildings %}
+                          <tr class="product-removes">
+                          <td> 
+                              <div class="product-names">
+                                {% comment %} <div class="light-product-box"><img class="img-fluid" src="{% static  'images/ecommerce/product-categories/laptop.png' %}" alt="laptop"></div> {% endcomment %}
+                                <p>{{ building.name }}</p>
+                              </div>
+                            </td>
+                            <td> 
+                              <p class="f-light">{{ building.address }}</p>
+                            </td>
+                            <td>
+                              <div class="d-flex align-items-center">
+                                <p class="f-light mb-0 me-2">{{ building.section_count }}</p>
+                                <a href="{% url 'section-list' building.id %}" class="me-2 icon-align">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
+                                    <path d="M1 12s3-9 11-9 11 9 11 9-3 9-11 9S1 12 1 12z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                  </svg>
+                                </a>
+                                <a href="{% url 'section-add' building.id %}" class="icon-align">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                  </svg>
+                                </a>
+                              </div>
+                            </td>
+                          <td>
+                            <div class="d-flex align-items-center">
+                              <p class="f-light mb-0 me-2">{{ building.flat_count }}</p>
+                              <a href="{% url 'flat-list' building.id %}" class="me-2 icon-align">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
+                                  <path d="M1 12s3-9 11-9 11 9 11 9-3 9-11 9S1 12 1 12z"></path>
+                                  <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                              </a>
+                              <a href="{% url 'flat-add' building.id %}" class="icon-align">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus">
+                                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                              </a>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex align-items-center">
+                              <p class="f-light mb-0 me-2">{{ building.users_count }}</p>
+                              <a href="{% url 'resident-list' building.id %}" class="me-2 icon-align">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
+                                  <path d="M1 12s3-9 11-9 11 9 11 9-3 9-11 9S1 12 1 12z"></path>
+                                  <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                              </a>
+                              <a href="{% url 'resident-add' building.id %}" class="icon-align">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus">
+                                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                              </a>
+                            </div>
+                          </td>
+                          
+                          </tr>
+                          {% endfor %}
+                       </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Container-fluid Ends-->
+        </div>
+        {% include "footer.html" %}
+        <!-- footer start-->
+{% endblock %}

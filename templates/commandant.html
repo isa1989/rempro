@@ -1,0 +1,106 @@
+{% load static %}
+{% include 'base.html' %}
+{% block content %} starts-->
+    <div class="loader-wrapper">
+      <div class="loader"> 
+        <div class="loader4"></div>
+      </div>
+    </div>
+    <!-- loader ends-->
+    <!-- tap on top starts-->
+    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
+    <!-- tap on tap ends-->
+    <!-- page-wrapper Start-->
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+      <!-- Page Header Start-->
+      {% include 'header.html' %}
+      <!-- Page Header Ends                              -->
+      <!-- Page Body Start-->
+      <div class="page-body-wrapper">
+        {% include 'sidebar.html' %}
+        <!-- Page Sidebar Start-->
+       
+        <!-- Page Sidebar Ends-->
+        <div class="page-body">
+          <div class="container-fluid">
+            <div class="page-title">
+              <div class="row">
+                <div class="col-6">
+                  <h4>
+                     Komendantlar</h4>
+                </div>
+                <div class="col-6">
+                  <ol class="breadcrumb">
+                      {% for crumb in breadcrumbs %}
+                          <li class="breadcrumb-item">
+                              <a href="{{ crumb.url }}">
+                                  {% if crumb.url %}
+                                      {{ crumb.title }}
+                                  {% else %}
+                                      <span>{{ crumb.title }}</span>
+                                  {% endif %}
+                              </a>
+                          </li>
+                      {% endfor %}
+                  </ol>
+              </div>
+              </div>
+            </div>
+          </div>
+          <!-- Container-fluid starts-->
+          <div class="container-fluid">
+            <div class="row"> 
+              <div class="col-sm-12"> 
+                <div class="card"> 
+                  <div class="card-body">
+                    <div class="list-product-header">
+        
+                    </div>
+                    <div class="list-product">
+                      <table class="table" id="project-status">
+                        <thead> 
+                          <tr> 
+                            <th> <span class="f-light f-w-600">Komendantın adı</span></th>
+                            <th> <span class="f-light f-w-600">Komendantı sil</span></th>
+                            {% comment %} <th> <span class="f-light f-w-600">Blokun adı</span></th>
+                            <th> <span class="f-light f-w-600">Binanın adı </span></th>                            
+                            <th> <span class="f-light f-w-600">Evin sahəsi</span></th>
+                            <th> <span class="f-light f-w-600">Kirayə</span></th>
+                            <th> <span class="f-light f-w-600">Xidmətlər</span></th> {% endcomment %}
+                          
+                          </tr>
+                        </thead>
+                        <tbody> 
+                            {% for commandant in commandants %}
+                            <td>
+                              <div class="product-names">
+                                  <p>{{ commandant.username }}</p>
+                              </div>
+                          </td>
+                          <td>
+                              <form action="{% url 'commandant-delete' branch_id=branch.id pk=commandant.id %}" method="post" style="display:inline;" onsubmit="return confirmDelete();">
+                                  {% csrf_token %}
+                                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                              </form>
+                          </td>
+                      </tr>
+                      
+                      <script>
+                      function confirmDelete() {
+                          return confirm("Are you sure you want to delete the commandant {{ commandant.username }}?");
+                      }
+                      </script>
+                          {% endfor %}
+                       </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Container-fluid Ends-->
+        </div>
+        {% include "footer.html" %}
+        <!-- footer start-->
+{% endblock %}

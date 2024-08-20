@@ -1,0 +1,68 @@
+﻿{% load static %}
+{% include 'base.html' %}
+
+{% block content %}
+<body>
+  <!-- login page start-->
+  <div class="container-fluid p-0">
+    <div class="row m-0">
+      <div class="col-12 p-0">
+        <div class="login-card login-dark">
+          <div>
+            <div>
+              <a class="logo" href="{% url 'branches' %}">
+                <img class="img-fluid for-dark" src="{% static 'images/logo/logo.png' %}" alt="loginpage">
+                <img class="img-fluid for-light" src="{% static 'images/logo/logo_dark.png' %}" alt="loginpage">
+              </a>
+            </div>
+            <div class="login-main">
+              <form method="post" class="theme-form">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label class="col-form-label">Username</label>
+                  <input class="form-control" type="text" name="username" required="" placeholder="Username">
+                </div>
+                <div class="form-group">
+                  <label class="col-form-label">Password</label>
+                  <div class="form-input position-relative">
+                    <input class="form-control" type="password" name="password" required="" placeholder="*********">
+                    <div class="show-hide"><span class="show"></span></div>
+                  </div>
+                </div>
+                <div class="form-group mb-0">
+                 
+                  {% comment %} <a class="link" href="{% url 'password_reset' %}">Forgot password?</a> {% endcomment %}
+                  <div class="text-end mt-3">
+                    <button class="btn btn-primary btn-block w-100" type="submit">Daxil ol</button>
+                  </div>
+                </div>
+                
+                <p class="mt-4 mb-0 text-center">
+                  {% comment %} Don't have an account? <a class="ms-2" href="{% url 'signup' %}">Create Account</a> {% endcomment %}
+                </p>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const showHideBtn = document.querySelector('.show-hide');
+    const passwordInput = document.querySelector('input[name="password"]');
+    
+    showHideBtn.addEventListener('click', function() {
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';  // Show password
+        showHideBtn.querySelector('span').textContent = ''; // Update icon to "eye" (or text to "Hide")
+      } else {
+        passwordInput.type = 'password'; // Hide password
+        showHideBtn.querySelector('span').textContent = ''; // Update icon to "eye with a line" (or text to "Show")
+      }
+    });
+  });
+</script>
+
+{% endblock %}

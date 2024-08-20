@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Riho admin is super flexible, powerful, clean &amp; modern responsive bootstrap 5 admin template with unlimited possibilities.">
+    <meta name="keywords" content="admin template, Riho admin template, dashboard template, flat admin template, responsive admin template, web app">
+    <meta name="author" content="pixelstrap">
+    <link rel="icon" href="{% static 'images/favicon.png' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/x-icon">
+    <title>{% block title %}rempro - Premium Admin Template{% endblock %}</title>
+    <!-- Google font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{% static 'css/font-awesome.css' %}">
+    <link rel="stylesheet" href="{% static 'css/vendors/icofont.css' %}">
+    <link rel="stylesheet" href="{% static 'css/vendors/themify.css' %}">
+    <link rel="stylesheet" href="{% static 'css/vendors/flag-icon.css' %}">
+    <link rel="stylesheet" href="{% static 'css/vendors/feather-icon.css' %}">
+    <link rel="stylesheet" href="{% static 'css/vendors/slick.css' %}">
+    <link rel="stylesheet" href="{% static 'css/vendors/slick-theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/vendors/scrollbar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/vendors/animate.css' %}">
+    <link rel="stylesheet" href="{% static 'css/vendors/echart.css' %}">
+    <link rel="stylesheet" href="{% static 'css/vendors/date-picker.css' %}">
+    <link rel="stylesheet" href="{% static 'css/vendors/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link id="color" rel="stylesheet" href="{% static 'css/color-1.css' %}" media="screen">
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+</head>
+<body>
+    <!-- Your content goes here -->
+    {% block content %}
+    {% endblock %}
+
+    <!-- JavaScript Files -->
+    <!-- Load critical JavaScript -->
+    <script src="{% static 'js/jquery.min.js' %}" defer></script>
+    <script src="{% static 'js/bootstrap/bootstrap.bundle.min.js' %}" defer></script>
+    <script src="{% static 'js/icons/feather-icon/feather.min.js' %}" defer></script>
+    <script src="{% static 'js/icons/feather-icon/feather-icon.js' %}" defer></script>
+    <!-- Load other libraries -->
+    <script src="{% static 'js/scrollbar/simplebar.js' %}" defer></script>
+    <script src="{% static 'js/scrollbar/custom.js' %}" defer></script>
+    <script src="{% static 'js/config.js' %}" defer></script>
+    <script src="{% static 'js/sidebar-menu.js' %}" defer></script>
+    <script src="{% static 'js/sidebar-pin.js' %}" defer></script>
+    <script src="{% static 'js/slick/slick.min.js' %}" defer></script>
+    <script src="{% static 'js/slick/slick.js' %}" defer></script>
+    <script src="{% static 'js/header-slick.js' %}" defer></script>
+    <script src="{% static 'js/chart/apex-chart/apex-chart.js' %}" defer></script>
+    <script src="{% static 'js/chart/apex-chart/stock-prices.js' %}" defer></script>
+    <script src="{% static 'js/chart/apex-chart/moment.min.js' %}" defer></script>
+    <script src="{% static 'js/chart/echart/esl.js' %}" defer></script>
+    <script src="{% static 'js/chart/echart/config.js' %}" defer></script>
+    <script src="{% static 'js/chart/echart/pie-chart/facePrint.js' %}" defer></script>
+    <script src="{% static 'js/chart/echart/pie-chart/testHelper.js' %}" defer></script>
+    <script src="{% static 'js/chart/echart/pie-chart/custom-transition-texture.js' %}" defer></script>
+    <script src="{% static 'js/chart/echart/data/symbols.js' %}" defer></script> 
+    <script src="{% static 'js/datepicker/date-picker/datepicker.js' %}" defer></script>
+    <script src="{% static 'js/datepicker/date-picker/datepicker.en.js' %}" defer></script>
+    <script src="{% static 'js/datepicker/date-picker/datepicker.custom.js' %}" defer></script>
+    <script src="{% static 'js/dashboard/dashboard_3.js' %}" defer></script>
+    <script src="{% static 'js/script.js' %}" defer></script>
+    <script src="{% static 'js/theme-customizer/customizer.js' %}" defer></script>
+</body>
+</html>

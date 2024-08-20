@@ -1,0 +1,101 @@
+{% load static %}
+{% include 'base.html' %}
+{% block content %}
+    <!-- loader starts-->
+    <div class="loader-wrapper">
+        <div class="loader"> 
+            <div class="loader4"></div>
+        </div>
+    </div>
+    <!-- loader ends-->
+    <!-- tap on top starts-->
+    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
+    <!-- tap on tap ends-->
+    <!-- page-wrapper Start-->
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+        <!-- Page Header Start-->
+        {% include 'header.html' %}
+        <!-- Page Header Ends                              -->
+        <!-- Page Body Start-->
+        <div class="page-body-wrapper">
+            {% include 'sidebar.html' %}
+            <!-- Page Sidebar Start-->
+           
+            <!-- Page Sidebar Ends-->
+            <div class="page-body">
+                <div class="container-fluid">
+                    <div class="page-title">
+                        <div class="row">
+                            <div class="col-6">
+                                <h4>Ödəniş Əlavə Et</h4>
+                            </div>
+                            <div class="col-6">
+                                <ol class="breadcrumb">
+                                    {% for crumb in breadcrumbs %}
+                                        <li class="breadcrumb-item">
+                                            <a href="{{ crumb.url }}">
+                                                {% if crumb.url %}
+                                                    {{ crumb.title }}
+                                                {% else %}
+                                                    <span>{{ crumb.title }}</span>
+                                                {% endif %}
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Container-fluid starts-->
+                <div class="container-fluid">
+                    <div class="row"> 
+                        <div class="col-sm-12"> 
+                            <div class="card"> 
+                                <div class="card-body">
+                                    <form method="post" action="{% url 'payment-add' %}">
+                                        {% csrf_token %}
+                                        {{ form.as_p }}
+                                        <button type="submit" class="btn btn-primary">Save</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Container-fluid Ends-->
+            </div>
+            {% include "footer.html" %}
+        </div>
+    </div>
+
+    <!-- JavaScript to handle dynamic filtering -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const buildingSelect = document.querySelector('#id_building');
+            const flatSelect = document.querySelector('#id_flat');
+
+            buildingSelect.addEventListener('change', function() {
+                const buildingId = this.value;
+
+                fetch(`{% url 'payment-add' %}?building_id=${buildingId}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    flatSelect.innerHTML = '<option value="">Select Flat</option>';  // Reset the select field
+                    data.flats.forEach(flat => {
+                        const option = document.createElement('option');
+                        option.value = flat.id;
+                        option.textContent = flat.name;
+                        flatSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    </script>
+    
+{% endblock %}
