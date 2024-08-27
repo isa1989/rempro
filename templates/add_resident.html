@@ -1,7 +1,11 @@
 {% load static %}
+
 {% include 'base.html' %}
 
 {% block content %}
+<link href="{% static 'select2/css/select2.min.css' %}" rel="stylesheet" />
+<script src="{% static 'select2/js/select2.min.js' %}"></script>
+
 <!-- starts -->
 <div class="loader-wrapper">
     <div class="loader"> 
@@ -17,23 +21,7 @@
 <!-- page-wrapper Start-->
 <div class="page-wrapper compact-wrapper" id="pageWrapper">
     <!-- Page Header Start-->
-    <div class="page-header">
-        <div class="header-wrapper row m-0">
-            <form class="form-inline search-full col" action="#" method="get">
-                <div class="form-group w-100">
-                    <div class="Typeahead Typeahead--twitterUsers">
-                        <div class="u-posRelative"> 
-                            <input class="demo-input Typeahead-input form-control-plaintext w-100" type="text" placeholder="Search Residents .." name="q" title="" autofocus="">
-                            <div class="spinner-border Typeahead-spinner" role="status"><span class="sr-only">Loading... </span></div>
-                            <i class="close-search" data-feather="x"></i>
-                        </div>
-                        <div class="Typeahead-menu"></div>
-                    </div>
-                </div>
-            </form>
-            <!-- Additional header content here -->
-        </div>
-    </div>
+    {% include 'header.html' %}
     <!-- Page Header Ends -->
 
     <!-- Page Body Start -->
@@ -46,7 +34,7 @@
                 <div class="page-title">
                     <div class="row">
                         <div class="col-6">
-                            <h4>Add Resident</h4>
+                            <h4>Sakin əlavə et</h4>
                         </div>
                         <div class="col-6">
                             <ol class="breadcrumb">
@@ -86,7 +74,7 @@
                                                         </div>
                                                         <div class="col-12 mt-3">
                                                             <button class="btn btn-primary" type="submit">Save</button>
-                                                            <a class="btn btn-secondary" href="{% url 'resident-list' %}">Cancel</a>
+                                                            <a class="btn btn-secondary" href="{% url 'resident-list' building.id %}">Cancel</a>
                                                         </div>
                                                     </form>
                                                 </div>
@@ -138,6 +126,42 @@
         // Add event listener to update visibility on change
         if (isRentCheckbox) {
             isRentCheckbox.addEventListener('change', toggleTenantDocument);
+        }
+    });
+
+    $(document).ready(function() {
+        // Extract building ID from a data attribute or other source
+        var buildingId = "{{ building.id|escapejs }}"; // Ensure this is correctly escaped
+
+        // Initialize Select2
+        $('.select2').select2({
+            placeholder: 'Mənzili seçin',
+            allowClear: true,
+            ajax: {
+                url: function(params) {
+                    // Construct the URL with the building_id as a query parameter
+                    return `{% url "flat-autocomplete" %}?building_id=${buildingId}`;
+                },
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        q: params.term // Search term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.results
+                    };
+                },
+                cache: true
+            }
+        });
+
+        // Set selected value if available
+        var selectedValue = "{{ form.flat.value|escapejs }}";
+        if (selectedValue) {
+            $('.select2').val(selectedValue).trigger('change');
         }
     });
 </script>

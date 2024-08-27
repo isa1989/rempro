@@ -1,0 +1,42 @@
+services:
+  
+  remprodb:
+    restart: always
+    image: postgres:13
+    ports:
+      - "5434:5432"
+    volumes:
+      - rempro_db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: rem_db
+      POSTGRES_USER: rem_user
+      POSTGRES_PASSWORD: P2d6WCLvVtc3NQaVNNb
+    env_file:
+      - .env
+    networks:
+      - django_nginx_network
+      
+  remproweb:
+    restart: always
+    build: .
+    volumes:
+      - ./static:/rempro/static
+      - ./media:/rempro/media 
+    ports:
+      - "8001:8001"
+    # environment:
+    #   - DATABASE_URL=postgres://rem_user:P2d6WCLvVtc3NQaVNNb@remdb:5432/rem_db
+    depends_on:
+      - remprodb
+    networks:
+      - django_nginx_network
+      
+
+volumes:
+  static_volume:
+  media_volume:
+  rempro_db_data:
+
+networks:
+  django_nginx_network:
+    external: true

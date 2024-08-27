@@ -1,6 +1,8 @@
+from django.utils import timezone
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.core.validators import RegexValidator
 
 
 def validate_day(value):
@@ -88,6 +90,23 @@ class User(AbstractUser):
         blank=True,
         null=True,
     )
+    building = models.ForeignKey(
+        Building,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    phone_number = models.CharField(
+        max_length=17,  # Adjust based on your needs
+        validators=[
+            RegexValidator(
+                regex=r"^\+?1?\d{9,15}$",
+                message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.",
+            )
+        ],
+        blank=True,  # Allow blank values
+        null=True,  # Allow null values
+    )
     commandant = models.BooleanField(default=False)
     resident = models.BooleanField(default=False)
     groups = models.ManyToManyField(
@@ -119,7 +138,9 @@ class User(AbstractUser):
 
 
 class Flat(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey(
+        User, on_delete=models.SET_NULL, related_name="flats", null=True, blank=True
+    )
     building = models.ForeignKey(Building, on_delete=models.CASCADE)
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
@@ -195,6 +216,7 @@ class Payment(models.Model):
         verbose_name="Xidmət",
         help_text="Ödəmə ilə əlaqəli xidmət (əgər varsa)",
     )
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     date = models.DateField(verbose_name="Tarix", help_text="Ödənişin tarixi")
 
     def __str__(self):
@@ -204,3 +226,22 @@ class Payment(models.Model):
         ordering = ["-date"]
         verbose_name = "Ödəniş"
         verbose_name_plural = "Ödəniş"
+
+
+class Log(models.Model):
+    ACTION_CHOICES = [
+        ("CREATE", "Create"),
+        ("UPDATE", "Update"),
+        ("DELETE", "Delete"),
+        ("ACCESS", "Access"),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="logs")
+    action = models.CharField(max_length=10, choices=ACTION_CHOICES)
+    model_name = models.CharField(max_length=50)
+    object_id = models.PositiveIntegerField()
+    timestamp = models.DateTimeField(default=timezone.now)
+    details = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user} {self.action} {self.model_name} #{self.object_id} at {self.timestamp}"

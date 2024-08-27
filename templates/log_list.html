@@ -27,7 +27,7 @@
               <div class="row">
                 <div class="col-6">
                   <h4>
-                    Xidmətlər</h4>
+                     Logs</h4>
                 </div>
                 <div class="col-6">
                   <ol class="breadcrumb">
@@ -53,32 +53,43 @@
               <div class="col-sm-12"> 
                 <div class="card"> 
                   <div class="card-body">
-                    
+                    <div class="list-product-header">
+                      <!-- Optionally add header or action buttons here -->
+                    </div>
                     <div class="list-product">
-                      <table class="table" id="project-status">
+                      <table class="table" id="log-status">
                         <thead> 
                           <tr> 
-                                <th> <span class="f-light f-w-600">Xidmətin adı</span></th>
-                                <th> <span class="f-light f-w-600">Xidmətin qiyməti</span></th>
-                                <th> <span class="f-light f-w-600">Ödəniş vaxtı</span></th>
-                          
+                            <th> <span class="f-light f-w-600">Log ID</span></th>
+                            <th> <span class="f-light f-w-600">User</span></th>
+                            <th> <span class="f-light f-w-600">Action</span></th>                            
+                            <th> <span class="f-light f-w-600">Timestamp</span></th>
+                            <th> <span class="f-light f-w-600">Details</span></th>
                           </tr>
                         </thead>
                         <tbody> 
-                            {% for service in services %}
-                        <tr class="product-removes">
+                            {% for log in logs %}
+                          <tr class="log-entry">
                             <td> 
-                              <div class="product-names">
-                                <p>{{ service.name }}</p>
-                              </div>
-                           </td>
-                           <td> 
-                              <p class="f-light">{{ service.price }}</p>
+                              <p>{{ log.id }}</p>
                             </td>
                             <td> 
-                                <p class="f-light">{{ service.invoice_day }}</p>
+                              <p class="f-light">{{ log.user }}</p>
                             </td>
-                      </tr>
+                            <td> 
+                              <p class="f-light">{{ log.action }}</p>
+                            </td>
+                            <td> 
+                              <p class="f-light">{{ log.timestamp }}</p>
+                            </td>
+                            <td>
+                              <p class="f-light">{{ log.details }}</p>
+                            </td>
+                          </tr>
+                          {% empty %}
+                            <tr>
+                                <td colspan="5">Heç bir log tapılmadı.</td>
+                            </tr>
                           {% endfor %}
                        </tbody>
                       </table>

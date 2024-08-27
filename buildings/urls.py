@@ -5,6 +5,8 @@ urlpatterns = [
     # --------------------------- AUTH -----------------------------
     path("login/", views.LoginView.as_view(), name="login"),
     path("logout/", views.UserLogoutView.as_view(), name="logout"),
+    # --------------------------- PROFILE -----------------------------
+    path("user/<int:pk>/", views.UserProfileView.as_view(), name="user_profile"),
     # --------------------------- BRANCH -----------------------------
     path("", views.BranchListView.as_view(), name="branches"),
     path("branch/add/", views.BranchCreateView.as_view(), name="branch-add"),
@@ -29,7 +31,13 @@ urlpatterns = [
         views.FlatServiceListView.as_view(),
         name="flat-services",
     ),
-    # --------------------------- BUILDING -----------------------------
+    path("flats/<int:building_id>/", views.FlatListView.as_view(), name="flat-list"),
+    path(
+        "flat/add/<int:building_id>/",
+        views.FlatCreateView.as_view(),
+        name="flat-add",
+    ),
+    # --------------------------- BUILDINGS -----------------------------
     path("buildings", views.BuildingListView.as_view(), name="buildings"),
     path(
         "building/add/<int:branch_id>/",
@@ -45,12 +53,6 @@ urlpatterns = [
         "section/add/<int:building_id>/",
         views.SectionsCreateView.as_view(),
         name="section-add",
-    ),
-    path("flats/<int:building_id>/", views.FlatListView.as_view(), name="flat-list"),
-    path(
-        "flat/add/<int:building_id>/",
-        views.FlatCreateView.as_view(),
-        name="flat-add",
     ),
     # ----------------------Services-------------------------------
     path("services", views.ServicesListView.as_view(), name="services"),
@@ -77,9 +79,14 @@ urlpatterns = [
         views.ResidentListView.as_view(),
         name="resident-list",
     ),
+    path("residents/", views.ResidentListView.as_view(), name="all-residents"),
     path(
-        "residents/add/<int:flat_id>/",
+        "residents/add/<int:building_id>/",
         views.ResidentCreateView.as_view(),
         name="resident-add",
     ),
+    # -------------------------- RESIDENTS -------------------------------
+    path("flat-autocomplete/", views.flat_autocomplete, name="flat-autocomplete"),
+    # -------------------------- LOGS -------------------------------
+    path("logs/", views.LogListView.as_view(), name="log_list"),
 ]

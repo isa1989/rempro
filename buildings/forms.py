@@ -215,9 +215,14 @@ class CommandantForm(UserCreationForm):
 
 
 class ResidentForm(UserCreationForm):
+    flat = forms.CharField(
+        required=False, widget=forms.Select(attrs={"class": "form-control select2"})
+    )
+
     class Meta:
         model = User
         fields = [
+            "flat",
             "username",
             "first_name",
             "last_name",
@@ -241,9 +246,11 @@ class ResidentForm(UserCreationForm):
         }
 
     def __init__(self, *args, **kwargs):
-        # Extract additional kwargs if present
+        building_id = kwargs.pop("building_id", None)
         self.branch_id = kwargs.pop("branch_id", None)
         super().__init__(*args, **kwargs)
+        if building_id:
+            self.fields["flat"].queryset = Flat.objects.filter(building_id=building_id)
         self.fields["password1"].label = "New Password"
         self.fields["password2"].label = "Confirm New Password"
         self.fields["password1"].widget = forms.PasswordInput(
@@ -263,18 +270,15 @@ class ResidentForm(UserCreationForm):
         for field in self.fields.values():
             field.help_text = None
 
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        if commit:
-            user.save()
-            # Additional logic for resident-specific fields
-            if self.branch_id:
-                user.profile.branch_id = self.branch_id
-                user.profile.save()
-        return user
-
 
 class PaymentForm(forms.ModelForm):
+    flat = forms.ModelChoiceField(
+        queryset=Flat.objects.all(),  # Customize this queryset as needed
+        required=False,
+        widget=forms.Select(attrs={"class": "form-control select2"}),
+        empty_label="Seçin",  # Optional: Placeholder text for the dropdown
+    )
+
     class Meta:
         model = Payment
         fields = ["building", "flat", "amount", "service", "date"]
@@ -283,12 +287,6 @@ class PaymentForm(forms.ModelForm):
                 attrs={
                     "class": "form-control form-select",
                     "data-placeholder": "Binanı seç",
-                }
-            ),
-            "flat": forms.Select(
-                attrs={
-                    "class": "form-control form-select",
-                    "data-placeholder": "Mənzili seç",
                 }
             ),
             "amount": forms.NumberInput(

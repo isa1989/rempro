@@ -15,7 +15,20 @@ class CustomUserAdmin(UserAdmin):
         "is_superuser",
     ]
     list_filter = ["commandant", "branch", "is_staff", "is_superuser"]
-    fieldsets = UserAdmin.fieldsets + ((None, {"fields": ("commandant", "branch")}),)
+    fieldsets = UserAdmin.fieldsets + (
+        (
+            None,
+            {
+                "fields": (
+                    "phone_number",
+                    "commandant",
+                    "branch",
+                    "resident",
+                    "building",
+                )
+            },
+        ),
+    )
     add_fieldsets = UserAdmin.add_fieldsets + (
         (
             None,
