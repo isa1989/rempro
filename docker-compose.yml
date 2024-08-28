@@ -1,5 +1,5 @@
 services:
-  
+
   remprodb:
     restart: always
     image: postgres:13
@@ -11,17 +11,15 @@ services:
       POSTGRES_DB: rem_db
       POSTGRES_USER: rem_user
       POSTGRES_PASSWORD: P2d6WCLvVtc3NQaVNNb
-    env_file:
-      - .env
     networks:
       - django_nginx_network
-      
+
   remproweb:
     restart: always
     build: .
     volumes:
       - ./static:/rempro/static
-      - ./media:/rempro/media 
+      - ./media:/rempro/media
     ports:
       - "8001:8001"
     # environment:
@@ -30,7 +28,7 @@ services:
       - remprodb
     networks:
       - django_nginx_network
-      
+
 
 volumes:
   static_volume:

@@ -12,9 +12,16 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 import os
 from pathlib import Path
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Initialise environment variables
+ENV_FILE = BASE_DIR / ".env"
+
+env = environ.Env()
+environ.Env.read_env(ENV_FILE)
 
 
 # Quick-start development settings - unsuitable for production
@@ -24,9 +31,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-t743lk5o4bp-*)^(5hwt7l9q(i0u06!7$*i2uvtz+fks&_*)rq"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost"])
 
 
 # Application definition
@@ -80,13 +87,24 @@ WSGI_APPLICATION = "rempro.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if not env.bool("PROD", default=False):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django_tenants.postgresql_backend",
+            "NAME": env("DATABASE_NAME"),
+            "USER": env("DATABASE_USER"),
+            "PASSWORD": env("DATABASE_PASS"),
+            "HOST": env("DATABASE_HOST"),
+            "PORT": "5432",
+        },
+    }
 
 
 # Password validation
@@ -123,10 +141,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 STATIC_URL = "/static/"
-# STATIC_ROOT = BASE_DIR / "static/"
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static/assets/"),  # Project-level static files
-]
+
+if not env.bool("PROD", default=False):
+    STATICFILES_DIRS = [
+        os.path.join(BASE_DIR, "static/"),  # Project-level static files
+    ]
+else:
+    STATIC_ROOT = BASE_DIR / "static/"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media/"
