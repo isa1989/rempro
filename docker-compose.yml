@@ -23,8 +23,8 @@ services:
       - ./media:/rempro/media
     ports:
       - "8001:8001"
-    # environment:
-    #   - DATABASE_URL=postgres://rem_user:P2d6WCLvVtc3NQaVNNb@remdb:5432/rem_db
+    environment:
+      - DATABASE_URL=postgres://rem_user:P2d6WCLvVtc3NQaVNNb@remdb:5434/rem_db
     depends_on:
       - remprodb
     networks:
