@@ -11,6 +11,7 @@ services:
       POSTGRES_DB: rem_db
       POSTGRES_USER: rem_user
       POSTGRES_PASSWORD: P2d6WCLvVtc3NQaVNNb
+      PGPORT: 5434
     networks:
       - django_nginx_network
 
