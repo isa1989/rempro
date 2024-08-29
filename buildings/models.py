@@ -245,3 +245,16 @@ class Log(models.Model):
 
     def __str__(self):
         return f"{self.user} {self.action} {self.model_name} #{self.object_id} at {self.timestamp}"
+
+
+class News(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = "Xəbərlər"
+        verbose_name_plural = "Xəbərlər"

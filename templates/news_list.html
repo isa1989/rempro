@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <!-- loader starts-->
+    <div class="loader-wrapper">
+        <div class="loader"> 
+            <div class="loader4"></div>
+        </div>
+    </div>
+    <!-- loader ends-->
+    <!-- tap on top starts-->
+    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
+    <!-- tap on tap ends-->
+    <!-- page-wrapper Start-->
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+        <!-- Page Header Start-->
+        {% include 'header.html' %}
+        <!-- Page Header Ends -->
+        <!-- Page Body Start-->
+        <div class="page-body-wrapper">
+            {% include 'sidebar.html' %}
+            <!-- Page Sidebar Start-->
+           
+            <!-- Page Sidebar Ends-->
+            <div class="page-body">
+                <div class="container-fluid">
+                    <div class="page-title">
+                        <div class="row">
+                            <div class="col-6">
+                                <h4>Xəbərlər</h4>
+                            </div>
+                            <div class="col-6">
+                                <ol class="breadcrumb">
+                                    {% for crumb in breadcrumbs %}
+                                        <li class="breadcrumb-item">
+                                            <a href="{{ crumb.url }}">
+                                                {% if crumb.url %}
+                                                    {{ crumb.title }}
+                                                {% else %}
+                                                    <span>{{ crumb.title }}</span>
+                                                {% endif %}
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Container-fluid starts-->
+                <div class="container-fluid">
+                    <div class="row"> 
+                        <div class="col-sm-12"> 
+                            <div class="card"> 
+                                <div class="card-body">
+                                    <div class="list-product-header">
+                                        <div> 
+                                            <a class="btn btn-primary" href="{% url 'news-create' %}"><i class="fa fa-plus"></i> Yeni Xəbər əlavə et</a>
+                                        </div>
+                                    </div>
+                                    <div class="list-product">
+                                        <table class="table" id="news-status">
+                                            <thead> 
+                                                <tr> 
+                                                    <th><span class="f-light f-w-600">Başlıq</span></th>
+                                                    <th><span class="f-light f-w-600">Məzmun</span></th>
+                                                    <th><span class="f-light f-w-600">Tarix</span></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody> 
+                                                {% for news in news_list %}
+                                                <tr class="news-entry">
+                                                    <td>
+                                                        <a href="{% url 'news-detail' news.id %}">{{ news.title }}</a>
+                                                    </td>
+                                                    <td> 
+                                                        <p class="f-light">{{ news.content|slice:":100" }}...</p> <!-- Truncate content for brevity -->
+                                                    </td>
+                                                    <td>
+                                                        <p class="f-light">{{ news.created_at }}</p>
+                                                    </td>
+                                                </tr>
+                                                {% empty %}
+                                                <tr>
+                                                    <td colspan="3">Heç bir xəbər mövcud deyil.</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Container-fluid Ends -->
+            </div>
+            {% include "footer.html" %}
+            <!-- footer start -->
+        </div>
+    </div>
+{% endblock %}

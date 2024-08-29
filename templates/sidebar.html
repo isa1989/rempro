@@ -105,11 +105,18 @@
                         </svg>
                         <span class="lan-3">Tarixçə</span>
                     </a>
-                    {% comment %} <ul class="sidebar-submenu">
-                        <li><a href="{% url 'payment-chart' %}">Ödənişlər</a></li>
-                        <li><a href="{% url 'expense-chart' %}">Xərclər</a></li>
-                    </ul> {% endcomment %}
-                </li>
+                    <li class="sidebar-list">
+                        <i class="fa fa-thumb-tack"> </i>
+                        <a class="sidebar-link sidebar-title" href="{% url 'news-list' %}">
+                            <svg class="stroke-icon">
+                                <use href="{% static 'svg/icon-sprite.svg#stroke-home' %}"></use>
+                            </svg>
+                            <svg class="fill-icon">
+                                <use href="{% static 'svg/icon-sprite.svg#fill-home' %}"></use>
+                            </svg>
+                            <span class="lan-3">Xəbərlər</span>
+                        </a>
+                    </li>
                 {% else %}
                 <li class="sidebar-list">
                     <i class="fa fa-thumb-tack"> </i>
@@ -127,6 +134,7 @@
                         <li><a href="{% url 'services' %}">Xidmətlər</a></li>
                         <li><a href="{% url 'payment-list' %}">Ödənişlər</a></li>
                         <li><a href="{% url 'all-residents'  %}">Sakinlər</a></li>
+                        <li><a href="{% url 'news-list'  %}">Xəbərlər</a></li>
                     </ul>
                 </li>
                 {% endif %}

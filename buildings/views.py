@@ -22,6 +22,7 @@ from .models import (
     Expense,
     Payment,
     Log,
+    News,
 )
 from .forms import (
     BuildingForm,
@@ -33,6 +34,7 @@ from .forms import (
     CommandantForm,
     PaymentForm,
     ResidentForm,
+    NewsForm,
 )
 from django.contrib.auth.decorators import login_required
 
@@ -754,3 +756,42 @@ class LogListView(ListView):
         context["user_name"] = self.request.user.username
         context["is_superuser"] = self.request.user.is_superuser
         return context
+
+
+class NewsListView(ListView):
+    model = News
+    template_name = "news_list.html"
+    context_object_name = "news_list"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse("branches")},
+        ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
+        return context
+
+
+class NewsCreateView(CreateView):
+    model = News
+    form_class = NewsForm
+    template_name = "news_form.html"
+    success_url = reverse_lazy("news-list")
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        Log.objects.create(
+            action="Əlavə edildi",
+            model_name="News",
+            object_id=self.object.id,
+            user=self.request.user,
+            details=f"Xəbər əlavə edildi: {self.object.title}",
+            timestamp=timezone.now(),
+        )
+        return response
+
+
+class NewsDetailView(DetailView):
+    model = News
+    template_name = "news_detail.html"

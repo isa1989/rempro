@@ -1,5 +1,5 @@
 from django import forms
-from .models import Building, Section, Flat, Service, Branch, User, Payment
+from .models import Building, Section, Flat, Service, Branch, User, Payment, News
 from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm
 
@@ -308,5 +308,20 @@ class PaymentForm(forms.ModelForm):
                     "data-placeholder": "Tarix",
                     "type": "date",
                 }
+            ),
+        }
+
+
+class NewsForm(forms.ModelForm):
+    class Meta:
+        model = News
+        fields = ["title", "content"]
+
+        widgets = {
+            "title": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Başlıq"}
+            ),
+            "content": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Məzmun"}
             ),
         }
