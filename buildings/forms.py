@@ -80,7 +80,7 @@ class FlatForm(forms.ModelForm):
             "owner_document": forms.ClearableFileInput(
                 attrs={"class": "form-control-file"}
             ),
-            "services": forms.Textarea(attrs={"class": "form-control"}),
+            "services": forms.SelectMultiple(attrs={"class": "form-control"}),
             "section": forms.Select(attrs={"class": "form-control"}),
         }
 
@@ -155,8 +155,8 @@ class BranchForm(forms.ModelForm):
             "camera_url": forms.URLInput(attrs={"class": "form-control"}),
         }
         labels = {
-            "name": "Branch Name",
-            "address": "Branch Address",
+            "name": "Filial adı",
+            "address": "Adress",
             "email": "Email Address",
             "whatsapp_link": "WhatsApp Link",
             "telegram": "Telegram Link",
@@ -226,6 +226,7 @@ class ResidentForm(UserCreationForm):
             "username",
             "first_name",
             "last_name",
+            "phone_number",
             "email",
             "password1",
             "password2",
@@ -239,6 +240,13 @@ class ResidentForm(UserCreationForm):
             ),
             "last_name": forms.TextInput(
                 attrs={"class": "form-control", "placeholder": "Last Name"}
+            ),
+            "phone_number": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Phone Number",
+                    "type": "tel",
+                }
             ),
             "email": forms.EmailInput(
                 attrs={"class": "form-control", "placeholder": "Email"}

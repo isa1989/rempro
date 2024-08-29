@@ -105,9 +105,12 @@ class BranchListView(LoginRequiredMixin, ListView):
     context_object_name = "branches"
 
     def get_queryset(self):
-        # Annotate each branch with the count of commandants
+        branch_id = self.request.user.branch_id
         return Branch.objects.annotate(
-            commandant_count=Count("users", filter=Q(users__commandant=True))
+            commandant_count=Count(
+                "users", filter=Q(users__commandant=True), distinct=True
+            ),
+            building_count=Count("buildings", distinct=True),
         )
 
     def get_context_data(self, **kwargs):
@@ -124,6 +127,13 @@ class BranchCreateView(LoginRequiredMixin, CreateView):
     form_class = BranchForm
     template_name = "add_branch.html"  # Replace with your actual template
     success_url = reverse_lazy("branches")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add is_superuser status to context
+        context["is_superuser"] = self.request.user.is_superuser
+        context["user_name"] = self.request.user.username
+        return context
 
 
 class CommandantListView(LoginRequiredMixin, ListView):
@@ -143,6 +153,8 @@ class CommandantListView(LoginRequiredMixin, ListView):
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("branches")},
         ]
+        context["is_superuser"] = self.request.user.is_superuser
+        context["user_name"] = self.request.user.username
         return context
 
 
@@ -172,6 +184,8 @@ class CommandantCreateView(LoginRequiredMixin, CreateView):
                 "url": reverse("commandant-add", kwargs={"branch_id": branch_id}),
             },
         ]
+        context["is_superuser"] = self.request.user.is_superuser
+        context["user_name"] = self.request.user.username
         return context
 
     def form_valid(self, form):
@@ -205,7 +219,10 @@ class BuildingListView(LoginRequiredMixin, ListView):
     context_object_name = "buildings"
 
     def get_queryset(self):
-        return Building.objects.annotate(
+        branch_id = self.kwargs.get("branch_id")
+        if not branch_id:
+            branch_id = self.request.user.branch_id
+        return Building.objects.filter(branch_id=branch_id).annotate(
             flat_count=Count("flat", distinct=True),
             section_count=Count("section", distinct=True),
             users_count=Count("flat__user", distinct=True),
@@ -213,14 +230,24 @@ class BuildingListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        branch_id = self.request.user.branch_id
+        branch_id = self.kwargs.get("branch_id")
+        if not branch_id:
+            branch_id = self.request.user.branch_id
+
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("branches")},
-            {"title": "Binalar", "url": reverse("buildings")},
+            # {"title": "Binalar", "url": reverse("buildings")},
         ]
         context["branch_id"] = branch_id
         context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
         return context
+
+
+# class BranchDetailView(DetailView):
+#     model = Branch
+#     template_name = "branch_detail.html"
+#     context_object_name = "branch"
 
 
 class BuildingCreateView(LoginRequiredMixin, CreateView):
@@ -228,7 +255,6 @@ class BuildingCreateView(LoginRequiredMixin, CreateView):
     model = Building
     form_class = BuildingForm
     template_name = "add_building.html"
-    success_url = reverse_lazy("buildings")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -254,11 +280,15 @@ class BuildingCreateView(LoginRequiredMixin, CreateView):
             model_name="Building",
             object_id=self.object.id,
             user=self.request.user,
-            details=f"Created building: {self.object.name}",
+            details=f"Bina yaradıldı: {self.object.name}",
             timestamp=timezone.now(),
         )
 
         return response
+
+    def get_success_url(self):
+        branch_id = self.kwargs.get("branch_id")
+        return reverse_lazy("buildings-list", kwargs={"branch_id": branch_id})
 
 
 class SectionListView(LoginRequiredMixin, ListView):
@@ -275,9 +305,9 @@ class SectionListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("branches")},
-            {"title": "Binalar", "url": reverse("buildings")},
         ]
         context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
         return context
 
 
@@ -303,6 +333,7 @@ class SectionsCreateView(LoginRequiredMixin, CreateView):
             {"title": "Binalar", "url": reverse("buildings")},
         ]
         context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
         return context
 
     def form_valid(self, form):
@@ -315,7 +346,7 @@ class SectionsCreateView(LoginRequiredMixin, CreateView):
             model_name="Section",
             object_id=self.object.id,
             user=self.request.user,
-            details=f"Created section: {self.object.name}",
+            details=f"Blok yaradıldı: {self.object.name}",
             timestamp=timezone.now(),
         )
         return response
@@ -339,9 +370,10 @@ class FlatListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("branches")},
-            {"title": "Binalar", "url": reverse("buildings")},
+            # {"title": "Binalar", "url": reverse("buildings")},
         ]
         context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
         return context
 
 
@@ -364,8 +396,10 @@ class FlatCreateView(LoginRequiredMixin, CreateView):
         context["building"] = building
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("branches")},
-            {"title": "Binalar", "url": reverse("buildings")},
+            # {"title": "Binalar", "url": reverse("buildings")},
         ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
         return context
 
     def form_valid(self, form):
@@ -378,7 +412,7 @@ class FlatCreateView(LoginRequiredMixin, CreateView):
             model_name="Flat",
             object_id=self.object.id,
             user=self.request.user,
-            details=f"Created flat: {self.object.name}",
+            details=f"Mənzil yaradıldı: {self.object.name}",
             timestamp=timezone.now(),
         )
         return response
@@ -689,7 +723,7 @@ class ResidentListView(ListView):
             context["building"] = get_object_or_404(Building, id=building_id)
 
         context["breadcrumbs"] = [
-            {"title": "Ana səhifə", "url": reverse("buildings")},
+            {"title": "Ana səhifə", "url": reverse("branches")},
         ]
         context["is_superuser"] = self.request.user.is_superuser
         context["user_name"] = self.request.user.username
@@ -733,6 +767,7 @@ class ResidentCreateView(CreateView):
             {"title": "Ana səhifə", "url": reverse("buildings")},
         ]
         context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
         return context
 
     def get_success_url(self):

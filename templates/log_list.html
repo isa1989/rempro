@@ -1,5 +1,7 @@
 {% load static %}
 {% include 'base.html' %}
+{% load custom_filters %}
+
 {% block content %} starts-->
     <div class="loader-wrapper">
       <div class="loader"> 
@@ -77,7 +79,7 @@
                               <p class="f-light">{{ log.user }}</p>
                             </td>
                             <td> 
-                              <p class="f-light">{{ log.action }}</p>
+                              <p class="f-light">{{ log.action|action_label }}</p>
                             </td>
                             <td> 
                               <p class="f-light">{{ log.timestamp }}</p>

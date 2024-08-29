@@ -66,13 +66,14 @@
                       <table class="table" id="branch-status">
                         <thead>
                           <tr>
-                            <th><span class="f-light f-w-600">Branch Name</span></th>
-                            <th><span class="f-light f-w-600">Address</span></th>
+                            <th><span class="f-light f-w-600">Filial adı</span></th>
+                            <th><span class="f-light f-w-600">Adress</span></th>
                             <th><span class="f-light f-w-600">Email</span></th>
                             <th><span class="f-light f-w-600">WhatsApp Link</span></th>
                             <th><span class="f-light f-w-600">Telegram Link</span></th>
                             <th><span class="f-light f-w-600">Camera URL</span></th>
                             <th><span class="f-light f-w-600">Komendant</span></th>
+                            <th><span class="f-light f-w-600">Binalar</span></th>
                             {% comment %} <th><span class="f-light f-w-600">Actions</span></th> {% endcomment %}
                           </tr>
                         </thead>
@@ -102,6 +103,23 @@
                                   </a>
                                 </div>
                             </td>
+                            <td>
+                              <div class="d-flex align-items-center">
+                                <p class="f-light mb-0 me-2">{{ branch.building_count }}</p>
+                                <a href="{% url 'buildings-list' branch.id %}" class="me-2 icon-align">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
+                                    <path d="M1 12s3-9 11-9 11 9 11 9-3 9-11 9S1 12 1 12z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                  </svg>
+                                </a>
+                                <a href="{% url 'building-add' branch.id %}" class="icon-align">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                  </svg>
+                                </a>
+                              </div>
+                          </td>
                           </tr>
                           {% endfor %}
                         </tbody>

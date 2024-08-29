@@ -40,6 +40,16 @@ urlpatterns = [
     # --------------------------- BUILDINGS -----------------------------
     path("buildings", views.BuildingListView.as_view(), name="buildings"),
     path(
+        "branch/<int:branch_id>/buildings/",
+        views.BuildingListView.as_view(),
+        name="buildings-list",
+    ),
+    # path(
+    #     "building/<int:branch_id>/",
+    #     views.BranchDetailView.as_view(),
+    #     name="building-detail",
+    # ),
+    path(
         "building/add/<int:branch_id>/",
         views.BuildingCreateView.as_view(),
         name="building-add",
