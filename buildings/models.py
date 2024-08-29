@@ -230,14 +230,14 @@ class Payment(models.Model):
 
 class Log(models.Model):
     ACTION_CHOICES = [
-        ("CREATE", "Create"),
-        ("UPDATE", "Update"),
-        ("DELETE", "Delete"),
-        ("ACCESS", "Access"),
+        ("CREATE", "Əlavə edildi"),
+        ("UPDATE", "Dəyişdirildi"),
+        ("DELETE", "Silindi"),
+        ("ACCESS", "İcazə"),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="logs")
-    action = models.CharField(max_length=10, choices=ACTION_CHOICES)
+    action = models.CharField(max_length=20, choices=ACTION_CHOICES)
     model_name = models.CharField(max_length=50)
     object_id = models.PositiveIntegerField()
     timestamp = models.DateTimeField(default=timezone.now)

@@ -250,7 +250,7 @@ class BuildingCreateView(LoginRequiredMixin, CreateView):
 
         # Log the creation of the new building
         Log.objects.create(
-            action="Əlavə edildi",
+            action="CREATE",
             model_name="Building",
             object_id=self.object.id,
             user=self.request.user,
@@ -311,7 +311,7 @@ class SectionsCreateView(LoginRequiredMixin, CreateView):
         form.instance.building = building
         response = super().form_valid(form)
         Log.objects.create(
-            action="Əlavə edildi",
+            action="CREATE",
             model_name="Section",
             object_id=self.object.id,
             user=self.request.user,
@@ -374,7 +374,7 @@ class FlatCreateView(LoginRequiredMixin, CreateView):
         form.instance.building = building
         response = super().form_valid(form)
         Log.objects.create(
-            action="Əlavə edildi",
+            action="CREATE",
             model_name="Flat",
             object_id=self.object.id,
             user=self.request.user,
@@ -429,7 +429,7 @@ class ServiceCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         Log.objects.create(
-            action="Əlavə edildi",
+            action="CREATE",
             model_name="Service",
             object_id=self.object.id,
             user=self.request.user,
@@ -782,7 +782,7 @@ class NewsCreateView(CreateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         Log.objects.create(
-            action="Əlavə edildi",
+            action="CREATE",
             model_name="News",
             object_id=self.object.id,
             user=self.request.user,
