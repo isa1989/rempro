@@ -20,7 +20,7 @@ class CustomUserAdmin(UserAdmin):
         "email",
         "commandant",
         "resident",
-        "branch",
+        "display_branch",  # Use a custom method for displaying related fields
         "is_staff",
         "is_superuser",
     ]
@@ -51,6 +51,16 @@ class CustomUserAdmin(UserAdmin):
             },
         ),
     )
+
+    def display_branch(self, obj):
+        """Custom method to display related branches."""
+        return (
+            ", ".join([branch.name for branch in obj.branch.all()])
+            if obj.branch.exists()
+            else "None"
+        )
+
+    display_branch.short_description = "Branch"
 
 
 admin.site.register(User, CustomUserAdmin)

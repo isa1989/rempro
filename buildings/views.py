@@ -105,7 +105,7 @@ class BranchListView(LoginRequiredMixin, ListView):
     context_object_name = "branches"
 
     def get_queryset(self):
-        branch_id = self.request.user.branch_id
+        # branch_id = self.request.user.branch_id
         return Branch.objects.annotate(
             commandant_count=Count(
                 "users", filter=Q(users__commandant=True), distinct=True
@@ -135,6 +135,12 @@ class BranchCreateView(LoginRequiredMixin, CreateView):
         context["user_name"] = self.request.user.username
         return context
 
+    def form_valid(self, form):
+        user = self.request.user
+        response = super().form_valid(form)
+        user.branch.add(form.instance)
+        return response
+
 
 class CommandantListView(LoginRequiredMixin, ListView):
     login_url = "/login/"
@@ -144,7 +150,7 @@ class CommandantListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         branch_id = self.kwargs["branch_id"]
-        return User.objects.filter(branch_id=branch_id, commandant=True)
+        return User.objects.filter(branch__in=[branch_id], commandant=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -189,13 +195,18 @@ class CommandantCreateView(LoginRequiredMixin, CreateView):
         return context
 
     def form_valid(self, form):
-        # Assign the branch to the new commandant and mark them as a commandant
+        # Save the instance first to get an ID assigned
+        response = super().form_valid(form)
+        # Retrieve the branch using branch_id from URL
         branch_id = self.kwargs.get("branch_id")
         branch = get_object_or_404(Branch, id=branch_id)
-        form.instance.branch = branch
-        form.instance.is_staff = True
-        form.instance.commandant = True
-        return super().form_valid(form)
+        # Add the branch to the instance's many-to-many field
+        self.object.branch.add(branch)
+        # Set other fields
+        self.object.is_staff = True
+        self.object.commandant = True
+        self.object.save()  # Save the changes to the instance
+        return response
 
     def get_success_url(self):
         # Redirect to a list view or another appropriate URL after successful creation

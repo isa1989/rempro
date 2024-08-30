@@ -83,13 +83,7 @@ class Section(models.Model):
 
 
 class User(AbstractUser):
-    branch = models.ForeignKey(
-        Branch,
-        on_delete=models.CASCADE,
-        related_name="users",
-        blank=True,
-        null=True,
-    )
+    branch = models.ManyToManyField(Branch, related_name="users", blank=True)
     building = models.ForeignKey(
         Building,
         on_delete=models.CASCADE,
