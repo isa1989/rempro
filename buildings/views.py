@@ -1,6 +1,7 @@
 from django.http import JsonResponse, HttpResponseForbidden, HttpResponseNotAllowed
 from django.db.models import Sum
 from django.utils import timezone
+from django.forms import formset_factory
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.contrib import messages
@@ -23,6 +24,7 @@ from .models import (
     Payment,
     Log,
     News,
+    Camera,
 )
 from .forms import (
     BuildingForm,
@@ -35,6 +37,7 @@ from .forms import (
     PaymentForm,
     ResidentForm,
     NewsForm,
+    CameraForm,
 )
 from django.contrib.auth.decorators import login_required
 
@@ -111,6 +114,7 @@ class BranchListView(LoginRequiredMixin, ListView):
                 "users", filter=Q(users__commandant=True), distinct=True
             ),
             building_count=Count("buildings", distinct=True),
+            camera_count=Count("cameras", distinct=True),
         )
 
     def get_context_data(self, **kwargs):
@@ -121,25 +125,40 @@ class BranchListView(LoginRequiredMixin, ListView):
         return context
 
 
-class BranchCreateView(LoginRequiredMixin, CreateView):
-    login_url = "/login/"
+class BranchCreateView(CreateView):
     model = Branch
     form_class = BranchForm
-    template_name = "add_branch.html"  # Replace with your actual template
+    template_name = "add_branch.html"
     success_url = reverse_lazy("branches")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Add is_superuser status to context
-        context["is_superuser"] = self.request.user.is_superuser
-        context["user_name"] = self.request.user.username
+        CameraFormSet = formset_factory(
+            CameraForm, extra=1
+        )  # Set the initial number of forms
+        context["cameras_formset"] = CameraFormSet()
         return context
 
-    def form_valid(self, form):
-        user = self.request.user
-        response = super().form_valid(form)
-        user.branch.add(form.instance)
-        return response
+    def post(self, request, *args, **kwargs):
+        form = BranchForm(request.POST)
+        CameraFormSet = formset_factory(
+            CameraForm, extra=1
+        )  # Set the initial number of forms
+        formset = CameraFormSet(request.POST, request.FILES)
+
+        if form.is_valid() and formset.is_valid():
+            branch = form.save()
+            for camera_form in formset:
+                if camera_form.cleaned_data:
+                    Camera.objects.create(
+                        url=camera_form.cleaned_data.get("url"),
+                        description=camera_form.cleaned_data.get("description"),
+                        branch=branch,
+                    )
+            return redirect(self.success_url)
+        return self.render_to_response(
+            self.get_context_data(form=form, cameras_formset=formset)
+        )
 
 
 class CommandantListView(LoginRequiredMixin, ListView):
@@ -864,3 +883,79 @@ class NewsDeleteView(DeleteView):
             timestamp=timezone.now(),
         )
         return response
+
+
+class CameraListView(ListView):
+    model = Camera
+    template_name = "camera_list.html"  # Replace with your actual template
+    context_object_name = "cameras"
+
+    def get_queryset(self):
+        branch_id = self.kwargs["branch_id"]
+        branch = get_object_or_404(Branch, id=branch_id)
+        return Camera.objects.filter(branch=branch)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse("branches")},
+        ]
+        branch_id = self.kwargs["branch_id"]
+        context["branch"] = get_object_or_404(Branch, id=branch_id)
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
+        return context
+
+
+class CameraCreateView(LoginRequiredMixin, CreateView):
+    login_url = "/login/"
+    model = Camera
+    form_class = CameraForm
+    template_name = "camera_form.html"
+
+    def get_form_kwargs(self):
+        # Add the branch_id to the form kwargs if needed
+        kwargs = super().get_form_kwargs()
+        branch_id = self.kwargs.get("branch_id")
+        kwargs["branch_id"] = branch_id
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        branch_id = self.kwargs.get("branch_id")
+        branch = get_object_or_404(Branch, id=branch_id)
+        context["branch"] = branch
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse("branches")},
+            {"title": "Filiallar", "url": reverse("branches")},
+        ]
+        context["is_superuser"] = self.request.user.is_superuser
+        context["user_name"] = self.request.user.username
+        return context
+
+    def form_valid(self, form):
+        # Save the instance first to get an ID assigned
+        response = super().form_valid(form)
+        # Retrieve the branch using branch_id from URL
+        branch_id = self.kwargs.get("branch_id")
+        branch = get_object_or_404(Branch, id=branch_id)
+        # Add the branch to the instance's many-to-many field
+        self.object.branch = branch
+
+        self.object.save()  # Save the changes to the instance
+        return response
+
+    def get_success_url(self):
+        # Redirect to a list view or another appropriate URL after successful creation
+        branch_id = self.kwargs.get("branch_id")
+        return reverse_lazy("camera-list", kwargs={"branch_id": branch_id})
+
+
+class CameraDeleteView(LoginRequiredMixin, DeleteView):
+    model = Camera
+
+    def get_success_url(self):
+        branch_id = self.kwargs.get("branch_id")
+        return reverse_lazy(
+            "branches",
+        )

@@ -16,7 +16,6 @@ class Branch(models.Model):
     email = models.EmailField(blank=True, null=True)
     whatsapp_link = models.URLField(blank=True, null=True)
     telegram = models.URLField(blank=True, null=True)
-    camera_url = models.URLField(blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -24,6 +23,21 @@ class Branch(models.Model):
     class Meta:
         verbose_name = "Filial"
         verbose_name_plural = "Filial"
+
+
+class Camera(models.Model):
+    url = models.URLField()
+    description = models.CharField(max_length=255, blank=True, null=True)
+    branch = models.ForeignKey(
+        Branch, on_delete=models.CASCADE, related_name="cameras", blank=True, null=True
+    )
+
+    def __str__(self):
+        return self.url
+
+    class Meta:
+        verbose_name = "Camera"
+        verbose_name_plural = "Camera"
 
 
 class Service(models.Model):

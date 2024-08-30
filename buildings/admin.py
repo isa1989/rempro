@@ -10,6 +10,7 @@ from .models import (
     Expense,
     Payment,
     News,
+    Camera,
 )
 
 
@@ -64,6 +65,7 @@ class CustomUserAdmin(UserAdmin):
 
 
 admin.site.register(User, CustomUserAdmin)
+admin.site.register(Camera)
 admin.site.register(Branch)
 admin.site.register(Building)
 admin.site.register(Section)

@@ -104,4 +104,25 @@ urlpatterns = [
     path("news-create/", views.NewsCreateView.as_view(), name="news-create"),
     path("news/<int:pk>/", views.NewsDetailView.as_view(), name="news-detail"),
     path("news/<int:pk>/delete/", views.NewsDeleteView.as_view(), name="news-delete"),
+    # -------------------------- CAMERA -------------------------------
+    path(
+        "branch/<int:branch_id>/cameras/",
+        views.CameraListView.as_view(),
+        name="camera-list",
+    ),
+    path(
+        "branch/<int:branch_id>/cameras/add/",
+        views.CameraCreateView.as_view(),
+        name="camera-add",
+    ),
+    path(
+        "camera/<int:pk>/delete/",
+        views.CameraDeleteView.as_view(),
+        name="camera-delete",
+    ),
+    # path(
+    #     "branch/<int:branch_id>/camera/<int:pk>/delete/",
+    #     views.CameraDeleteView.as_view(),
+    #     name="camera-delete",
+    # ),
 ]

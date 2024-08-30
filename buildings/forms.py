@@ -1,5 +1,16 @@
 from django import forms
-from .models import Building, Section, Flat, Service, Branch, User, Payment, News
+from django.forms import inlineformset_factory
+from .models import (
+    Building,
+    Section,
+    Flat,
+    Service,
+    Branch,
+    User,
+    Payment,
+    News,
+    Camera,
+)
 from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm
 
@@ -141,18 +152,49 @@ class AddServiceForm(ModelForm):
         }
 
 
+class CameraForm(forms.ModelForm):
+    class Meta:
+        model = Camera
+        fields = ["url", "description"]
+        widgets = {
+            "url": forms.URLInput(attrs={"class": "form-control"}),
+            "description": forms.TextInput(attrs={"class": "form-control"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        # Extract branch_id from kwargs if present
+        self.branch_id = kwargs.pop("branch_id", None)
+        super().__init__(*args, **kwargs)
+
+
+class CameraFormSet(forms.BaseInlineFormSet):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # You can add custom behavior here if needed
+
+
+# Define the inline formset factory
+CameraFormSetFactory = inlineformset_factory(
+    Branch, Camera, form=CameraForm, formset=CameraFormSet, extra=1, can_delete=True
+)
+
+
 class BranchForm(forms.ModelForm):
     class Meta:
         model = Branch
-        fields = ["name", "address", "email", "whatsapp_link", "telegram", "camera_url"]
-        # Optionally, you can customize widgets, labels, help texts, etc.
+        fields = [
+            "name",
+            "address",
+            "email",
+            "whatsapp_link",
+            "telegram",
+        ]
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control"}),
             "address": forms.TextInput(attrs={"class": "form-control"}),
             "email": forms.EmailInput(attrs={"class": "form-control"}),
             "whatsapp_link": forms.URLInput(attrs={"class": "form-control"}),
             "telegram": forms.URLInput(attrs={"class": "form-control"}),
-            "camera_url": forms.URLInput(attrs={"class": "form-control"}),
         }
         labels = {
             "name": "Filial adı",
@@ -160,8 +202,9 @@ class BranchForm(forms.ModelForm):
             "email": "Email Address",
             "whatsapp_link": "WhatsApp Link",
             "telegram": "Telegram Link",
-            "camera_url": "Camera URL",
         }
+
+    cameras = CameraFormSetFactory()
 
 
 class CommandantForm(UserCreationForm):
