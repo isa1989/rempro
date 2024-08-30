@@ -617,6 +617,8 @@ class PaymentCreateView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["buildings"] = Building.objects.all()
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
         return context
 
     def get(self, request, *args, **kwargs):
