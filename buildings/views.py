@@ -232,7 +232,7 @@ class BuildingListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         branch_id = self.kwargs.get("branch_id")
         if not branch_id:
-            branch_id = self.request.user.branch_id
+            branch_id = self.request.user.branch.values_list("id", flat=True).last()
         return Building.objects.filter(branch_id=branch_id).annotate(
             flat_count=Count("flat", distinct=True),
             section_count=Count("section", distinct=True),
@@ -243,7 +243,7 @@ class BuildingListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         branch_id = self.kwargs.get("branch_id")
         if not branch_id:
-            branch_id = self.request.user.branch_id
+            branch_id = self.request.user.branch.values_list("id", flat=True).last()
 
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("branches")},
