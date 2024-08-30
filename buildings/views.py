@@ -832,3 +832,24 @@ class NewsCreateView(CreateView):
 class NewsDetailView(DetailView):
     model = News
     template_name = "news_detail.html"
+
+
+class NewsDeleteView(DeleteView):
+    model = News
+    success_url = reverse_lazy("news-list")
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)  # Perform delete on GET request
+
+    def post(self, request, *args, **kwargs):
+        object = self.get_object()
+        response = super().post(request, *args, **kwargs)
+        Log.objects.create(
+            action="DELETE",
+            model_name="News",
+            object_id=object.id,
+            user=self.request.user,
+            details=f"Xəbər silindi: {self.object.title}",
+            timestamp=timezone.now(),
+        )
+        return response
