@@ -882,7 +882,8 @@ class LogListView(ListView):
     model = Log
     template_name = "log_list.html"
     context_object_name = "logs"
-    ordering = ["-timestamp"]  # Order by newest first
+    ordering = ["-timestamp"]
+    paginate_by = 20
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -899,6 +900,7 @@ class NewsListView(ListView):
     model = News
     template_name = "news_list.html"
     context_object_name = "news_list"
+    paginate_by = 20
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -2,7 +2,7 @@
 {% include 'base.html' %}
 {% load custom_filters %}
 
-{% block content %} starts-->
+{% block content %}
     <div class="loader-wrapper">
       <div class="loader"> 
         <div class="loader4"></div>
@@ -28,8 +28,7 @@
             <div class="page-title">
               <div class="row">
                 <div class="col-6">
-                  <h4>
-                     Logs</h4>
+                  <h4>Tarixçə</h4>
                 </div>
                 <div class="col-6">
                   <ol class="breadcrumb">
@@ -62,31 +61,21 @@
                       <table class="table" id="log-status">
                         <thead> 
                           <tr> 
-                            <th> <span class="f-light f-w-600">Log ID</span></th>
-                            <th> <span class="f-light f-w-600">User</span></th>
-                            <th> <span class="f-light f-w-600">Action</span></th>                            
-                            <th> <span class="f-light f-w-600">Timestamp</span></th>
-                            <th> <span class="f-light f-w-600">Details</span></th>
+                            <th><span class="f-light f-w-600">Tarixçə ID</span></th>
+                            <th><span class="f-light f-w-600">İstifadəçi</span></th>
+                            <th><span class="f-light f-w-600">Məzmun</span></th>                            
+                            <th><span class="f-light f-w-600">Tarix</span></th>
+                            <th><span class="f-light f-w-600">Detal</span></th>
                           </tr>
                         </thead>
                         <tbody> 
                             {% for log in logs %}
                           <tr class="log-entry">
-                            <td> 
-                              <p>{{ log.id }}</p>
-                            </td>
-                            <td> 
-                              <p class="f-light">{{ log.user }}</p>
-                            </td>
-                            <td> 
-                              <p class="f-light">{{ log.action|action_label }}</p>
-                            </td>
-                            <td> 
-                              <p class="f-light">{{ log.timestamp }}</p>
-                            </td>
-                            <td>
-                              <p class="f-light">{{ log.details }}</p>
-                            </td>
+                            <td><p>{{ log.id }}</p></td>
+                            <td><p class="f-light">{{ log.user }}</p></td>
+                            <td><p class="f-light">{{ log.action|action_label }}</p></td>
+                            <td><p class="f-light">{{ log.timestamp }}</p></td>
+                            <td><p class="f-light">{{ log.details }}</p></td>
                           </tr>
                           {% empty %}
                             <tr>
@@ -96,6 +85,51 @@
                        </tbody>
                       </table>
                     </div>
+
+                    <!-- Pagination Controls -->
+                    {% if page_obj.paginator.num_pages > 1 %}
+                      <div class="pagination">
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1" aria-label="First">
+                                        <span aria-hidden="true">&laquo;&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active" aria-current="page">
+                                        <span class="page-link">{{ num }}<span class="sr-only">(current)</span></span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                                        <span aria-hidden="true">&raquo;&raquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                      </div>
+                    {% endif %}
                   </div>
                 </div>
               </div>
