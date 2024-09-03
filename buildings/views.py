@@ -1,3 +1,4 @@
+import re
 from django.http import JsonResponse, HttpResponseForbidden, HttpResponseNotAllowed
 from django.db.models import Sum
 from django.utils import timezone
@@ -7,7 +8,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.db.models import Count, Q
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, DeleteView
+from django.views.generic import ListView, DeleteView, UpdateView
 from django.views.generic.edit import FormView
 from django.contrib.auth.views import LoginView as BaseLoginView, LogoutView
 from django.views.generic.detail import DetailView
@@ -38,6 +39,7 @@ from .forms import (
     ResidentForm,
     NewsForm,
     CameraForm,
+    BuildingCreationForm,
 )
 from django.contrib.auth.decorators import login_required
 
@@ -391,10 +393,41 @@ class FlatListView(LoginRequiredMixin, ListView):
     model = Flat
     template_name = "flat.html"
     context_object_name = "flats"
+    paginate_by = 50
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        building_id = self.kwargs["building_id"]
+        kwargs["building_id"] = building_id
+        return kwargs
 
     def get_queryset(self):
-        building_id = self.kwargs["building_id"]
-        return Flat.objects.filter(building_id=building_id)
+        queryset = super().get_queryset()
+        building_id = self.kwargs.get("building_id")
+        if building_id is not None:
+            queryset = queryset.filter(building_id=building_id)
+
+        # Filtering based on GET parameters
+        section_id = self.request.GET.get("section")
+        min_square_metres = self.request.GET.get("min_square_metres")
+        max_square_metres = self.request.GET.get("max_square_metres")
+        name = self.request.GET.get("name")
+
+        if section_id:
+            queryset = queryset.filter(section_id=section_id)
+        if min_square_metres and max_square_metres:
+            queryset = queryset.filter(
+                square_metres__gte=min_square_metres,
+                square_metres__lte=max_square_metres,
+            )
+        elif min_square_metres:
+            queryset = queryset.filter(square_metres__gte=min_square_metres)
+        elif max_square_metres:
+            queryset = queryset.filter(square_metres__lte=max_square_metres)
+        if name:
+            queryset = queryset.filter(name=name)
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -402,8 +435,12 @@ class FlatListView(LoginRequiredMixin, ListView):
             {"title": "Ana səhifə", "url": reverse("branches")},
             # {"title": "Binalar", "url": reverse("buildings")},
         ]
+        building_id = self.kwargs["building_id"]
+        building = get_object_or_404(Building, id=building_id)
+        context["building_id"] = building.id
         context["user_name"] = self.request.user.username
         context["is_superuser"] = self.request.user.is_superuser
+        context["sections"] = Section.objects.filter(building_id=building_id)
         return context
 
 
@@ -959,3 +996,86 @@ class CameraDeleteView(LoginRequiredMixin, DeleteView):
         return reverse_lazy(
             "branches",
         )
+
+
+class CameraUpdateView(UpdateView):
+    model = Camera
+    form_class = CameraForm
+    template_name = "camera_edit.html"
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["branch_id"] = self.kwargs.get("branch_id")
+        return kwargs
+
+    def get_success_url(self):
+        branch_id = self.kwargs.get("branch_id")
+        return reverse_lazy("camera-list", kwargs={"branch_id": branch_id})
+
+
+def generate_flats(sequence, count):
+    """Generate flat names based on the given sequence and count."""
+    flats = []
+    sequence_pattern = re.findall(r"\D+", sequence)  # Find all non-digit parts
+    number_pattern = re.findall(r"\d+", sequence)  # Find all digit parts
+
+    if number_pattern:
+        start = int(number_pattern[0])
+        for i in range(count):
+            flat_name = sequence.replace(str(start), str(start + i), 1)
+            flats.append(flat_name)
+    else:
+        for i in range(count):
+            flats.append(sequence.replace(sequence[-1], chr(ord(sequence[-1]) + i), 1))
+
+    return flats
+
+
+def generate_flats(flat_sequence, floor_count):
+    # Ensure flat_sequence is an integer
+    flats = [str(i) for i in range(1, flat_sequence + 1)]
+    return flats
+
+
+def create_building(request):
+    if request.method == "POST":
+        form = BuildingCreationForm(request.POST)
+        if form.is_valid():
+            floor_count = form.cleaned_data["floor_count"]
+            sector_count = form.cleaned_data["sector_count"]
+            flat_sequence = int(
+                form.cleaned_data["flat_sequence"]
+            )  # Convert to integer
+            branch = form.cleaned_data["branch"]
+
+            # Create the building
+            building = Building.objects.create(
+                name="Dynamic Building",  # Adjust as needed
+                address="123 Dynamic St",  # Adjust as needed
+                branch=branch,
+            )
+
+            # Create sections and flats
+            flat_counter = 1  # Initialize a counter for unique flat names
+
+            for sector_num in range(1, sector_count + 1):
+                section_name = f"Sector {sector_num}"
+                section = Section.objects.create(building=building, name=section_name)
+
+                for floor in range(1, floor_count + 1):
+                    # Generate the number of flats based on the flat_sequence
+                    for _ in range(flat_sequence):
+                        Flat.objects.create(
+                            building=building,
+                            section=section,
+                            name=str(flat_counter),  # Assign a unique name
+                            square_metres=50.00,  # Adjust as needed
+                        )
+                        flat_counter += 1  # Increment the counter for the next flat
+
+            return redirect("buildings")  # Redirect to a list or detail view
+
+    else:
+        form = BuildingCreationForm()
+
+    return render(request, "create_building.html", {"form": form})

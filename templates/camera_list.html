@@ -70,9 +70,11 @@
                             {% for camera in cameras %}
                             <tr>
                              
-                              <td>
-                                <p class="f-light">{{ camera.url }}</p>
-                              </td>
+                                <td>
+                                    <a href="{% url 'camera-edit' branch_id=camera.branch.id pk=camera.id %}">
+                                      <p class="f-light">{{ camera.url }}</p>
+                                    </a>
+                                  </td>
                               <td>
                                 <p class="f-light">{{ camera.branch.name }}</p>
                               </td>

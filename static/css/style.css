@@ -4637,6 +4637,24 @@ strong ~ p {
   border: 1px solid #FE6A49;
   color: #fff;
 }
+
+.pagination .page-link {
+  color: #006666;
+  border-color: #006666;
+}
+
+/* Active page number */
+.pagination .page-item.active .page-link {
+  background-color: #006666; /* Background color for the active page */
+  color: #ffffff; /* Text color for the active page */
+  border-color: #006666; /* Border color for the active page */
+}
+
+/* Pagination link hover state */
+.pagination .page-link:hover {
+  color: #004d4d; /* Text color on hover */
+  border-color: #004d4d; /* Border color on hover */
+}
 .touchspin-wrapper .btn-touchspin.spin-border-secondary {
   background-color: unset;
   border: 1px solid #FE6A49;

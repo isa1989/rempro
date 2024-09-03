@@ -1,0 +1,79 @@
+{% load static %}
+{% include 'base.html' %}
+{% block content %}
+    <!-- starts -->
+    <div class="loader-wrapper">
+      <div class="loader">
+        <div class="loader4"></div>
+      </div>
+    </div>
+    <!-- loader ends -->
+
+    <!-- tap on top starts -->
+    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
+    <!-- tap on tap ends -->
+
+    <!-- page-wrapper Start -->
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+      <!-- Page Header Start -->
+      {% include 'header.html' %}
+      <!-- Page Header Ends -->
+
+      <!-- Page Body Start -->
+      <div class="page-body-wrapper">
+        {% include 'sidebar.html' %}
+        <!-- Page Sidebar Ends -->
+
+        <div class="page-body">
+          <div class="container-fluid">
+            <div class="page-title">
+              <div class="row">
+                <div class="col-6">
+                  <h4>Edit Camera</h4>
+                </div>
+                <div class="col-6">
+                  <ol class="breadcrumb">
+                    {% for crumb in breadcrumbs %}
+                      <li class="breadcrumb-item">
+                        <a href="{{ crumb.url }}">
+                          {% if crumb.url %}
+                            {{ crumb.title }}
+                          {% else %}
+                            <span>{{ crumb.title }}</span>
+                          {% endif %}
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Container-fluid starts -->
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-body">
+                    <form method="post" action="{% url 'camera-edit' branch_id=branch_id pk=form.instance.id %}">
+                      {% csrf_token %}
+                      {{ form.as_p }}
+                      <div class="col-12 mt-3">
+                        <button class="btn btn-primary" type="submit">Save</button>
+                        <a class="btn btn-secondary" href="{% url 'camera-list' branch_id=branch_id %}">Cancel</a>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Container-fluid Ends -->
+        </div>
+
+        {% include 'footer.html' %}
+        <!-- footer start -->
+      </div>
+    </div>
+{% endblock %}

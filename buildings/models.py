@@ -177,6 +177,10 @@ class Flat(models.Model):
     def services_count(self):
         return self.services.count()
 
+    @property
+    def rent_status(self):
+        return "Bəli" if self.is_rent else "Xeyr"
+
 
 class Expense(models.Model):
     name = models.CharField(max_length=255)

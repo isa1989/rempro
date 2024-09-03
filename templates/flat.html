@@ -1,130 +1,217 @@
 {% load static %}
 {% include 'base.html' %}
-{% block content %} starts-->
+{% block content %}
+    <!-- Loader starts-->
     <div class="loader-wrapper">
-      <div class="loader"> 
-        <div class="loader4"></div>
-      </div>
-    </div>
-    <!-- loader ends-->
-    <!-- tap on top starts-->
-    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
-    <!-- tap on tap ends-->
-    <!-- page-wrapper Start-->
-    <div class="page-wrapper compact-wrapper" id="pageWrapper">
-      <!-- Page Header Start-->
-      {% include 'header.html' %}
-      <!-- Page Header Ends                              -->
-      <!-- Page Body Start-->
-      <div class="page-body-wrapper">
-        {% include 'sidebar.html' %}
-        <!-- Page Sidebar Start-->
-       
-        <!-- Page Sidebar Ends-->
-        <div class="page-body">
-          <div class="container-fluid">
-            <div class="page-title">
-              <div class="row">
-                <div class="col-6">
-                  <h4>
-                     Mənzillər</h4>
-                </div>
-                <div class="col-6">
-                  <ol class="breadcrumb">
-                      {% for crumb in breadcrumbs %}
-                          <li class="breadcrumb-item">
-                              <a href="{{ crumb.url }}">
-                                  {% if crumb.url %}
-                                      {{ crumb.title }}
-                                  {% else %}
-                                      <span>{{ crumb.title }}</span>
-                                  {% endif %}
-                              </a>
-                          </li>
-                      {% endfor %}
-                  </ol>
-              </div>
-              </div>
-            </div>
-          </div>
-          <!-- Container-fluid starts-->
-          <div class="container-fluid">
-            <div class="row"> 
-              <div class="col-sm-12"> 
-                <div class="card"> 
-                  <div class="card-body">
-                    <div class="list-product-header">
-        
-                    </div>
-                    <div class="list-product">
-                      <table class="table" id="project-status">
-                        <thead> 
-                          <tr> 
-                            <th> <span class="f-light f-w-600">Mənzilin adı</span></th>
-                            <th> <span class="f-light f-w-600">Blokun adı</span></th>
-                            <th> <span class="f-light f-w-600">Binanın adı </span></th>                            
-                            <th> <span class="f-light f-w-600">Evin sahəsi</span></th>
-                            <th> <span class="f-light f-w-600">Kirayə</span></th>
-                            <th> <span class="f-light f-w-600">Xidmətlər</span></th>
-                            <th> <span class="f-light f-w-600">Balans</span></th>
-                          
-                          </tr>
-                        </thead>
-                        <tbody> 
-                            {% for flat in flats %}
-                          <tr class="product-removes">
-                           
-                            <td> 
-                              <div class="product-names">
-                                {% comment %} <div class="light-product-box"><img class="img-fluid" src="{% static  'images/ecommerce/product-categories/laptop.png' %}" alt="laptop"></div> {% endcomment %}
-                                <p>{{ flat.name }}</p>
-                              </div>
-                            </td>
-                            <td> 
-                              <p class="f-light">{{ flat.section }}</p>
-                            </td>
-                            <td> 
-                                <p class="f-light">{{ flat.building }}</p>
-                              </td>
-                              <td> 
-                                <p class="f-light">{{ flat.square_metres }}</p>
-                              </td>
-                              <td> 
-                                <p class="f-light">{{ flat.is_rent }}</p>
-                              </td>
-                              <td>
-                                <div class="d-flex align-items-center">
-                                  <p class="f-light mb-0 me-2">{{ flat.services_count }}</p>
-                                  <a href="{% url 'flat-services' flat.id %}" class="me-2 icon-align">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
-                                      <path d="M1 12s3-9 11-9 11 9 11 9-3 9-11 9S1 12 1 12z"></path>
-                                      <circle cx="12" cy="12" r="3"></circle>
-                                    </svg>
-                                  </a>
-                                <a href="{% url 'flat-add-services' flat.id %}" class="icon-align">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus">
-                                      <line x1="12" y1="5" x2="12" y2="19"></line>
-                                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    </svg>
-                                  </a>
-                                </div>
-                              </td>
-                              <td> 
-                                <p class="f-light">{{ flat.balance }}</p>
-                              </td>
-                              
-                          </tr>
-                          {% endfor %}
-                       </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Container-fluid Ends-->
+        <div class="loader">
+            <div class="loader4"></div>
         </div>
-        {% include "footer.html" %}
-        <!-- footer start-->
+    </div>
+    <!-- Loader ends-->
+    <!-- Tap on top starts-->
+    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
+    <!-- Tap on top ends-->
+    <!-- Page-wrapper Start-->
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+        <!-- Page Header Start-->
+        {% include 'header.html' %}
+        <!-- Page Header Ends -->
+        <!-- Page Body Start-->
+        <div class="page-body-wrapper">
+            {% include 'sidebar.html' %}
+            <!-- Page Sidebar Start-->
+
+            <!-- Page Sidebar Ends-->
+            <div class="page-body">
+                <div class="container-fluid">
+                    <div class="page-title">
+                        <div class="row">
+                            <div class="col-6">
+                                <h4>Mənzillər</h4>
+                            </div>
+                            <div class="col-6">
+                                <ol class="breadcrumb">
+                                    {% for crumb in breadcrumbs %}
+                                    <li class="breadcrumb-item">
+                                        <a href="{{ crumb.url }}">
+                                            {% if crumb.url %}
+                                            {{ crumb.title }}
+                                            {% else %}
+                                            <span>{{ crumb.title }}</span>
+                                            {% endif %}
+                                        </a>
+                                    </li>
+                                    {% endfor %}
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Container-fluid starts-->
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <!-- Filter Form -->
+                                    <form method="get" action="{% url 'flat-list' building_id=building_id %}">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <label for="name">Mənzilin adı:</label>
+                                                    <input type="text" id="name" name="name" value="{{ request.GET.name }}" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <label for="section">Blok:</label>
+                                                    <select id="section" name="section" class="form-control">
+                                                        <option value="">Bütün bloklar</option>
+                                                        {% for section in sections %}
+                                                            <option value="{{ section.id }}" {% if request.GET.section == section.id|stringformat:"s" %}selected{% endif %}>
+                                                                {{ section.name }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <div class="form-group">
+                                                    <label for="square_metres">Evin sahəsi:</label>
+                                                    <div class="input-group">
+                                                        <input type="number" id="min_square_metres" name="min_square_metres" class="form-control" placeholder="Min" value="{{ request.GET.min_square_metres }}">
+                                                        <input type="number" id="max_square_metres" name="max_square_metres" class="form-control" placeholder="Max" value="{{ request.GET.max_square_metres }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1"><br>
+                                                <button type="submit" class="btn btn-primary w-100">Axtar</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    
+                                    <!-- Filter Form End -->
+
+                                    <div class="list-product">
+                                        <table class="table" id="project-status">
+                                            <thead>
+                                                <tr>
+                                                    <th><span class="f-light f-w-600">Mənzilin adı</span></th>
+                                                    <th><span class="f-light f-w-600">Blokun adı</span></th>
+                                                    <th><span class="f-light f-w-600">Binanın adı</span></th>
+                                                    <th><span class="f-light f-w-600">Evin sahəsi</span></th>
+                                                    <th><span class="f-light f-w-600">Kirayə</span></th>
+                                                    <th><span class="f-light f-w-600">Xidmətlər</span></th>
+                                                    <th><span class="f-light f-w-600">Balans</span></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for flat in flats %}
+                                                <tr class="product-removes">
+                                                    <td>
+                                                        <div class="product-names">
+                                                            <p>{{ flat.name }}</p>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <p class="f-light">{{ flat.section }}</p>
+                                                    </td>
+                                                    <td>
+                                                        <p class="f-light">{{ flat.building }}</p>
+                                                    </td>
+                                                    <td>
+                                                        <p class="f-light">{{ flat.square_metres }}</p>
+                                                    </td>
+                                                    <td>
+                                                        <p class="f-light">{{ flat.rent_status }}</p>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <p class="f-light mb-0 me-2">{{ flat.services_count }}</p>
+                                                            <a href="{% url 'flat-services' flat.id %}" class="me-2 icon-align">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
+                                                                    <path d="M1 12s3-9 11-9 11 9 11 9-3 9-11 9S1 12 1 12z"></path>
+                                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                                </svg>
+                                                            </a>
+                                                            <a href="{% url 'flat-add-services' flat.id %}" class="icon-align">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus">
+                                                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                                                </svg>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <p class="f-light">{{ flat.balance }}</p>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Pagination controls -->
+                                    {% if page_obj.paginator.num_pages > 1 %}
+                                    <div class="pagination">
+                                        <ul class="pagination">
+                                            {% if page_obj.has_previous %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=1" aria-label="First">
+                                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                                </a>
+                                            </li>
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                                    <span aria-hidden="true">&laquo;</span>
+                                                </a>
+                                            </li>
+                                            {% endif %}
+                                            {% for page_num in page_obj.paginator.page_range %}
+                                            <li class="page-item {% if page_obj.number == page_num %}active{% endif %}">
+                                                <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                                            </li>
+                                            {% endfor %}
+                                            {% if page_obj.has_next %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                                    <span aria-hidden="true">&raquo;</span>
+                                                </a>
+                                            </li>
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                                </a>
+                                            </li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Container-fluid Ends-->
+            </div>
+            {% include "footer.html" %}
+            <!-- Footer start-->
+        </div>
+    </div>
+    <!-- Page-wrapper Ends -->
+
+    <!-- JavaScript to handle input formatting -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Combine min and max values into a single field when the form is submitted
+        document.querySelector('form').addEventListener('submit', function() {
+            const minSquareMetres = document.getElementById('min_square_metres').value;
+            const maxSquareMetres = document.getElementById('max_square_metres').value;
+            
+            // Set the values for the form submission
+            document.querySelector('input[name="min_square_metres"]').value = minSquareMetres;
+            document.querySelector('input[name="max_square_metres"]').value = maxSquareMetres;
+        });
+    });
+    </script>
 {% endblock %}

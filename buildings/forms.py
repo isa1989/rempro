@@ -29,6 +29,13 @@ class BuildingForm(forms.ModelForm):
         }
 
 
+class BuildingCreationForm(forms.Form):
+    floor_count = forms.IntegerField(label="Number of Floors", min_value=1)
+    sector_count = forms.IntegerField(label="Number of Sectors", min_value=1)
+    flat_sequence = forms.CharField(label="Flat Sequence", max_length=255)
+    branch = forms.ModelChoiceField(queryset=Branch.objects.all(), label="Branch")
+
+
 class SectionForm(forms.ModelForm):
     class Meta:
         model = Section
@@ -259,7 +266,12 @@ class CommandantForm(UserCreationForm):
 
 class ResidentForm(UserCreationForm):
     flat = forms.CharField(
-        required=False, widget=forms.Select(attrs={"class": "form-control select2"})
+        required=False,
+        widget=forms.Select(
+            attrs={
+                "class": "form-control select2",
+            }
+        ),
     )
 
     class Meta:
@@ -279,15 +291,15 @@ class ResidentForm(UserCreationForm):
                 attrs={"class": "form-control", "placeholder": "Username"}
             ),
             "first_name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "First Name"}
+                attrs={"class": "form-control", "placeholder": "Adı"}
             ),
             "last_name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Last Name"}
+                attrs={"class": "form-control", "placeholder": "Soyadı"}
             ),
             "phone_number": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "Phone Number",
+                    "placeholder": "Mobil nömrəsi",
                     "type": "tel",
                 }
             ),
@@ -307,19 +319,20 @@ class ResidentForm(UserCreationForm):
         self.fields["password1"].widget = forms.PasswordInput(
             attrs={
                 "class": "form-control",
-                "placeholder": "Create a password",
+                "placeholder": "Parol yarat",
                 "autocomplete": "new-password",
             }
         )
         self.fields["password2"].widget = forms.PasswordInput(
             attrs={
                 "class": "form-control",
-                "placeholder": "Confirm your password",
+                "placeholder": "Parolunuzu təsdiq edin",
                 "autocomplete": "new-password",
             }
         )
         for field in self.fields.values():
             field.help_text = None
+            field.label = ""
 
 
 class PaymentForm(forms.ModelForm):
@@ -361,6 +374,13 @@ class PaymentForm(forms.ModelForm):
                 }
             ),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in self.fields.values():
+            field.help_text = None
+            field.label = ""
 
 
 class NewsForm(forms.ModelForm):

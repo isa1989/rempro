@@ -1,0 +1,16 @@
+<!-- myapp/templates/create_building.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Building</title>
+</head>
+<body>
+    <h1>Create Building</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Create Building</button>
+    </form>
+</body>
+</html>
+    

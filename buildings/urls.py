@@ -54,6 +54,7 @@ urlpatterns = [
         views.BuildingCreateView.as_view(),
         name="building-add",
     ),
+    path("create-building/", views.create_building, name="create_building"),
     path(
         "sections/<int:building_id>/",
         views.SectionListView.as_view(),
@@ -120,9 +121,9 @@ urlpatterns = [
         views.CameraDeleteView.as_view(),
         name="camera-delete",
     ),
-    # path(
-    #     "branch/<int:branch_id>/camera/<int:pk>/delete/",
-    #     views.CameraDeleteView.as_view(),
-    #     name="camera-delete",
-    # ),
+    path(
+        "branch/<int:branch_id>/camera/<int:pk>/edit/",
+        views.CameraUpdateView.as_view(),
+        name="camera-edit",
+    ),
 ]
