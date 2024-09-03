@@ -14,22 +14,7 @@
     <!-- page-wrapper Start-->
     <div class="page-wrapper compact-wrapper" id="pageWrapper">
         <!-- Page Header Start-->
-        <div class="page-header">
-            <div class="header-wrapper row m-0">
-                <form class="form-inline search-full col" action="#" method="get">
-                    <div class="form-group w-100">
-                        <div class="Typeahead Typeahead--twitterUsers">
-                            <div class="u-posRelative"> 
-                                <input class="demo-input Typeahead-input form-control-plaintext w-100" type="text" placeholder="Search Riho .." name="q" title="" autofocus="">
-                                <div class="spinner-border Typeahead-spinner" role="status"><span class="sr-only">Loading... </span></div><i class="close-search" data-feather="x"></i>
-                            </div>
-                            <div class="Typeahead-menu"> </div>
-                        </div>
-                    </div>
-                </form>
-                <!-- Additional header content here -->
-            </div>
-        </div>
+        {% include 'header.html' %}
         <!-- Page Header Ends -->
         <!-- Page Body Start -->
         <div class="page-body-wrapper">
@@ -75,12 +60,12 @@
                                                         <form class="row g-2" method="post" action="{% url 'building-add' branch_id=branch_id %}">
                                                             {% csrf_token %}
                                                             <label class="form-label col-12 m-0" for="buildingName">Binanın adı <span class="txt-danger"> *</span></label>
-                                                            <div class="col-12 custom-input">
+                                                            <div class="col-6 custom-input">
                                                                 <input class="form-control" id="buildingName" type="text" name="name" required>
                                                                 <div class="invalid-feedback">Binanın adı yazılmalıdır.</div>
                                                             </div>
                                                             <label class="form-label col-12 m-0" for="buildingAddress">Binanın adresi <span class="txt-danger"> *</span></label>
-                                                            <div class="col-12 custom-input">
+                                                            <div class="col-6 custom-input">
                                                                 <input class="form-control" id="buildingAddress" type="text" name="address" required>
                                                                 <div class="invalid-feedback">Binanın adresi yazılmalıdır.</div>
                                                             </div>

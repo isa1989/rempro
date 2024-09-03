@@ -14,23 +14,7 @@
 <!-- page-wrapper Start-->
 <div class="page-wrapper compact-wrapper" id="pageWrapper">
     <!-- Page Header Start-->
-    <div class="page-header">
-        <div class="header-wrapper row m-0">
-            <form class="form-inline search-full col" action="#" method="get">
-                <div class="form-group w-100">
-                    <div class="Typeahead Typeahead--twitterUsers">
-                        <div class="u-posRelative">
-                            <input class="demo-input Typeahead-input form-control-plaintext w-100" type="text" placeholder="Search Riho .." name="q" title="" autofocus="">
-                            <div class="spinner-border Typeahead-spinner" role="status"><span class="sr-only">Loading... </span></div>
-                            <i class="close-search" data-feather="x"></i>
-                        </div>
-                        <div class="Typeahead-menu"></div>
-                    </div>
-                </div>
-            </form>
-            <!-- Additional header content here -->
-        </div>
-    </div>
+    {% include 'header.html' %}
     <!-- Page Header Ends -->
     <!-- Page Body Start -->
     <div class="page-body-wrapper">
@@ -42,7 +26,7 @@
                 <div class="page-title">
                     <div class="row">
                         <div class="col-6">
-                            <h4>Binanı əlavə et</h4>
+                            <h4>Filial əlavə et</h4>
                         </div>
                         <div class="col-6">
                             <ol class="breadcrumb">
@@ -82,18 +66,17 @@
                                                             <!-- Formset Management Form -->
                                                             {{ cameras_formset.management_form }}
                                                             <fieldset>
-                                                                <legend>Cameras</legend>
                                                                 <div id="cameras-formset">
                                                                     {% for form in cameras_formset %}
                                                                         <div class="camera-form">
                                                                             {{ form.as_p }}
                                                                             {% if form.instance.pk %}
-                                                                                <button type="button" class="remove-form btn btn-danger">Remove</button>
+                                                                                <button type="button" class="remove-form btn btn-danger">Sil</button>
                                                                             {% endif %}
                                                                         </div>
                                                                     {% endfor %}
-                                                                </div>
-                                                                <button type="button" id="add-camera-form" class="btn btn-success">Add Another Camera</button>
+                                                                </div><br>
+                                                                <button type="button" id="add-camera-form" class="btn btn-success">Kamera əlavə et</button>
                                                             </fieldset>
                                                         </div>
                                                         <div class="col-12 mt-3">

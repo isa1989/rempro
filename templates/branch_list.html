@@ -80,7 +80,7 @@
                         <tbody>
                           {% for branch in branches %}
                           <tr class="branch-removes">
-                            <td><p>{{ branch.name }}</p></td>
+                            <td><a href="{% url 'branch-detail' branch.id %}">{{ branch.name }}</a></td>
                             <td><p class="f-light">{{ branch.address }}</p></td>
                             <td><p class="f-light">{{ branch.email }}</p></td>
                             <td><p class="f-light">{{ branch.whatsapp_link }}</p></td>

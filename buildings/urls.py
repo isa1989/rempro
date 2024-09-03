@@ -9,6 +9,8 @@ urlpatterns = [
     path("user/<int:pk>/", views.UserProfileView.as_view(), name="user_profile"),
     # --------------------------- BRANCH -----------------------------
     path("", views.BranchListView.as_view(), name="branches"),
+    path("branch/<int:pk>/", views.BranchDetailView.as_view(), name="branch-detail"),
+    path("branch/<int:pk>/edit/", views.BranchUpdateView.as_view(), name="branch-edit"),
     path("branch/add/", views.BranchCreateView.as_view(), name="branch-add"),
     path(
         "branch/<int:branch_id>/commandants/",

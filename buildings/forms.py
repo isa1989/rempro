@@ -49,7 +49,7 @@ class SectionForm(forms.ModelForm):
     name = forms.CharField(
         max_length=15,
         widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "Enter section name"}
+            attrs={"class": "form-control", "placeholder": "Blokun adını yaz"}
         ),
     )
 
@@ -65,6 +65,8 @@ class SectionForm(forms.ModelForm):
             # Set the initial value for building field
             self.initial["building"] = building_id
             self.fields["building"].widget.attrs.update({"value": building_id})
+            for field in self.fields.values():
+                field.label = ""
 
         # self.fields["owner_document"].required = False
 

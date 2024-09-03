@@ -32563,10 +32563,10 @@ footer .license-list h6 {
   color: var(--theme-deafult);
 }
 .show-hide span.show:before {
-  content: "show";
+  content: "göstər";
 }
 .show-hide span:before {
-  content: "hide";
+  content: "gizlət";
 }
 
 .needs-validation .invalid-feedback {

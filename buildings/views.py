@@ -127,6 +127,35 @@ class BranchListView(LoginRequiredMixin, ListView):
         return context
 
 
+class BranchDetailView(DetailView):
+    model = Branch
+    template_name = "branch_detail.html"
+    context_object_name = "branch"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form"] = BranchForm(instance=self.object)
+        context["is_superuser"] = self.request.user.is_superuser
+        context["user_name"] = self.request.user.username
+        return context
+
+
+class BranchUpdateView(UpdateView):
+    model = Branch
+    form_class = BranchForm
+    template_name = "branch_edit.html"
+    context_object_name = "branch"
+
+    def get_success_url(self):
+        return reverse_lazy("branch-detail", kwargs={"pk": self.object.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["is_superuser"] = self.request.user.is_superuser
+        context["user_name"] = self.request.user.username
+        return context
+
+
 class BranchCreateView(CreateView):
     model = Branch
     form_class = BranchForm
@@ -139,6 +168,8 @@ class BranchCreateView(CreateView):
             CameraForm, extra=1
         )  # Set the initial number of forms
         context["cameras_formset"] = CameraFormSet()
+        context["is_superuser"] = self.request.user.is_superuser
+        context["user_name"] = self.request.user.username
         return context
 
     def post(self, request, *args, **kwargs):
@@ -296,6 +327,8 @@ class BuildingCreateView(LoginRequiredMixin, CreateView):
             {"title": "Binalar", "url": reverse("buildings")},
         ]
         context["branch_id"] = branch_id
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
         return context
 
     def form_valid(self, form):

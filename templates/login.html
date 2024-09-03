@@ -12,18 +12,18 @@
             <div>
               <a class="logo" href="{% url 'branches' %}">
                 <img class="img-fluid for-dark" src="{% static 'images/logo/logo.png' %}" alt="loginpage">
-                <img class="img-fluid for-light" src="{% static 'images/logo/logo_dark.png' %}" alt="loginpage">
+                <img class="img-fluid for-light" src="{% static 'images/logo/logo.png' %}" alt="loginpage">
               </a>
             </div>
             <div class="login-main">
               <form method="post" class="theme-form">
                 {% csrf_token %}
                 <div class="form-group">
-                  <label class="col-form-label">Username</label>
+                  <label class="col-form-label">İstifadəçi adı</label>
                   <input class="form-control" type="text" name="username" required="" placeholder="Username">
                 </div>
                 <div class="form-group">
-                  <label class="col-form-label">Password</label>
+                  <label class="col-form-label">Parol</label>
                   <div class="form-input position-relative">
                     <input class="form-control" type="password" name="password" required="" placeholder="*********">
                     <div class="show-hide"><span class="show"></span></div>

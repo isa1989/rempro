@@ -26,8 +26,10 @@ class Branch(models.Model):
 
 
 class Camera(models.Model):
-    url = models.URLField()
-    description = models.CharField(max_length=255, blank=True, null=True)
+    url = models.URLField(verbose_name="Kamera linki")
+    description = models.CharField(
+        max_length=255, blank=True, null=True, verbose_name="Kamera məzmunu"
+    )
     branch = models.ForeignKey(
         Branch, on_delete=models.CASCADE, related_name="cameras", blank=True, null=True
     )
@@ -150,20 +152,24 @@ class Flat(models.Model):
         User, on_delete=models.SET_NULL, related_name="flats", null=True, blank=True
     )
     building = models.ForeignKey(Building, on_delete=models.CASCADE)
-    section = models.ForeignKey(Section, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
+    section = models.ForeignKey(Section, on_delete=models.CASCADE, verbose_name="blok")
+    name = models.CharField(max_length=255, verbose_name="ad")
     services = models.ManyToManyField(
-        Service, related_name="flats", blank=True, verbose_name="Services"
+        Service, related_name="flats", blank=True, verbose_name="Xidmətlər"
     )
     balance = models.DecimalField(
-        default=0,
-        max_digits=10,
-        decimal_places=2,
+        default=0, max_digits=10, decimal_places=2, verbose_name="balans"
     )
-    square_metres = models.DecimalField(max_digits=8, decimal_places=2)
-    is_rent = models.BooleanField(default=False)
-    tenant_document = models.FileField(upload_to="documents/", blank=True, null=True)
-    owner_document = models.FileField(upload_to="documents/")
+    square_metres = models.DecimalField(
+        max_digits=8, decimal_places=2, verbose_name="Sahəsi"
+    )
+    is_rent = models.BooleanField(default=False, verbose_name="Icarə")
+    tenant_document = models.FileField(
+        upload_to="documents/", blank=True, null=True, verbose_name="Icarəçi sənədi"
+    )
+    owner_document = models.FileField(
+        upload_to="documents/", verbose_name="Sahibkar sənədi"
+    )
 
     class Meta:
         ordering = ["id"]

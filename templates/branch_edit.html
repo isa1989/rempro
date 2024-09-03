@@ -28,7 +28,7 @@
                     <div class="page-title">
                         <div class="row">
                             <div class="col-6">
-                                <h4>Filial Detalları</h4>
+                                <h4>Filialı redaktə et</h4>
                             </div>
                             <div class="col-6">
                                 <ol class="breadcrumb">
@@ -55,18 +55,14 @@
                         <div class="col-12"> 
                             <div class="card"> 
                                 <div class="card-body">
-                                    <div class="branch-details">
-                                        <h2>{{ branch.name }}</h2><br>
-                                        <p><strong>Address:</strong> {{ branch.address }}</p>
-                                        <p><strong>Email:</strong> {{ branch.email }}</p>
-                                        <p><strong>WhatsApp Link:</strong> {{ branch.whatsapp_link }}</p>
-                                        <p><strong>Telegram Link:</strong> {{ branch.telegram }}</p>
-                                        {% comment %} <p><strong>Camera Count:</strong> {{ branch.camera_count }}</p>
-                                        <p><strong>Commandant Count:</strong> {{ branch.commandant_count }}</p>
-                                        <p><strong>Building Count:</strong> {{ branch.building_count }}</p> {% endcomment %}
-                                        <a class="btn btn-secondary btn-custom" href="{% url 'branches' %}">Geri</a>
-                                        <a class="btn btn-primary btn-custom" href="{% url 'branch-edit' branch.id %}">Dəyiş</a>
-                                    </div>
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        {{ form.as_p }}
+                                        <div class="col-12 mt-3">
+                                            <button class="btn btn-primary" type="submit">Saxla</button>
+                                            <a class="btn btn-secondary" href="{% url 'branches' %}">Ləğv et</a>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
