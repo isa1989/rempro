@@ -40,7 +40,7 @@ urlpatterns = [
         name="flat-add",
     ),
     # --------------------------- BUILDINGS -----------------------------
-    path("buildings", views.BuildingListView.as_view(), name="buildings"),
+    path("buildings/", views.BuildingListView.as_view(), name="buildings"),
     path(
         "branch/<int:branch_id>/buildings/",
         views.BuildingListView.as_view(),
@@ -68,7 +68,20 @@ urlpatterns = [
         name="section-add",
     ),
     # ----------------------Services-------------------------------
-    path("services", views.ServicesListView.as_view(), name="services"),
+    path("services/", views.ServicesListView.as_view(), name="services"),
+    path(
+        "service/<int:pk>/detail/",
+        views.ServiceDetailView.as_view(),
+        name="service-detail",
+    ),
+    path(
+        "service/<int:pk>/edit/", views.ServiceEditView.as_view(), name="service-edit"
+    ),
+    path(
+        "service/<int:pk>/delete/",
+        views.ServiceDeleteView.as_view(),
+        name="service_delete",
+    ),
     path("service/add/", views.ServiceCreateView.as_view(), name="service-add"),
     path(
         "flat/<int:flat_id>/services/",
@@ -106,6 +119,7 @@ urlpatterns = [
     path("news", views.NewsListView.as_view(), name="news-list"),
     path("news-create/", views.NewsCreateView.as_view(), name="news-create"),
     path("news/<int:pk>/", views.NewsDetailView.as_view(), name="news-detail"),
+    path("news/<int:pk>/edit/", views.NewsUpdateView.as_view(), name="news-edit"),
     path("news/<int:pk>/delete/", views.NewsDeleteView.as_view(), name="news-delete"),
     # -------------------------- CAMERA -------------------------------
     path(

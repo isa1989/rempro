@@ -28,7 +28,7 @@
             <div class="page-title">
               <div class="row">
                 <div class="col-6">
-                  <h4>Cameras</h4>
+                  <h4>Kameralar</h4>
                 </div>
                 <div class="col-6">
                   <ol class="breadcrumb">
@@ -61,7 +61,7 @@
                       <table class="table" id="camera-status">
                         <thead> 
                           <tr> 
-                            <th><span class="f-light f-w-600">Camera URL</span></th>
+                            <th><span class="f-light f-w-600">Kamera URL</span></th>
                             <th><span class="f-light f-w-600">Filial</span></th>
                             <th><span class="f-light f-w-600">Kameranı sil</span></th>
                           </tr>
@@ -81,7 +81,7 @@
                               <td>
                                 <form action="{% url 'camera-delete' pk=camera.id %}" method="post" style="display:inline;" onsubmit="return confirmDelete();">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    <button type="submit" class="btn btn-danger btn-sm">Sil</button>
                                 </form>
                               </td>
                             </tr>

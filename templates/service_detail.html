@@ -8,26 +8,30 @@
         </div>
     </div>
     <!-- loader ends-->
+
     <!-- tap on top starts-->
     <div class="tap-top"><i data-feather="chevrons-up"></i></div>
     <!-- tap on tap ends-->
+
     <!-- page-wrapper Start-->
     <div class="page-wrapper compact-wrapper" id="pageWrapper">
+
         <!-- Page Header Start-->
         {% include 'header.html' %}
         <!-- Page Header Ends -->
+
         <!-- Page Body Start-->
         <div class="page-body-wrapper">
             {% include 'sidebar.html' %}
             <!-- Page Sidebar Start-->
-           
             <!-- Page Sidebar Ends-->
+
             <div class="page-body">
                 <div class="container-fluid">
                     <div class="page-title">
                         <div class="row">
                             <div class="col-6">
-                                <h4>Xəbər Detalları</h4>
+                                <h4>Xidmətin Detalları</h4>
                             </div>
                             <div class="col-6">
                                 <ol class="breadcrumb">
@@ -47,6 +51,7 @@
                         </div>
                     </div>
                 </div>
+
                 <!-- Container-fluid starts-->
                 <div class="container-fluid">
                     <div class="row"> 
@@ -54,15 +59,16 @@
                             <div class="card"> 
                                 <div class="card-body">
                                     <div class="news-details">
-                                        <h2>{{ object.title }}</h2>
-                                        <p>{{ object.content }}</p>
-                                        <p class="f-light">{{ object.created_at }}</p>
-                                        <a class="btn btn-primary btn-custom" href="{% url 'news-list' %}">Geri</a>
-                                        <a class="btn btn-primary btn-custom" href="{% url 'news-edit' object.id %}">Dəyiş</a>
-                                        <form action="{% url 'news-delete' object.id %}" method="post" style="display:inline;">
+                                        <h2>{{ service.name }}</h2><br>
+                                        <p><strong>Qiymət:</strong> {{ service.price }}</p>
+                                        <p><strong>Ödəniş günü:</strong> {{ service.invoice_day }}</p>
+                                        <p class="f-light">{{ service.created_at }}</p> <!-- Add this if your model has a created_at field -->
+                                        <a class="btn btn-primary btn-custom" href="{% url 'services' %}">Geri</a>
+                                        <a class="btn btn-primary btn-custom" href="{% url 'service-edit' service.pk %}">Dəyiş</a>
+                                       <form action="{% url 'service_delete' service.pk %}" method="post" style="display:inline;">
                                             {% csrf_token %}
                                             <button type="submit" class="btn btn-secondary btn-custom">Sil</button>
-                                        </form>
+                                        </form> 
                                     </div>
                                 </div>
                             </div>
@@ -71,6 +77,7 @@
                 </div>
                 <!-- Container-fluid Ends -->
             </div>
+
             {% include "footer.html" %}
             <!-- footer start -->
         </div>

@@ -109,23 +109,59 @@
                     </li>
                 {% else %}
                 <li class="sidebar-list">
-
-                    <a class="sidebar-link sidebar-title" href="#">
+                    <a class="sidebar-link sidebar-title" href="{% url 'buildings' %}">
                         <svg class="stroke-icon">
                             <use href="{% static 'svg/icon-sprite.svg#stroke-home' %}"></use>
                         </svg>
                         <svg class="fill-icon">
                             <use href="{% static 'svg/icon-sprite.svg#fill-home' %}"></use>
                         </svg>
-                        <span class="lan-3">Filial</span>
+                        <span class="lan-3">Binalar</span>
                     </a>
-                    <ul class="sidebar-submenu">
-                        <li><a href="{% url 'buildings' %}">Binalar</a></li>
-                        <li><a href="{% url 'services' %}">Xidmətlər</a></li>
-                        <li><a href="{% url 'payment-list' %}">Ödənişlər</a></li>
-                        <li><a href="{% url 'all-residents'  %}">Sakinlər</a></li>
-                        <li><a href="{% url 'news-list'  %}">Xəbərlər</a></li>
-                    </ul>
+                </li>
+                <li class="sidebar-list">
+                    <a class="sidebar-link sidebar-title" href="{% url 'services' %}">
+                        <svg class="stroke-icon">
+                            <use href="{% static 'svg/icon-sprite.svg#stroke-home' %}"></use>
+                        </svg>
+                        <svg class="fill-icon">
+                            <use href="{% static 'svg/icon-sprite.svg#fill-home' %}"></use>
+                        </svg>
+                        <span class="lan-3">Xidmətlər</span>
+                    </a>
+                </li>
+                <li class="sidebar-list">
+                    <a class="sidebar-link sidebar-title" href="{% url 'payment-list' %}">
+                        <svg class="stroke-icon">
+                            <use href="{% static 'svg/icon-sprite.svg#stroke-home' %}"></use>
+                        </svg>
+                        <svg class="fill-icon">
+                            <use href="{% static 'svg/icon-sprite.svg#fill-home' %}"></use>
+                        </svg>
+                        <span class="lan-3">Ödənişlər</span>
+                    </a>
+                </li>
+                <li class="sidebar-list">
+                    <a class="sidebar-link sidebar-title" href="{% url 'all-residents' %}">
+                        <svg class="stroke-icon">
+                            <use href="{% static 'svg/icon-sprite.svg#stroke-home' %}"></use>
+                        </svg>
+                        <svg class="fill-icon">
+                            <use href="{% static 'svg/icon-sprite.svg#fill-home' %}"></use>
+                        </svg>
+                        <span class="lan-3">Sakinlər</span>
+                    </a>
+                </li>
+                <li class="sidebar-list">
+                    <a class="sidebar-link sidebar-title" href="{% url 'news-list' %}">
+                        <svg class="stroke-icon">
+                            <use href="{% static 'svg/icon-sprite.svg#stroke-home' %}"></use>
+                        </svg>
+                        <svg class="fill-icon">
+                            <use href="{% static 'svg/icon-sprite.svg#fill-home' %}"></use>
+                        </svg>
+                        <span class="lan-3">Xəbərlər</span>
+                    </a>
                 </li>
                 {% endif %}
             </ul>
@@ -133,3 +169,6 @@
         </div>
     </nav>
 </div>
+<script>document.getElementById('left-arrow').addEventListener('click', function() {
+    document.querySelector('.sidebar-wrapper').classList.toggle('collapsed');
+});</script>

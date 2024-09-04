@@ -122,9 +122,9 @@ class FlatForm(forms.ModelForm):
 
 class ServiceForm(forms.ModelForm):
     invoice_day = forms.IntegerField(
-        label="Invoice Day",
         min_value=1,
         max_value=31,
+        label="Ödəniş günü",
         error_messages={
             "min_value": "Invoice day must be between 1 and 31.",
             "max_value": "Invoice day must be between 1 and 31.",
@@ -136,16 +136,18 @@ class ServiceForm(forms.ModelForm):
         fields = ["name", "price", "invoice_day"]
         widgets = {
             "name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Xidmətin adı"}
-            ),
-            "price": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Xidmətin qiyməti"}
-            ),
-            "invoice_day": forms.DateInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "Select date",
-                    "type": "date",
+                }
+            ),
+            "price": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
+            "invoice_day": forms.TextInput(
+                attrs={
+                    "class": "form-control",
                 }
             ),
         }
@@ -341,7 +343,12 @@ class PaymentForm(forms.ModelForm):
     flat = forms.ModelChoiceField(
         queryset=Flat.objects.all(),  # Customize this queryset as needed
         required=False,
-        widget=forms.Select(attrs={"class": "form-control select2"}),
+        widget=forms.Select(
+            attrs={
+                "class": "form-control select2",
+                "data-placeholder": "Mənzili seç",
+            }
+        ),
         empty_label="Seçin",  # Optional: Placeholder text for the dropdown
     )
 

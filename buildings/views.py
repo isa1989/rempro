@@ -100,6 +100,7 @@ class UserProfileView(DetailView):
             {"title": "Sakinlər", "url": reverse("all-residents")},
         ]
         context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
         return context
 
 
@@ -545,6 +546,42 @@ class ServicesListView(LoginRequiredMixin, ListView):
         return context
 
 
+class ServiceDetailView(LoginRequiredMixin, DetailView):
+    login_url = "/login/"
+    model = Service
+    template_name = "service_detail.html"
+    context_object_name = "service"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse("branches")},
+            {"title": "Xidmətlər", "url": reverse("services")},
+        ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
+        return context
+
+
+class ServiceUpdateView(LoginRequiredMixin, UpdateView):
+    login_url = "/login/"
+    model = Service
+    template_name = "service_form.html"
+    fields = ["field1", "field2", "field3"]  # Specify the fields you want to edit
+    context_object_name = "service"
+    success_url = reverse_lazy("services")  # Redirect after successful update
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse("branches")},
+            {"title": "Xidmətlər", "url": reverse("services")},
+        ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
+        return context
+
+
 class ServiceCreateView(LoginRequiredMixin, CreateView):
     login_url = "/login/"
     model = Service
@@ -558,6 +595,8 @@ class ServiceCreateView(LoginRequiredMixin, CreateView):
             {"title": "Ana səhifə", "url": reverse("branches")},
             {"title": "Xidmətlər", "url": reverse("services")},
         ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
         return context
 
     def form_valid(self, form):
@@ -596,6 +635,9 @@ class FlatServiceListView(LoginRequiredMixin, ListView):
                 "url": reverse("flat-services", kwargs={"flat_id": flat_id}),
             },
         ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
+
         return context
 
 
@@ -623,6 +665,8 @@ class FlatAddServiceListView(LoginRequiredMixin, FormView):
         ]
         flat = get_object_or_404(Flat, id=self.kwargs["flat_id"])
         context["flat"] = flat
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
         return context
 
 
@@ -889,7 +933,6 @@ class LogListView(ListView):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("branches")},
-            {"title": "Logs", "url": reverse("log_list")},
         ]
         context["user_name"] = self.request.user.username
         context["is_superuser"] = self.request.user.is_superuser
@@ -935,6 +978,84 @@ class NewsDetailView(DetailView):
     model = News
     template_name = "news_detail.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse("branches")},
+        ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
+        return context
+
+
+class ServiceEditView(LoginRequiredMixin, UpdateView):
+    login_url = "/login/"
+    model = Service
+    form_class = ServiceForm
+    template_name = "service_edit.html"
+    context_object_name = "service"
+
+    def get_success_url(self):
+        return reverse_lazy("service-detail", kwargs={"pk": self.object.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse_lazy("branches")},
+            {"title": "Xidmətlər", "url": reverse_lazy("services")},
+        ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
+        return context
+
+
+class ServiceDeleteView(LoginRequiredMixin, DeleteView):
+    login_url = "/login/"
+    model = Service
+    template_name = "service_confirm_delete.html"
+    context_object_name = "service"
+    success_url = reverse_lazy("services")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse_lazy("branches")},
+            {"title": "Xidmətlər", "url": reverse_lazy("services")},
+        ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
+        return context
+
+    def form_valid(self, form):
+        object = self.get_object()
+        response = super().form_valid(form)
+        Log.objects.create(
+            action="DELETE",
+            model_name="Service",
+            object_id=object.id,
+            user=self.request.user,
+            details=f"Xidmət silindi: {self.object.name}",
+            timestamp=timezone.now(),
+        )
+        return response
+
+
+class NewsUpdateView(UpdateView):
+    model = News
+    form_class = NewsForm
+    template_name = "edit_news.html"
+    success_url = reverse_lazy("news-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse("branches")},
+            {"title": "Xəbərlər", "url": reverse("news-list")},
+        ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
+        return context
+
 
 class NewsDeleteView(DeleteView):
     model = News
@@ -955,6 +1076,15 @@ class NewsDeleteView(DeleteView):
             timestamp=timezone.now(),
         )
         return response
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse("branches")},
+        ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
+        return context
 
 
 class CameraListView(ListView):

@@ -45,19 +45,16 @@ class Camera(models.Model):
 class Service(models.Model):
     name = models.CharField(
         max_length=255,
-        verbose_name="Service Name",
-        help_text="Enter the name of the service",
+        verbose_name="Xidmətin adı",
     )
     price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         default=0.00,
-        verbose_name="Price",
-        help_text="Enter the price of the service",
+        verbose_name="Qiymət",
     )
     invoice_day = models.IntegerField(
-        verbose_name="Invoice Day",
-        help_text="Enter the day of the month when the invoice is issued",
+        verbose_name="Ödəniş günü",
         validators=[validate_day],
     )
 

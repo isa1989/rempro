@@ -74,7 +74,9 @@
                         <tr class="product-removes">
                             <td> 
                               <div class="product-names">
-                                <p>{{ service.name }}</p>
+                                <a href="{% url 'service-detail' service.pk %}" class="text-decoration-none">
+                                  <p>{{ service.name }}</p>
+                              </a>
                               </div>
                            </td>
                            <td> 

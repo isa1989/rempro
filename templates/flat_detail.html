@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Flat Details</h2>
+    <p>Name: {{ flat.name }}</p>
+    <p>Building: {{ flat.building }}</p>
+    <p>Section: {{ flat.section }}</p>
+    <p>Square Metres: {{ flat.square_metres }}</p>
+    <p>Is Rent: {{ flat.is_rent }}</p>
+    <p>Services Count: {{ flat.services.count }}</p>
+
+    <!-- List the services associated with the flat -->
+    <h3>Services</h3>
+    <ul>
+        {% for service in flat.services.all %}
+            <li>{{ service.name }} - {{ service.price }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

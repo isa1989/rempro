@@ -1,45 +1,45 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <!-- loader starts-->
+    <!-- Loader Starts -->
     <div class="loader-wrapper">
         <div class="loader"> 
             <div class="loader4"></div>
         </div>
     </div>
-    <!-- loader ends-->
-    <!-- tap on top starts-->
+    <!-- Loader Ends -->
+
+    <!-- Tap on Top Starts -->
     <div class="tap-top"><i data-feather="chevrons-up"></i></div>
-    <!-- tap on tap ends-->
-    <!-- page-wrapper Start-->
+    <!-- Tap on Top Ends -->
+
+    <!-- Page Wrapper Start -->
     <div class="page-wrapper compact-wrapper" id="pageWrapper">
-        <!-- Page Header Start-->
+        <!-- Page Header Start -->
         {% include 'header.html' %}
         <!-- Page Header Ends -->
-        <!-- Page Body Start-->
+
+        <!-- Page Body Start -->
         <div class="page-body-wrapper">
             {% include 'sidebar.html' %}
-            <!-- Page Sidebar Start-->
-           
-            <!-- Page Sidebar Ends-->
+
+            <!-- Page Body Content Start -->
             <div class="page-body">
                 <div class="container-fluid">
                     <div class="page-title">
                         <div class="row">
                             <div class="col-6">
-                                <h4>Xəbər Detalları</h4>
+                                <h4>Edit News Item</h4>
                             </div>
                             <div class="col-6">
                                 <ol class="breadcrumb">
                                     {% for crumb in breadcrumbs %}
                                         <li class="breadcrumb-item">
-                                            <a href="{{ crumb.url }}">
-                                                {% if crumb.url %}
-                                                    {{ crumb.title }}
-                                                {% else %}
-                                                    <span>{{ crumb.title }}</span>
-                                                {% endif %}
-                                            </a>
+                                            {% if crumb.url %}
+                                                <a href="{{ crumb.url }}">{{ crumb.title }}</a>
+                                            {% else %}
+                                                <span>{{ crumb.title }}</span>
+                                            {% endif %}
                                         </li>
                                     {% endfor %}
                                 </ol>
@@ -47,21 +47,19 @@
                         </div>
                     </div>
                 </div>
-                <!-- Container-fluid starts-->
+
+                <!-- Container-fluid Starts -->
                 <div class="container-fluid">
                     <div class="row"> 
                         <div class="col-12"> 
                             <div class="card"> 
                                 <div class="card-body">
-                                    <div class="news-details">
-                                        <h2>{{ object.title }}</h2>
-                                        <p>{{ object.content }}</p>
-                                        <p class="f-light">{{ object.created_at }}</p>
-                                        <a class="btn btn-primary btn-custom" href="{% url 'news-list' %}">Geri</a>
-                                        <a class="btn btn-primary btn-custom" href="{% url 'news-edit' object.id %}">Dəyiş</a>
-                                        <form action="{% url 'news-delete' object.id %}" method="post" style="display:inline;">
+                                    <div class="news-form">
+                                        <form method="post">
                                             {% csrf_token %}
-                                            <button type="submit" class="btn btn-secondary btn-custom">Sil</button>
+                                            {{ form.as_p }}
+                                            <button type="submit" class="btn btn-primary">Saxla</button>
+                                            <a class="btn btn-secondary" href="{% url 'news-list' %}">Ləğv et</a>
                                         </form>
                                     </div>
                                 </div>
@@ -71,8 +69,10 @@
                 </div>
                 <!-- Container-fluid Ends -->
             </div>
-            {% include "footer.html" %}
-            <!-- footer start -->
+            <!-- Page Body Content Ends -->
+
+            {% include 'footer.html' %}
+            <!-- Footer Start -->
         </div>
     </div>
 {% endblock %}
