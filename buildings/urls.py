@@ -111,6 +111,11 @@ urlpatterns = [
         views.ResidentCreateView.as_view(),
         name="resident-add",
     ),
+    path(
+        "building/<int:building_id>/resident/<int:pk>/delete/",
+        views.ResidentDeleteView.as_view(),
+        name="resident-delete",
+    ),
     # -------------------------- RESIDENTS -------------------------------
     path("flat-autocomplete/", views.flat_autocomplete, name="flat-autocomplete"),
     # -------------------------- LOGS -------------------------------

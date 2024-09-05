@@ -310,12 +310,6 @@ class BuildingListView(LoginRequiredMixin, ListView):
         return context
 
 
-# class BranchDetailView(DetailView):
-#     model = Branch
-#     template_name = "branch_detail.html"
-#     context_object_name = "branch"
-
-
 class BuildingCreateView(LoginRequiredMixin, CreateView):
     login_url = "/login/"
     model = Building
@@ -936,6 +930,39 @@ class ResidentCreateView(CreateView):
         return reverse_lazy("resident-list", kwargs={"building_id": building_id})
 
 
+class ResidentDeleteView(DeleteView):
+    model = User
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)  # Perform delete on GET request
+
+    def post(self, request, *args, **kwargs):
+        object = self.get_object()
+        response = super().post(request, *args, **kwargs)
+        Log.objects.create(
+            action="DELETE",
+            model_name="User",
+            object_id=object.id,
+            user=self.request.user,
+            details=f"Sakin silindi: {self.object.username}",
+            timestamp=timezone.now(),
+        )
+        return response
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse_lazy("branches")},
+        ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
+        return context
+
+    def get_success_url(self):
+        building_id = self.kwargs["building_id"]
+        return reverse_lazy("resident-list", kwargs={"building_id": building_id})
+
+
 class LogListView(ListView):
     model = Log
     template_name = "log_list.html"
@@ -1026,7 +1053,6 @@ class ServiceEditView(LoginRequiredMixin, UpdateView):
 class ServiceDeleteView(LoginRequiredMixin, DeleteView):
     login_url = "/login/"
     model = Service
-    template_name = "service_confirm_delete.html"
     context_object_name = "service"
     success_url = reverse_lazy("services")
 
