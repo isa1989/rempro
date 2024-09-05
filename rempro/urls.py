@@ -16,10 +16,12 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
 from django.conf import settings
+from django.http import HttpResponseNotFound
+from django.template.loader import render_to_string
 
 
 urlpatterns = [
@@ -32,8 +34,12 @@ urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 # Serving static files during development
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-# Internationalization patterns for i18n URLs
-# urlpatterns += i18n_patterns(
-#     path("api/", include("api.urls")),  # Adjust to your app's specific URLs
-#     # Add other internationalized paths as needed
-# )
+if settings.DEBUG:
+    urlpatterns += [
+        re_path(
+            r"^.*$",
+            lambda request: HttpResponseNotFound(
+                render_to_string("error-404.html", {})
+            ),
+        ),
+    ]
