@@ -22,6 +22,7 @@ from django.conf.urls.i18n import i18n_patterns
 from django.conf import settings
 from django.http import HttpResponseNotFound
 from django.template.loader import render_to_string
+from buildings.views import custom_404_view
 
 
 urlpatterns = [
@@ -36,10 +37,5 @@ urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
     urlpatterns += [
-        re_path(
-            r"^.*$",
-            lambda request: HttpResponseNotFound(
-                render_to_string("error-404.html", {})
-            ),
-        ),
+        re_path(r"^.*$", custom_404_view),
     ]

@@ -2,6 +2,8 @@ import re
 from django.http import JsonResponse, HttpResponseForbidden, HttpResponseNotAllowed
 from django.db.models import Sum
 from django.utils import timezone
+from django.http import HttpResponseNotFound
+from django.template.loader import render_to_string
 from django.forms import formset_factory
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
@@ -1244,3 +1246,12 @@ def create_building(request):
         form = BuildingCreationForm()
 
     return render(request, "create_building.html", {"form": form})
+
+
+def custom_404_view(request, exception=None):
+    context = {
+        "user_name": request.user.username,
+        "is_superuser": request.user.is_superuser,
+    }
+    content = render_to_string("error-404.html", context)
+    return HttpResponseNotFound(content)
