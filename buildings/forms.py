@@ -292,7 +292,7 @@ class ResidentForm(UserCreationForm):
         ]
         widgets = {
             "username": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Username"}
+                attrs={"class": "form-control", "placeholder": "İstifadəçi"}
             ),
             "first_name": forms.TextInput(
                 attrs={"class": "form-control", "placeholder": "Adı"}

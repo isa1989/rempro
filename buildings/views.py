@@ -892,10 +892,22 @@ class ResidentCreateView(CreateView):
     def form_valid(self, form):
         building_id = self.kwargs.get("building_id")
         building = get_object_or_404(Building, id=building_id)
-        form.instance.resident = True
-        form.instance.branch = building.branch
-        form.instance.building = building
+
+        # Save the form instance to get a valid ID
         response = super().form_valid(form)
+
+        # Set the branch and building for the user
+        user = self.object  # The saved instance
+        user.building = building
+
+        # Set the many-to-many relationship correctly
+        user.branch.set(
+            [building.branch.id]
+        )  # Use a list to set the many-to-many relationship
+
+        # Save the user instance with updated fields
+        user.resident = True
+        user.save()
 
         flat = form.cleaned_data.get("flat")
         try:
