@@ -886,23 +886,12 @@ class ResidentCreateView(CreateView):
     def form_valid(self, form):
         building_id = self.kwargs.get("building_id")
         building = get_object_or_404(Building, id=building_id)
-
-        # Save the form instance to get a valid ID
         response = super().form_valid(form)
-
-        # Set the branch and building for the user
         user = self.object  # The saved instance
         user.building = building
-
-        # Set the many-to-many relationship correctly
-        user.branch.set(
-            [building.branch.id]
-        )  # Use a list to set the many-to-many relationship
-
-        # Save the user instance with updated fields
+        user.branch.set([building.branch.id])
         user.resident = True
         user.save()
-
         flat = form.cleaned_data.get("flat")
         try:
             flat = Flat.objects.get(id=flat)  # Adjust if your field is different
@@ -944,7 +933,7 @@ class ResidentDeleteView(DeleteView):
             model_name="User",
             object_id=object.id,
             user=self.request.user,
-            details=f"Sakin silindi: {self.object.username}",
+            details=f"Sakin silindi: {self.object.title}",
             timestamp=timezone.now(),
         )
         return response
@@ -952,14 +941,14 @@ class ResidentDeleteView(DeleteView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
-            {"title": "Ana səhifə", "url": reverse_lazy("branches")},
+            {"title": "Ana səhifə", "url": reverse("branches")},
         ]
         context["user_name"] = self.request.user.username
         context["is_superuser"] = self.request.user.is_superuser
         return context
 
     def get_success_url(self):
-        building_id = self.kwargs["building_id"]
+        building_id = self.kwargs.get("building_id")
         return reverse_lazy("resident-list", kwargs={"building_id": building_id})
 
 

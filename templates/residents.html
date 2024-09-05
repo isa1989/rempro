@@ -101,10 +101,10 @@
                                                         <!-- Action Buttons -->
                                                         <a href="{% url 'user_profile' resident.id %}" class="btn btn-info btn-sm">Bax</a>
                                                         {% comment %} <a href="{% url 'resident-edit' resident.id %}" class="btn btn-warning btn-sm">Edit</a> {% endcomment %}
-                                                        <form action="{% url 'resident-delete' pk=resident.id building_id=building.id %}" method="post" style="display:inline;" onsubmit="return confirmDelete();">
+                                                        {% comment %} <form action="{% url 'resident-delete' pk=resident.id building_id=building.id %}" method="post" style="display:inline;" onsubmit="return confirmDelete();">
                                                             {% csrf_token %}
                                                             <button type="submit" class="btn btn-danger btn-sm">Sil</button>
-                                                        </form>
+                                                        </form> {% endcomment %}
                                                     </td>
                                                 </tr>
                                             {% empty %}
