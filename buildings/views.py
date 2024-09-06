@@ -935,37 +935,34 @@ class ResidentCreateView(CreateView):
         return reverse_lazy("resident-list", kwargs={"building_id": building_id})
 
 
-class ResidentDeleteView(DeleteView):
+class ResidentDeleteView(LoginRequiredMixin, DeleteView):
+    login_url = "/login/"
     model = User
-
-    def get(self, request, *args, **kwargs):
-        return self.post(request, *args, **kwargs)  # Perform delete on GET request
-
-    def post(self, request, *args, **kwargs):
-        object = self.get_object()
-        response = super().post(request, *args, **kwargs)
-        Log.objects.create(
-            action="DELETE",
-            model_name="User",
-            object_id=object.id,
-            user=self.request.user,
-            details=f"Sakin silindi: {self.object.title}",
-            timestamp=timezone.now(),
-        )
-        return response
+    context_object_name = "resident"
+    success_url = reverse_lazy("all-residents")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
-            {"title": "Ana səhifə", "url": reverse("branches")},
+            {"title": "Ana səhifə", "url": reverse_lazy("branches")},
+            {"title": "Xidmətlər", "url": reverse_lazy("all-residents")},
         ]
         context["user_name"] = self.request.user.username
         context["is_superuser"] = self.request.user.is_superuser
         return context
 
-    def get_success_url(self):
-        building_id = self.kwargs.get("building_id")
-        return reverse_lazy("resident-list", kwargs={"building_id": building_id})
+    def form_valid(self, form):
+        object = self.get_object()
+        response = super().form_valid(form)
+        Log.objects.create(
+            action="DELETE",
+            model_name="User",
+            object_id=object.id,
+            user=self.request.user,
+            details=f"Sakin silindi: {self.object.username}",
+            timestamp=timezone.now(),
+        )
+        return response
 
 
 class LogListView(ListView):

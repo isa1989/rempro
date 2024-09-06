@@ -78,7 +78,7 @@
                                             <tr> 
                                                 <th> <span class="f-light f-w-600">Sakinin adı</span></th>
                                                 <th> <span class="f-light f-w-600">Telefon nömrəsi</span></th>
-                                                <th> <span class="f-light f-w-600">Actions</span></th>
+                                                <th> <span class="f-light f-w-600">Sil</span></th>
                                             </tr>
                                         </thead>
                                         <tbody> 
@@ -98,12 +98,12 @@
                                                     </td>
                                                     <td>
                                                         <!-- Action Buttons -->
-                                                        <a href="{% url 'user_profile' resident.id %}" class="btn btn-info btn-sm">Bax</a>
+                                                        {% comment %} <a href="{% url 'user_profile' resident.id %}" class="btn btn-info btn-sm">Bax</a> {% endcomment %}
                                                         {% comment %} <a href="{% url 'resident-edit' resident.id %}" class="btn btn-warning btn-sm">Edit</a> {% endcomment %}
-                                                        {% comment %} <form action="{% url 'resident-delete' pk=resident.id building_id=building.id %}" method="post" style="display:inline;" onsubmit="return confirmDelete();">
+                                                       <form action="{% url 'resident-delete' pk=resident.id %}" method="post" style="display:inline;" onsubmit="return confirmDelete();">
                                                             {% csrf_token %}
                                                             <button type="submit" class="btn btn-danger btn-sm">Sil</button>
-                                                        </form> {% endcomment %}
+                                                        </form> 
                                                     </td>
                                                 </tr>
                                             {% empty %}

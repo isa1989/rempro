@@ -112,7 +112,7 @@ urlpatterns = [
         name="resident-add",
     ),
     path(
-        "building/<int:building_id>/resident/<int:pk>/delete/",
+        "resident/<int:pk>/delete/",
         views.ResidentDeleteView.as_view(),
         name="resident-delete",
     ),
