@@ -855,19 +855,25 @@ class PaymentChartView(ListView):
 
 
 class ResidentListView(ListView):
+    login_url = "/login/"
     model = User
     template_name = "residents.html"
     context_object_name = "residents"
 
     def get_queryset(self):
+        print(self.request.user, "ssssssssssssssssssssss")
         building_id = self.kwargs.get("building_id")
         branch_id = self.kwargs.get("branch_id")
-
+        if branch_id:
+            queryset = queryset.filter(branch__id=branch_id)
         if building_id:
             queryset = User.objects.filter(building_id=building_id, resident=True)
         else:
             queryset = User.objects.filter(resident=True)
-
+        if self.request.user.branch.exists():
+            queryset = queryset.filter(branch__in=self.request.user.branch.all())
+        else:
+            queryset = queryset.none()
         return queryset
 
     def get_context_data(self, **kwargs):

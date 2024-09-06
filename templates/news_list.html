@@ -74,7 +74,7 @@
                                                         <a href="{% url 'news-detail' news.id %}">{{ news.title }}</a>
                                                     </td>
                                                     <td> 
-                                                        <p class="f-light">{{ news.content|slice:":100" }}...</p> <!-- Truncate content for brevity -->
+                                                        <p class="f-light">{{ news.content|slice:":100" }}</p> <!-- Truncate content for brevity -->
                                                     </td>
                                                     <td>
                                                         <p class="f-light">{{ news.created_at }}</p>
