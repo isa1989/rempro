@@ -147,4 +147,6 @@ urlpatterns = [
         views.CameraUpdateView.as_view(),
         name="camera-edit",
     ),
+    # -------------------------- WEATHER -------------------------------
+    path("weather/", views.get_weather, name="get_weather"),
 ]
