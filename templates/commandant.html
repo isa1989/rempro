@@ -1,6 +1,6 @@
 {% load static %}
 {% include 'base.html' %}
-{% block content %} starts-->
+{% block content %}
     <div class="loader-wrapper">
       <div class="loader"> 
         <div class="loader4"></div>
@@ -80,7 +80,7 @@
                           <td>
                               <form action="{% url 'commandant-delete' branch_id=branch.id pk=commandant.id %}" method="post" style="display:inline;" onsubmit="return confirmDelete();">
                                   {% csrf_token %}
-                                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                  <button type="submit" class="btn btn-danger btn-sm">Sil</button>
                               </form>
                           </td>
                       </tr>
