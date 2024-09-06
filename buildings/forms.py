@@ -349,7 +349,8 @@ class PaymentForm(forms.ModelForm):
                 "data-placeholder": "Mənzili seç",
             }
         ),
-        empty_label="Seçin",  # Optional: Placeholder text for the dropdown
+        empty_label="Seçin",
+        label="Mənzil",
     )
 
     class Meta:
@@ -389,7 +390,7 @@ class PaymentForm(forms.ModelForm):
 
         for field in self.fields.values():
             field.help_text = None
-            field.label = ""
+            # field.label = ""
 
 
 class NewsForm(forms.ModelForm):

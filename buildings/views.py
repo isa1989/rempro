@@ -99,6 +99,7 @@ class UserProfileView(DetailView):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("branches")},
+            {"title": "Binalar", "url": reverse("buildings")},
             {"title": "Sakinlər", "url": reverse("all-residents")},
         ]
         context["user_name"] = self.request.user.username
@@ -154,6 +155,9 @@ class BranchUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse("branches")},
+        ]
         context["is_superuser"] = self.request.user.is_superuser
         context["user_name"] = self.request.user.username
         return context
@@ -167,9 +171,10 @@ class BranchCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        CameraFormSet = formset_factory(
-            CameraForm, extra=1
-        )  # Set the initial number of forms
+        CameraFormSet = formset_factory(CameraForm, extra=1)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse("branches")},
+        ]
         context["cameras_formset"] = CameraFormSet()
         context["is_superuser"] = self.request.user.is_superuser
         context["user_name"] = self.request.user.username
@@ -213,6 +218,7 @@ class CommandantListView(LoginRequiredMixin, ListView):
         context["branch"] = Branch.objects.get(id=branch_id)
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("branches")},
+            {"title": "Binalar", "url": reverse("buildings")},
         ]
         context["is_superuser"] = self.request.user.is_superuser
         context["user_name"] = self.request.user.username
@@ -367,6 +373,7 @@ class SectionListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("branches")},
+            {"title": "Binalar", "url": reverse("buildings")},
         ]
         context["user_name"] = self.request.user.username
         context["is_superuser"] = self.request.user.is_superuser
@@ -463,7 +470,7 @@ class FlatListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("branches")},
-            # {"title": "Binalar", "url": reverse("buildings")},
+            {"title": "Binalar", "url": reverse("buildings")},
         ]
         building_id = self.kwargs["building_id"]
         building = get_object_or_404(Building, id=building_id)
@@ -493,7 +500,7 @@ class FlatCreateView(LoginRequiredMixin, CreateView):
         context["building"] = building
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("branches")},
-            # {"title": "Binalar", "url": reverse("buildings")},
+            {"title": "Binalar", "url": reverse("buildings")},
         ]
         context["user_name"] = self.request.user.username
         context["is_superuser"] = self.request.user.is_superuser
@@ -743,6 +750,9 @@ class PaymentListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse("branches")},
+        ]
         context["user_name"] = self.request.user.username
         context["is_superuser"] = self.request.user.is_superuser
         return context
@@ -756,6 +766,10 @@ class PaymentCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse("branches")},
+            {"title": "Ödənişlər", "url": reverse("payment-list")},
+        ]
         context["buildings"] = Building.objects.all()
         context["user_name"] = self.request.user.username
         context["is_superuser"] = self.request.user.is_superuser
@@ -866,6 +880,7 @@ class ResidentListView(ListView):
 
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("branches")},
+            {"title": "Binalar", "url": reverse("buildings")},
         ]
         context["is_superuser"] = self.request.user.is_superuser
         context["user_name"] = self.request.user.username
@@ -908,6 +923,7 @@ class ResidentCreateView(CreateView):
         context["building"] = get_object_or_404(Building, id=self.kwargs["building_id"])
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("buildings")},
+            {"title": "Binalar", "url": reverse("buildings")},
         ]
         context["user_name"] = self.request.user.username
         context["is_superuser"] = self.request.user.is_superuser
@@ -990,6 +1006,16 @@ class NewsCreateView(CreateView):
     form_class = NewsForm
     template_name = "news_form.html"
     success_url = reverse_lazy("news-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse("branches")},
+            {"title": "Xəbərlər", "url": reverse("news-list")},
+        ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
+        return context
 
     def form_valid(self, form):
         response = super().form_valid(form)
