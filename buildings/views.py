@@ -60,7 +60,10 @@ def flat_autocomplete(request):
 
 
 class DashboardView(View):
+    template_name = "dashboard.html"
+
     def get(self, request, *args, **kwargs):
+        # Collect data for the dashboard
         context = {
             "page_title": "Dashboard",
             "breadcrumbs": [
@@ -72,17 +75,10 @@ class DashboardView(View):
             "flat_count": Flat.objects.count(),
             "resident_count": User.objects.filter(resident=True).count(),
             "payment_count": Payment.objects.count(),
+            "user_name": request.user.username,
+            "is_superuser": request.user.is_superuser,
         }
-        return render(request, "dashboard.html", context)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [
-            {"title": "Ana səhifə", "url": reverse("buildings")},
-        ]
-        context["user_name"] = self.request.user.username
-        context["is_superuser"] = self.request.user.is_superuser
-        return context
+        return render(request, self.template_name, context)
 
 
 class LoginView(BaseLoginView):
