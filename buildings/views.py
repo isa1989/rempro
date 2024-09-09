@@ -10,11 +10,12 @@ from django.urls import reverse
 from django.contrib import messages
 from django.db.models import Count, Q
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, DeleteView, UpdateView
+from django.views.generic import ListView, DeleteView, UpdateView, View
 from django.views.generic.edit import FormView
 from django.contrib.auth.views import LoginView as BaseLoginView, LogoutView
 from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
+from .utils import get_weather_data
 from django.views.generic.edit import CreateView
 from .models import (
     Building,
@@ -56,6 +57,23 @@ def flat_autocomplete(request):
     )
     results = [{"id": flat.id, "text": flat.name} for flat in flats]
     return JsonResponse({"results": results})
+
+
+class DashboardView(View):
+    def get(self, request, *args, **kwargs):
+        context = {
+            "page_title": "Dashboard",
+            "breadcrumbs": [
+                {"title": "Ana səhifə", "url": reverse("dashboard")},
+            ],
+            "branch_count": Branch.objects.count(),
+            "building_count": Building.objects.count(),
+            "section_count": Section.objects.count(),
+            "flat_count": Flat.objects.count(),
+            "resident_count": User.objects.filter(resident=True).count(),
+            "payment_count": Payment.objects.count(),
+        }
+        return render(request, "dashboard.html", context)
 
 
 class LoginView(BaseLoginView):
@@ -196,6 +214,7 @@ class BranchCreateView(CreateView):
                         description=camera_form.cleaned_data.get("description"),
                         branch=branch,
                     )
+            messages.success(request, f"{branch} yaradıldı!")
             return redirect(self.success_url)
         return self.render_to_response(
             self.get_context_data(form=form, cameras_formset=formset)
@@ -267,6 +286,9 @@ class CommandantCreateView(LoginRequiredMixin, CreateView):
         self.object.is_staff = True
         self.object.commandant = True
         self.object.save()  # Save the changes to the instance
+        messages.success(
+            self.request, f"{self.object.username} adlı komendant yaradıldı!"
+        )
         return response
 
     def get_success_url(self):
@@ -278,6 +300,13 @@ class CommandantCreateView(LoginRequiredMixin, CreateView):
 class ComendantDeleteView(LoginRequiredMixin, DeleteView):
     login_url = "/login/"
     model = User
+
+    def post(self, request, *args, **kwargs):
+        response = super().delete(request, *args, **kwargs)
+        messages.success(
+            self.request, f"{self.object.username} adlı komendant silindi!"
+        )
+        return response
 
     def get_success_url(self):
         branch_id = self.kwargs.get("branch_id")
@@ -351,6 +380,7 @@ class BuildingCreateView(LoginRequiredMixin, CreateView):
             details=f"Bina yaradıldı: {self.object.name}",
             timestamp=timezone.now(),
         )
+        messages.success(self.request, f"{self.object.name} adlı bina yaradıldı!")
 
         return response
 
@@ -418,6 +448,7 @@ class SectionsCreateView(LoginRequiredMixin, CreateView):
             details=f"Blok yaradıldı: {self.object.name}",
             timestamp=timezone.now(),
         )
+        messages.success(self.request, f"{self.object.name} bloku yaradıldı!")
         return response
 
     def get_success_url(self):
@@ -519,6 +550,7 @@ class FlatCreateView(LoginRequiredMixin, CreateView):
             details=f"Mənzil yaradıldı: {self.object.name}",
             timestamp=timezone.now(),
         )
+        messages.success(self.request, f"{self.object.name} mənzili yaradıldı!")
         return response
 
     def get_success_url(self):
@@ -612,6 +644,7 @@ class ServiceCreateView(LoginRequiredMixin, CreateView):
             details=f"Xidmət yaradıldı: {self.object.name}",
             timestamp=timezone.now(),
         )
+        messages.success(self.request, f"{self.object.name} yaradıldı!")
         return response
 
 
@@ -788,6 +821,9 @@ class PaymentCreateView(CreateView):
     def form_valid(self, form):
         # Set the user to the current user before saving the form
         form.instance.user = self.request.user
+        messages.success(
+            self.request, f"{form.instance.flat} mənzili üçün ödəniş yaradıldı!"
+        )
         return super().form_valid(form)
 
 
@@ -921,7 +957,7 @@ class ResidentCreateView(CreateView):
         except Flat.DoesNotExist:
             messages.error(self.request, f"Flat with name {flat} does not exist.")
             return redirect(self.get_success_url())
-
+        messages.success(self.request, f"{user.username} adlı sakin əlavə edildi!")
         return response
 
     def get_context_data(self, **kwargs):
@@ -967,6 +1003,9 @@ class ResidentDeleteView(LoginRequiredMixin, DeleteView):
             user=self.request.user,
             details=f"Sakin silindi: {self.object.username}",
             timestamp=timezone.now(),
+        )
+        messages.success(
+            self.request, f"{self.object.username} adlı sakin əlavə silindi!"
         )
         return response
 
@@ -1030,6 +1069,7 @@ class NewsCreateView(CreateView):
             details=f"Xəbər əlavə edildi: {self.object.title}",
             timestamp=timezone.now(),
         )
+        messages.success(self.request, f"{self.object.title} yaradıldı!")
         return response
 
 
@@ -1314,14 +1354,15 @@ def custom_404_view(request, exception=None):
 
 
 def get_weather(request):
-    from .utils import get_weather_data
-
     city_id = "587084"  # Default city ID for Baku
 
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         # Handle AJAX request
         try:
             weather_data = get_weather_data(city_id)
+            # Strip decimal part from temperature
+            if "temperature" in weather_data:
+                weather_data["temperature"] = int(weather_data["temperature"])
             return JsonResponse(weather_data)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
@@ -1329,8 +1370,11 @@ def get_weather(request):
     # Handle regular page request
     try:
         weather_data = get_weather_data(city_id)
+        # Strip decimal part from temperature
+        if "temperature" in weather_data:
+            weather_data["temperature"] = int(weather_data["temperature"])
         context = {"city": city_id, "weather": weather_data}
-    except:
-        context = {"city": city_id}
+    except Exception as e:
+        context = {"city": city_id, "error": str(e)}
 
     return render(request, "cms/weather/weather_data.html", context)

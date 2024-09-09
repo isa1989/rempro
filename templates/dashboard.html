@@ -1,0 +1,151 @@
+{% load static %}
+{% include 'base.html' %}
+{% block content %}
+    <!-- Loader -->
+    <div class="loader-wrapper">
+        <div class="loader">
+            <div class="loader4"></div>
+        </div>
+    </div>
+    <!-- Loader Ends -->
+
+    <!-- Tap on Top -->
+    <div class="tap-top" style="display: none;"><i data-feather="chevrons-up"></i></div>
+    <!-- Tap on Top Ends -->
+
+    <!-- Page Wrapper -->
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+        <!-- Page Header -->
+        {% include 'header.html' %}
+        <!-- Page Header Ends -->
+
+        <!-- Page Body -->
+        <div class="page-body-wrapper">
+            {% include 'sidebar.html' %}
+            <div class="page-body">
+                <div class="container-fluid">
+                    <div class="page-title">
+                        <div class="row">
+                            <div class="col-6">
+                                <h4>{{ page_title }}</h4>
+                            </div>
+                            <div class="col-6">
+                                <ol class="breadcrumb">
+                                    {% for crumb in breadcrumbs %}
+                                        <li class="breadcrumb-item">
+                                            <a href="{{ crumb.url }}">
+                                                {% if crumb.url %}
+                                                    {{ crumb.title }}
+                                                {% else %}
+                                                    <span>{{ crumb.title }}</span>
+                                                {% endif %}
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Container-fluid starts -->
+                <div class="container-fluid">
+                    <div class="row">
+                        <!-- Card for Branches -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <img src="{% static 'dashboard/branch.png' %}" alt="Branch Icon" width="24"> Filiallar
+                                    </h5>
+                                    <p class="card-text">{{ branch_count }} </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card for Buildings -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <img src="{% static 'dashboard/buildings.png' %}" alt="Buildings Icon" width="24"> Binalar
+                                    </h5>
+                                    <p class="card-text">{{ building_count }} </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card for Blocks -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <img src="{% static 'dashboard/sector.png' %}" alt="Blocks Icon" width="24"> Bloklar
+                                    </h5>
+                                    <p class="card-text">{{ section_count }} </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card for Flats -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <img src="{% static 'dashboard/flat.png' %}" alt="Flats Icon" width="24"> Mənzillər
+                                    </h5>
+                                    <p class="card-text">{{ flat_count }} </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card for Residents -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <img src="{% static 'dashboard/resident.png' %}" alt="Residents Icon" width="24"> Sakinlər
+                                    </h5>
+                                    <p class="card-text">{{ resident_count }} </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card for Payments -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <img src="{% static 'dashboard/payment.png' %}" alt="Payments Icon" width="24"> Ödənişlər
+                                    </h5>
+                                    <p class="card-text">{{ payment_count }} </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Container-fluid Ends -->
+            </div>
+            {% include "footer.html" %}
+            <!-- Footer Start -->
+        </div>
+    </div>
+
+    <!-- JavaScript for Tap to Top -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        // Show or hide the "tap to top" button based on scroll position
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 100) {
+                $('.tap-top').fadeIn();
+            } else {
+                $('.tap-top').fadeOut();
+            }
+        });
+
+        // Scroll to top on button click
+        $('.tap-top').click(function() {
+            $('html
+
+{% endblock %}

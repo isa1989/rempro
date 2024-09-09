@@ -53,6 +53,13 @@
                         <div class="col-sm-12">
                             <div class="card">
                                 <div class="card-body">
+                                    {% if messages %}
+                                    <div class="alert alert-info">
+                                        {% for message in messages %}
+                                            <p>{{ message }}</p>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
                                     <!-- Filter Form -->
                                     <form method="get" action="{% url 'flat-list' building_id=building_id %}">
                                         <div class="row align-items-center">

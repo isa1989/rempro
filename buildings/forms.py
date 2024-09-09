@@ -231,13 +231,13 @@ class CommandantForm(UserCreationForm):
         ]
         widgets = {
             "username": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Username"}
+                attrs={"class": "form-control", "placeholder": "Komendant adı"}
             ),
             "first_name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "First Name"}
+                attrs={"class": "form-control", "placeholder": "Adı"}
             ),
             "last_name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Last Name"}
+                attrs={"class": "form-control", "placeholder": "Soyadı"}
             ),
             "email": forms.EmailInput(
                 attrs={"class": "form-control", "placeholder": "Email"}
@@ -253,19 +253,20 @@ class CommandantForm(UserCreationForm):
         self.fields["password1"].widget = forms.PasswordInput(
             attrs={
                 "class": "form-control",
-                "placeholder": "Create a password",
+                "placeholder": "Parol yarat",
                 "autocomplete": "new-password",
             }
         )
         self.fields["password2"].widget = forms.PasswordInput(
             attrs={
                 "class": "form-control",
-                "placeholder": "Confirm your password",
+                "placeholder": "Parolu təkrar yaz",
                 "autocomplete": "new-password",
             }
         )
         for field in self.fields.values():
             field.help_text = None
+            field.label = ""
 
 
 class ResidentForm(UserCreationForm):

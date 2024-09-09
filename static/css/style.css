@@ -40966,6 +40966,19 @@ body.dark-sidebar .page-wrapper.horizontal-wrapper .page-body-wrapper .sidebar-w
 body.dark-sidebar .page-wrapper.compact-sidebar .page-body-wrapper div.sidebar-wrapper > div {
   background: #22242B;
 }
+
+.alert-info {
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  background-color: #e5f5f5; /* Light background for visibility */
+  color: #006666; /* Text color */
+  border: none; /* Remove border */
+}
+
+.alert-info p {
+  margin: 0;
+}
 body.dark-sidebar .page-wrapper.compact-sidebar .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links li .sidebar-title {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
