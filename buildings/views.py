@@ -1358,15 +1358,14 @@ def custom_404_view(request, exception=None):
 
 
 def get_weather(request):
+    from .utils import get_weather_data
+
     city_id = "587084"  # Default city ID for Baku
 
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         # Handle AJAX request
         try:
             weather_data = get_weather_data(city_id)
-            # Strip decimal part from temperature
-            if "temperature" in weather_data:
-                weather_data["temperature"] = int(weather_data["temperature"])
             return JsonResponse(weather_data)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
@@ -1374,11 +1373,8 @@ def get_weather(request):
     # Handle regular page request
     try:
         weather_data = get_weather_data(city_id)
-        # Strip decimal part from temperature
-        if "temperature" in weather_data:
-            weather_data["temperature"] = int(weather_data["temperature"])
         context = {"city": city_id, "weather": weather_data}
-    except Exception as e:
-        context = {"city": city_id, "error": str(e)}
+    except:
+        context = {"city": city_id}
 
     return render(request, "cms/weather/weather_data.html", context)
