@@ -75,6 +75,15 @@ class DashboardView(View):
         }
         return render(request, "dashboard.html", context)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse("buildings")},
+        ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
+        return context
+
 
 class LoginView(BaseLoginView):
     template_name = "login.html"
@@ -897,7 +906,6 @@ class ResidentListView(ListView):
     context_object_name = "residents"
 
     def get_queryset(self):
-        print(self.request.user, "ssssssssssssssssssssss")
         building_id = self.kwargs.get("building_id")
         branch_id = self.kwargs.get("branch_id")
         if branch_id:
