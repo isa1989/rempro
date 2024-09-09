@@ -15,7 +15,7 @@ from django.views.generic.edit import FormView
 from django.contrib.auth.views import LoginView as BaseLoginView, LogoutView
 from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
-from .utils import get_weather_data
+from buildings.utils import get_weather_data
 from django.views.generic.edit import CreateView
 from .models import (
     Building,
