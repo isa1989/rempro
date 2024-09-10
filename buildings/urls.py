@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     # --------------------------- HOME -----------------------------
-    path("dashboard/", views.DashboardView.as_view(), name="dashboard"),
+    path("", views.DashboardView.as_view(), name="dashboard"),
     path("login/", views.LoginView.as_view(), name="login"),
     # --------------------------- AUTH -----------------------------
     path("login/", views.LoginView.as_view(), name="login"),
@@ -11,7 +11,7 @@ urlpatterns = [
     # --------------------------- PROFILE -----------------------------
     path("user/<int:pk>/", views.UserProfileView.as_view(), name="user_profile"),
     # --------------------------- BRANCH -----------------------------
-    path("", views.BranchListView.as_view(), name="branches"),
+    path("branches/", views.BranchListView.as_view(), name="branches"),
     path("branch/<int:pk>/", views.BranchDetailView.as_view(), name="branch-detail"),
     path("branch/<int:pk>/edit/", views.BranchUpdateView.as_view(), name="branch-edit"),
     path("branch/add/", views.BranchCreateView.as_view(), name="branch-add"),
