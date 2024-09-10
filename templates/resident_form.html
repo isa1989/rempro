@@ -1,0 +1,258 @@
+{% load static %}
+
+{% include 'base.html' %}
+
+{% block content %}
+<link href="{% static 'select2/css/select2.min.css' %}" rel="stylesheet" />
+<script src="{% static 'select2/js/select2.min.js' %}"></script>
+
+<!-- Loader starts -->
+<div class="loader-wrapper">
+    <div class="loader">
+        <div class="loader4"></div>
+    </div>
+</div>
+<!-- Loader ends -->
+
+<!-- Tap on top starts -->
+<div class="tap-top"><i data-feather="chevrons-up"></i></div>
+<!-- Tap on top ends -->
+
+<!-- Page-wrapper Start -->
+<div class="page-wrapper compact-wrapper" id="pageWrapper">
+    <!-- Page Header Start -->
+    {% include 'header.html' %}
+    <!-- Page Header Ends -->
+
+    <!-- Page Body Start -->
+    <div class="page-body-wrapper">
+        {% include 'sidebar.html' %}
+        <!-- Page Sidebar Ends -->
+
+        <div class="page-body">
+            <div class="container-fluid">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-6">
+                            <h4>Sakin əlavə et</h4>
+                        </div>
+                        <div class="col-6">
+                            <ol class="breadcrumb">
+                                {% for crumb in breadcrumbs %}
+                                    <li class="breadcrumb-item">
+                                        <a href="{{ crumb.url }}">
+                                            {{ crumb.title }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Container-fluid starts -->
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row g-xl-5 g-3">
+                                    <div class="col-xxl-9 col-xl-8 box-col-8 position-relative">
+                                        <div class="tab-content" id="add-resident-pills-tabContent">
+                                            <div class="tab-pane fade show active" id="detail-resident" role="tabpanel" aria-labelledby="detail-resident-tab">
+                                                <div class="sidebar-body">
+                                                    <form class="row g-2" method="post" action="{% url 'add-custom-resident' %}" enctype="multipart/form-data">
+                                                        {% csrf_token %}
+                                                        <div class="col-12">
+                                                            <!-- Username Field -->
+                                                            <label for="{{ form.username.id_for_label }}">İstifadəçi adı</label>
+                                                            {{ form.username }}
+                                                            {% if form.username.errors %}
+                                                                <div class="invalid-feedback">
+                                                                    {{ form.username.errors }}
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="col-12 mt-3">
+                                                            <!-- First Name Field -->
+                                                            <label for="{{ form.first_name.id_for_label }}">Adı</label>
+                                                            {{ form.first_name }}
+                                                            {% if form.first_name.errors %}
+                                                                <div class="invalid-feedback">
+                                                                    {{ form.first_name.errors }}
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="col-12 mt-3">
+                                                            <!-- Last Name Field -->
+                                                            <label for="{{ form.last_name.id_for_label }}">Soyadı</label>
+                                                            {{ form.last_name }}
+                                                            {% if form.last_name.errors %}
+                                                                <div class="invalid-feedback">
+                                                                    {{ form.last_name.errors }}
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="col-12 mt-3">
+                                                            <!-- Email Field -->
+                                                            <label for="{{ form.email.id_for_label }}">Email</label>
+                                                            {{ form.email }}
+                                                            {% if form.email.errors %}
+                                                                <div class="invalid-feedback">
+                                                                    {{ form.email.errors }}
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="col-12 mt-3">
+                                                            <!-- Phone Number Field -->
+                                                            <label for="{{ form.phone_number.id_for_label }}">Mobil nömrəsi</label>
+                                                            {{ form.phone_number }}
+                                                            {% if form.phone_number.errors %}
+                                                                <div class="invalid-feedback">
+                                                                    {{ form.phone_number.errors }}
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="col-12 mt-3">
+                                                            <!-- Branch Field -->
+                                                            <label for="{{ form.branch.id_for_label }}">Branch</label>
+                                                            {{ form.branch }}
+                                                            {% if form.branch.errors %}
+                                                                <div class="invalid-feedback">
+                                                                    {{ form.branch.errors }}
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="col-12 mt-3">
+                                                            <!-- Building Field -->
+                                                            <label for="{{ form.building.id_for_label }}">Building</label>
+                                                            {{ form.building }}
+                                                            {% if form.building.errors %}
+                                                                <div class="invalid-feedback">
+                                                                    {{ form.building.errors }}
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="col-12 mt-3">
+                                                            <!-- Flat Field -->
+                                                            <label for="{{ form.flat.id_for_label }}">Flat</label>
+                                                            {{ form.flat }}
+                                                            {% if form.flat.errors %}
+                                                                <div class="invalid-feedback">
+                                                                    {{ form.flat.errors }}
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="col-12 mt-3">
+                                                            <!-- Password1 Field -->
+                                                            <label for="{{ form.password1.id_for_label }}">Yeni Parola</label>
+                                                            {{ form.password1 }}
+                                                            {% if form.password1.errors %}
+                                                                <div class="invalid-feedback">
+                                                                    {{ form.password1.errors }}
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="col-12 mt-3">
+                                                            <!-- Password2 Field -->
+                                                            <label for="{{ form.password2.id_for_label }}">Parolayı Doğrula</label>
+                                                            {{ form.password2 }}
+                                                            {% if form.password2.errors %}
+                                                                <div class="invalid-feedback">
+                                                                    {{ form.password2.errors }}
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="col-12 mt-3">
+                                                            <button class="btn btn-primary" type="submit">Saxla</button>
+                                                            <a class="btn btn-secondary" href="{% url 'all-residents' %}">Ləğv et</a>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Container-fluid Ends -->
+        </div>
+
+        {% include 'footer.html' %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Select2 for branch, building, and flat fields
+        $('#id_branch').select2({
+            placeholder: 'Branch seçin',
+            allowClear: true
+        });
+
+        $('#id_building').select2({
+            placeholder: 'Building seçin',
+            allowClear: true
+        });
+
+        $('#id_flat').select2({
+            placeholder: 'Flat seçin',
+            allowClear: true
+        });
+
+        // Handle branch selection
+        $('#id_branch').on('change', function() {
+            let branchId = $(this).val();
+            if (branchId) {
+                $.ajax({
+                    url: "{% url 'building_autocomplete' %}",
+                    data: {
+                        'branch_id': branchId,
+                        'q': ''
+                    },
+                    success: function(data) {
+                        let $buildingField = $('#id_building');
+                        $buildingField.empty().append(new Option('Select a building', ''));
+                        $.each(data.results, function(index, building) {
+                            $buildingField.append(new Option(building.text, building.id));
+                        });
+                        $buildingField.trigger('change');
+                        $('#id_flat').empty().trigger('change'); // Clear flat options
+                    }
+                });
+            } else {
+                $('#id_building').empty().append(new Option('Select a building', '')).trigger('change');
+                $('#id_flat').empty().append(new Option('Select a flat', ''));
+            }
+        });
+
+        // Handle building selection
+        $('#id_building').on('change', function() {
+            let buildingId = $(this).val();
+            if (buildingId) {
+                $.ajax({
+                    url: "{% url 'flat-autocomplete' %}",
+                    data: {
+                        'building_id': buildingId,
+                        'q': ''
+                    },
+                    success: function(data) {
+                        let $flatField = $('#id_flat');
+                        $flatField.empty().append(new Option('Select a flat', ''));
+                        $.each(data.results, function(index, flat) {
+                            $flatField.append(new Option(flat.text, flat.id));
+                        });
+                    }
+                });
+            } else {
+                $('#id_flat').empty().append(new Option('Select a flat', ''));
+            }
+        });
+    });
+</script>
+
+{% endblock %}

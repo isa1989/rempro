@@ -119,8 +119,18 @@ urlpatterns = [
         views.ResidentDeleteView.as_view(),
         name="resident-delete",
     ),
+    path(
+        "add-resident/",
+        views.ResidentCustomCreateView.as_view(),
+        name="add-custom-resident",
+    ),
     # -------------------------- RESIDENTS -------------------------------
     path("flat-autocomplete/", views.flat_autocomplete, name="flat-autocomplete"),
+    path(
+        "autocomplete/buildings/",
+        views.building_autocomplete,
+        name="building_autocomplete",
+    ),
     # -------------------------- LOGS -------------------------------
     path("logs/", views.LogListView.as_view(), name="log_list"),
     # -------------------------- NEWS -------------------------------

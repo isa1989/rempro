@@ -316,11 +316,100 @@ class ResidentForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         building_id = kwargs.pop("building_id", None)
         self.branch_id = kwargs.pop("branch_id", None)
+        request_user = kwargs.pop("request_user", None)
         super().__init__(*args, **kwargs)
         if building_id:
             self.fields["flat"].queryset = Flat.objects.filter(building_id=building_id)
         self.fields["password1"].label = "New Password"
         self.fields["password2"].label = "Confirm New Password"
+        self.fields["password1"].widget = forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Parol yarat",
+                "autocomplete": "new-password",
+            }
+        )
+        self.fields["password2"].widget = forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Parolunuzu təsdiq edin",
+                "autocomplete": "new-password",
+            }
+        )
+        for field in self.fields.values():
+            field.help_text = None
+            field.label = ""
+
+
+class ResidentCreationForm(UserCreationForm):
+    branch = forms.ModelChoiceField(
+        queryset=Branch.objects.none(),  # Başlangıçta boş bir queryset
+        required=False,
+        widget=forms.Select(attrs={"class": "form-control select2"}),
+    )
+    building = forms.ModelChoiceField(
+        queryset=Building.objects.none(),  # Başlangıçta boş bir queryset
+        required=False,
+        widget=forms.Select(attrs={"class": "form-control select2"}),
+    )
+    flat = forms.ModelChoiceField(
+        queryset=Flat.objects.none(),  # Başlangıçta boş bir queryset
+        required=False,
+        widget=forms.Select(attrs={"class": "form-control select2"}),
+    )
+
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "phone_number",
+            "branch",
+            "building",
+            "flat",
+            "password1",
+            "password2",
+        ]
+        widgets = {
+            "username": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "İstifadəçi"}
+            ),
+            "first_name": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Adı"}
+            ),
+            "last_name": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Soyadı"}
+            ),
+            "phone_number": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Mobil nömrəsi",
+                    "type": "tel",
+                }
+            ),
+            "email": forms.EmailInput(
+                attrs={"class": "form-control", "placeholder": "Email"}
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+
+        if user:
+            # Kullanıcıya özgü verilerle queryset'leri güncelle
+            self.fields["branch"].queryset = Branch.objects.filter(users=user)
+            self.fields["building"].queryset = Building.objects.filter(
+                branch__in=user.branch.all()
+            )
+            self.fields["flat"].queryset = Flat.objects.filter(
+                building__in=Building.objects.filter(branch__in=user.branch.all())
+            )
+
+        self.fields["password1"].label = "Yeni Parola"
+        self.fields["password2"].label = "Parolayı Doğrula"
         self.fields["password1"].widget = forms.PasswordInput(
             attrs={
                 "class": "form-control",

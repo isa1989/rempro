@@ -43,6 +43,7 @@ from .forms import (
     NewsForm,
     CameraForm,
     BuildingCreationForm,
+    ResidentCreationForm,
 )
 from django.contrib.auth.decorators import login_required
 
@@ -56,6 +57,14 @@ def flat_autocomplete(request):
         building_id=building_id,
     )
     results = [{"id": flat.id, "text": flat.name} for flat in flats]
+    return JsonResponse({"results": results})
+
+
+def building_autocomplete(request):
+    q = request.GET.get("q", "")
+    branch_id = request.GET.get("branch_id")
+    buildings = Building.objects.filter(name__icontains=q, branch_id=branch_id)
+    results = [{"id": building.id, "text": building.name} for building in buildings]
     return JsonResponse({"results": results})
 
 
@@ -902,18 +911,11 @@ class ResidentListView(ListView):
     context_object_name = "residents"
 
     def get_queryset(self):
-        building_id = self.kwargs.get("building_id")
-        branch_id = self.kwargs.get("branch_id")
-        if branch_id:
-            queryset = queryset.filter(branch__id=branch_id)
-        if building_id:
-            queryset = User.objects.filter(building_id=building_id, resident=True)
+        branch_ids = self.request.user.branch.all().values_list("id", flat=True)
+        if branch_ids:
+            queryset = User.objects.filter(branch__id__in=branch_ids, resident=True)
         else:
-            queryset = User.objects.filter(resident=True)
-        if self.request.user.branch.exists():
-            queryset = queryset.filter(branch__in=self.request.user.branch.all())
-        else:
-            queryset = queryset.none()
+            queryset = User.objects.none()
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -979,6 +981,41 @@ class ResidentCreateView(CreateView):
         # Redirect to a list view or another appropriate URL after successful creation
         building_id = self.kwargs.get("building_id")
         return reverse_lazy("resident-list", kwargs={"building_id": building_id})
+
+
+class ResidentCustomCreateView(CreateView):
+    model = User
+    form_class = ResidentCreationForm
+    template_name = "resident_form.html"
+    success_url = reverse_lazy("all-residents")  # Adjust as needed
+
+    def form_valid(self, form):
+        # Form verilerini al
+        cleaned_data = form.cleaned_data
+        cleaned_data["branch"] = [cleaned_data["branch"].id]
+        form.cleaned_data = cleaned_data
+        response = super().form_valid(form)
+        instance = self.object
+        instance.resident = True
+        instance.save()
+
+        return response
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # context["building"] = get_object_or_404(Building, id=self.kwargs["building_id"])
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse("buildings")},
+            {"title": "Binalar", "url": reverse("buildings")},
+        ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
+        return context
 
 
 class ResidentDeleteView(LoginRequiredMixin, DeleteView):
@@ -1377,4 +1414,4 @@ def get_weather(request):
     except:
         context = {"city": city_id}
 
-    return render(request, "cms/weather/weather_data.html", context)
+    return render(request, "weather.html", context)
