@@ -98,6 +98,8 @@ urlpatterns = [
     ),
     # -------------------------- Expense -------------------------------
     path("expenses/chart/", views.ExpenseChartView.as_view(), name="expense-chart"),
+    path("expenses/", views.ExpenseListView.as_view(), name="expense-list"),
+    path("expenses/add/", views.ExpenseCreateView.as_view(), name="expense-add"),
     # --------------------------- Payment -------------------------------
     path("payments/", views.PaymentListView.as_view(), name="payment-list"),
     path("payments/add/", views.PaymentCreateView.as_view(), name="payment-add"),

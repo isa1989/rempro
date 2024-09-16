@@ -88,6 +88,18 @@
                 </li>
                 <li class="sidebar-list">
 
+                    <a class="sidebar-link sidebar-title" href="{% url 'expense-list' %}">
+                        <svg class="stroke-icon">
+                            <use href="{% static 'svg/icon-sprite.svg#stroke-home' %}"></use>
+                        </svg>
+                        <svg class="fill-icon">
+                            <use href="{% static 'svg/icon-sprite.svg#fill-home' %}"></use>
+                        </svg>
+                        <span class="lan-3">Xərclər</span>
+                    </a>
+                </li>
+                <li class="sidebar-list">
+
                     <a class="sidebar-link sidebar-title" href="{% url 'log_list' %}">
                         <svg class="stroke-icon">
                             <use href="{% static 'svg/icon-sprite.svg#stroke-home' %}"></use>
@@ -97,6 +109,7 @@
                         </svg>
                         <span class="lan-3">Tarixçə</span>
                     </a>
+                </li>
                     <li class="sidebar-list">
     
                         <a class="sidebar-link sidebar-title" href="{% url 'news-list' %}">

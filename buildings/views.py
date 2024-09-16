@@ -1,5 +1,6 @@
 import re
 from django.http import JsonResponse, HttpResponseForbidden, HttpResponseNotAllowed
+from django.db.models.functions import ExtractMonth, ExtractYear
 from django.db.models import Sum
 from django.utils import timezone
 from django.http import HttpResponseNotFound
@@ -44,6 +45,7 @@ from .forms import (
     CameraForm,
     BuildingCreationForm,
     ResidentCreationForm,
+    ExpenseForm,
 )
 from django.contrib.auth.decorators import login_required
 
@@ -69,6 +71,7 @@ def building_autocomplete(request):
 
 
 class DashboardView(View):
+    login_url = "/login/"
     template_name = "dashboard.html"
 
     def get(self, request, *args, **kwargs):
@@ -88,6 +91,15 @@ class DashboardView(View):
             "is_superuser": request.user.is_superuser,
         }
         return render(request, self.template_name, context)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse("branches")},
+        ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
+        return context
 
 
 class LoginView(BaseLoginView):
@@ -119,7 +131,7 @@ class UserLogoutView(LogoutView):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
         # Redirect to a custom URL after logout
-        return redirect("/")
+        return redirect("/login/")
 
 
 class UserProfileView(DetailView):
@@ -720,7 +732,50 @@ class FlatAddServiceListView(LoginRequiredMixin, FormView):
         return context
 
 
-from django.db.models.functions import ExtractMonth, ExtractYear
+class ExpenseListView(ListView):
+    model = Expense
+    template_name = "expense_list.html"
+    context_object_name = "expenses"
+    paginate_by = 20
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse("buildings")},
+        ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
+        return context
+
+
+class ExpenseCreateView(LoginRequiredMixin, CreateView):
+    login_url = "/login/"
+    model = Expense
+    form_class = ExpenseForm
+    template_name = "add_expense.html"
+    success_url = reverse_lazy("expense-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse("buildings")},
+        ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
+        return context
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        Log.objects.create(
+            action="CREATE",
+            model_name="Expense",
+            object_id=self.object.id,
+            user=self.request.user,
+            details=f"Xərc yaradıldı: {self.object.name}",
+            timestamp=timezone.now(),
+        )
+        messages.success(self.request, f"{self.object.name} yaradıldı!")
+        return response
 
 
 class ExpenseChartView(ListView):

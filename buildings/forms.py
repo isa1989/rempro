@@ -10,6 +10,7 @@ from .models import (
     Payment,
     News,
     Camera,
+    Expense,
 )
 from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm
@@ -374,23 +375,30 @@ class ResidentCreationForm(UserCreationForm):
         ]
         widgets = {
             "username": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "İstifadəçi"}
+                attrs={
+                    "class": "form-control",
+                }
             ),
             "first_name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Adı"}
+                attrs={
+                    "class": "form-control",
+                }
             ),
             "last_name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Soyadı"}
+                attrs={
+                    "class": "form-control",
+                }
             ),
             "phone_number": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "Mobil nömrəsi",
                     "type": "tel",
                 }
             ),
             "email": forms.EmailInput(
-                attrs={"class": "form-control", "placeholder": "Email"}
+                attrs={
+                    "class": "form-control",
+                }
             ),
         }
 
@@ -408,7 +416,7 @@ class ResidentCreationForm(UserCreationForm):
                 building__in=Building.objects.filter(branch__in=user.branch.all())
             )
 
-        self.fields["password1"].label = "Yeni Parola"
+        self.fields["password1"].label = "Parol"
         self.fields["password2"].label = "Parolayı Doğrula"
         self.fields["password1"].widget = forms.PasswordInput(
             attrs={
@@ -502,3 +510,34 @@ class NewsForm(forms.ModelForm):
 
         for field in self.fields.values():
             field.label = ""
+
+
+class ExpenseForm(forms.ModelForm):
+    class Meta:
+        model = Expense
+        fields = ["name", "price", "outcome_date", "outcome_document", "description"]
+
+        widgets = {
+            "name": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Başlıq"}
+            ),
+            "price": forms.NumberInput(
+                attrs={"class": "form-control", "placeholder": "Qiymət"}
+            ),
+            "outcome_date": forms.DateInput(
+                attrs={"class": "form-control", "placeholder": "Tarix", "type": "date"}
+            ),
+            "outcome_document": forms.ClearableFileInput(
+                attrs={"class": "form-control"}
+            ),
+            "description": forms.Textarea(
+                attrs={"class": "form-control", "placeholder": "Açıqlama", "rows": 3}
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in self.fields.values():
+            field.label = ""
+            field.help_text = None
