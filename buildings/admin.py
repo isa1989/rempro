@@ -33,9 +33,7 @@ class CustomUserAdmin(UserAdmin):
                 "fields": (
                     "phone_number",
                     "commandant",
-                    "branch",
                     "resident",
-                    "building",
                 )
             },
         ),
@@ -46,7 +44,6 @@ class CustomUserAdmin(UserAdmin):
             {
                 "fields": (
                     "commandant",
-                    "branch",
                     "resident",
                 )
             },

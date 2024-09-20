@@ -1,169 +1,219 @@
 {% load static %}
-
 {% include 'base.html' %}
-
 {% block content %}
 <link href="{% static 'select2/css/select2.min.css' %}" rel="stylesheet" />
 <script src="{% static 'select2/js/select2.min.js' %}"></script>
-
-<!-- starts -->
+<!-- Loader starts -->
 <div class="loader-wrapper">
-    <div class="loader"> 
-        <div class="loader4"></div>
-    </div>
+   <div class="loader">
+      <div class="loader4"></div>
+   </div>
 </div>
-<!-- loader ends -->
-
-<!-- tap on top starts-->
+<!-- Loader ends -->
+<!-- Tap on top starts -->
 <div class="tap-top"><i data-feather="chevrons-up"></i></div>
-<!-- tap on tap ends-->
-
-<!-- page-wrapper Start-->
+<!-- Tap on top ends -->
+<!-- Page-wrapper Start -->
 <div class="page-wrapper compact-wrapper" id="pageWrapper">
-    <!-- Page Header Start-->
-    {% include 'header.html' %}
-    <!-- Page Header Ends -->
-
-    <!-- Page Body Start -->
-    <div class="page-body-wrapper">
-        {% include 'sidebar.html' %}
-        <!-- Page Sidebar Ends -->
-
-        <div class="page-body">
-            <div class="container-fluid">
-                <div class="page-title">
-                    <div class="row">
-                        <div class="col-6">
-                            <h4>Sakin əlavə et</h4>
-                        </div>
-                        <div class="col-6">
-                            <ol class="breadcrumb">
-                                {% for crumb in breadcrumbs %}
-                                    <li class="breadcrumb-item">
-                                        <a href="{{ crumb.url }}">
-                                            {% if crumb.url %}
-                                                {{ crumb.title }}
-                                            {% else %}
-                                                <span>{{ crumb.title }}</span>
-                                            {% endif %}
-                                        </a>
-                                    </li>
-                                {% endfor %}
-                            </ol>
-                        </div>
-                    </div>
-                </div>
+   <!-- Page Header Start -->
+   {% include 'header.html' %}
+   <!-- Page Header Ends -->
+   <!-- Page Body Start -->
+   <div class="page-body-wrapper">
+      {% include 'sidebar.html' %}
+      <!-- Page Sidebar Ends -->
+      <div class="page-body">
+         <div class="container-fluid">
+            <div class="page-title">
+               <div class="row">
+                  <div class="col-6">
+                     <h4>Sakin əlavə et</h4>
+                  </div>
+                  <div class="col-6">
+                     <ol class="breadcrumb">
+                        {% for crumb in breadcrumbs %}
+                        <li class="breadcrumb-item">
+                           <a href="{{ crumb.url }}">{{ crumb.title }}</a>
+                        </li>
+                        {% endfor %}
+                     </ol>
+                  </div>
+               </div>
             </div>
-
-            <!-- Container-fluid starts -->
-            <div class="container-fluid">
-                <div class="row"> 
-                    <div class="col-12"> 
-                        <div class="card"> 
-                            <div class="card-body">
-                                <div class="row g-xl-5 g-3">
-                                    <div class="col-xxl-9 col-xl-8 box-col-8 position-relative">
-                                        <div class="tab-content" id="add-resident-pills-tabContent">
-                                            <div class="tab-pane fade show active" id="detail-resident" role="tabpanel" aria-labelledby="detail-resident-tab">
-                                                <div class="sidebar-body">
-                                                    <form class="row g-2" method="post" action="{% url 'resident-add' building.id %}" enctype="multipart/form-data">
-                                                        {% csrf_token %}
-                                                        <div class="col-12">
-                                                            {{ form.as_p }}
-                                                            {% comment %} <input type="hidden" name="tenant_document" value="{{ form.tenant_document.value|default_if_none:'' }}"> {% endcomment %}
-                                                        </div>
-                                                        <div class="col-12 mt-3">
-                                                            <button class="btn btn-primary" type="submit">Saxla</button>
-                                                            <a class="btn btn-secondary" href="{% url 'resident-list' building.id %}">Ləğv et</a>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
+         </div>
+         <!-- Container-fluid starts -->
+         <div class="container-fluid">
+            <div class="row">
+               <div class="col-12">
+                  <div class="card">
+                     <div class="card-body">
+                        <div class="row g-xl-5 g-3">
+                           <div class="col-xxl-9 col-xl-8 box-col-8 position-relative">
+                              <div class="tab-content" id="add-resident-pills-tabContent">
+                                 <div class="tab-pane fade show active" id="detail-resident" role="tabpanel" aria-labelledby="detail-resident-tab">
+                                    <div class="sidebar-body">
+                                       <form class="row g-2" method="post" action="{% url 'add-resident' %}" enctype="multipart/form-data">
+                                          {% csrf_token %}
+                                          <div class="col-12 mt-3">
+                                             <!-- Branch Field -->
+                                             <label for="{{ form.branch.id_for_label }}">Filial</label>
+                                             {{ form.branch }}
+                                             {% if form.branch.errors %}
+                                             <div class="invalid-feedback">{{ form.branch.errors }}</div>
+                                             {% endif %}
+                                          </div>
+                                          <div class="col-12 mt-3">
+                                             <!-- Building Field -->
+                                             <label for="{{ form.building.id_for_label }}">Bina</label>
+                                             {{ form.building }}
+                                             {% if form.building.errors %}
+                                             <div class="invalid-feedback">{{ form.building.errors }}</div>
+                                             {% endif %}
+                                          </div>
+                                          <div class="col-12 mt-3">
+                                             <!-- Flat Field -->
+                                             <label for="{{ form.flat.id_for_label }}">Mənzil</label>
+                                             {{ form.flat }}
+                                             {% if form.flat.errors %}
+                                             <div class="invalid-feedback">{{ form.flat.errors }}</div>
+                                             {% endif %}
+                                          </div>
+                                          <div class="col-12 mt-3">
+                                             <!-- Username Field -->
+                                             <label for="{{ form.username.id_for_label }}">İstifadəçi adı</label>
+                                             {{ form.username }}
+                                             {% if form.username.errors %}
+                                             <div class="invalid-feedback">{{ form.username.errors }}</div>
+                                             {% endif %}
+                                          </div>
+                                          <div class="col-12 mt-3">
+                                             <!-- Email Field -->
+                                             <label for="{{ form.email.id_for_label }}">Email</label>
+                                             {{ form.email }}
+                                             {% if form.email.errors %}
+                                             <div class="invalid-feedback">{{ form.email.errors }}</div>
+                                             {% endif %}
+                                          </div>
+                                          <div class="col-12 mt-3">
+                                             <!-- Phone Number Field -->
+                                             <label for="{{ form.phone_number.id_for_label }}">Telefon Nömrəsi</label>
+                                             {{ form.phone_number }}
+                                             {% if form.phone_number.errors %}
+                                             <div class="invalid-feedback">{{ form.phone_number.errors }}</div>
+                                             {% endif %}
+                                          </div>
+                                          <div class="col-12 mt-3">
+                                             <!-- First Name Field -->
+                                             <label for="{{ form.first_name.id_for_label }}">Ad</label>
+                                             {{ form.first_name }}
+                                             {% if form.first_name.errors %}
+                                             <div class="invalid-feedback">{{ form.first_name.errors }}</div>
+                                             {% endif %}
+                                          </div>
+                                          <div class="col-12 mt-3">
+                                             <!-- Last Name Field -->
+                                             <label for="{{ form.last_name.id_for_label }}">Soyad</label>
+                                             {{ form.last_name }}
+                                             {% if form.last_name.errors %}
+                                             <div class="invalid-feedback">{{ form.last_name.errors }}</div>
+                                             {% endif %}
+                                          </div>
+                                          <div class="col-12 mt-3">
+                                             <label for="{{ form.password1.id_for_label }}">Parol</label>
+                                             {{ form.password1 }}
+                                             {% if form.password1.errors %}
+                                             <div class="invalid-feedback">
+                                                {{ form.password1.errors }}
+                                             </div>
+                                             {% endif %}
+                                          </div>
+                                          <div class="col-12 mt-3">
+                                             <!-- Password2 Field -->
+                                             <label for="{{ form.password2.id_for_label }}">Parolu təkrar yaz</label>
+                                             {{ form.password2 }}
+                                             {% if form.password2.errors %}
+                                             <div class="invalid-feedback">
+                                                {{ form.password2.errors }}
+                                             </div>
+                                             {% endif %}
+                                          </div>
+                                          <div class="col-12">
+                                             <button class="btn btn-primary" type="submit">Saxla</button>
+                                             <a class="btn btn-secondary" href="{% url 'all-residents' %}">Ləğv et</a>
+                                          </div>
+                                       </form>
                                     </div>
-                                </div>
-                            </div>
+                                 </div>
+                              </div>
+                           </div>
                         </div>
-                    </div>
-                </div>
+                     </div>
+                  </div>
+               </div>
             </div>
-            <!-- Container-fluid Ends -->
-        </div>
-
-        {% include 'footer.html' %}
-        <!-- footer start -->
-    </div>
+         </div>
+         <!-- Container-fluid Ends -->
+      </div>
+      {% include 'footer.html' %}
+   </div>
 </div>
-
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Select the is_rent checkbox and tenant_document field
-        var isRentCheckbox = document.querySelector('input[name="is_rent"]');
-        var tenantDocumentField = document.querySelector('input[name="tenant_document"]');
-        var tenantDocumentLabel = document.querySelector('label[for="id_tenant_document"]');
-
-        // Function to toggle visibility based on is_rent
-        function toggleTenantDocument() {
-            if (isRentCheckbox && tenantDocumentField) {
-                // Show or hide the tenant_document field based on is_rent
-                if (isRentCheckbox.checked) {
-                    tenantDocumentField.style.display = 'block';
-                    if (tenantDocumentLabel) {
-                        tenantDocumentLabel.style.display = 'block';
-                    }
-                } else {
-                    tenantDocumentField.style.display = 'none';
-                    if (tenantDocumentLabel) {
-                        tenantDocumentLabel.style.display = 'none';
-                    }
-                }
-            }
-        }
-
-        // Initial check
-        toggleTenantDocument();
-
-        // Add event listener to update visibility on change
-        if (isRentCheckbox) {
-            isRentCheckbox.addEventListener('change', toggleTenantDocument);
-        }
-    });
-
-    $(document).ready(function() {
-        // Extract building ID from a data attribute or other source
-        var buildingId = "{{ building.id|escapejs }}"; // Ensure this is correctly escaped
-
-        // Initialize Select2
-        $('.select2').select2({
-            placeholder: 'Mənzili seçin',
-            allowClear: true,
-            ajax: {
-                url: function(params) {
-                    // Construct the URL with the building_id as a query parameter
-                    return `{% url "flat-autocomplete" %}?building_id=${buildingId}`;
-                },
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        q: params.term // Search term
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.results
-                    };
-                },
-                cache: true
-            }
-        });
-
-        // Set selected value if available
-        var selectedValue = "{{ form.flat.value|escapejs }}";
-        if (selectedValue) {
-            $('.select2').val(selectedValue).trigger('change');
-        }
-    });
+   document.addEventListener('DOMContentLoaded', function() {
+       // Select elements
+       var branchSelect = document.getElementById('id_branch');
+       var buildingSelect = document.getElementById('id_building');
+       var flatSelect = document.getElementById('id_flat');
+   
+       // Branch seçimi değiştiğinde
+       branchSelect.addEventListener('change', function() {
+           var branchId = this.value;
+           if (branchId) {
+               // Branch ID'sine göre binaları almak için AJAX isteği
+               fetch("{% url 'building_autocomplete' %}?branch_id=" + branchId)
+                   .then(response => response.json())
+                   .then(data => {
+                       // Mevcut seçenekleri temizle
+                       buildingSelect.innerHTML = '';
+                       buildingSelect.append(new Option('Bina seçin', ''));
+   
+                       // Yanıttan yeni seçenekler ekle
+                       data.results.forEach(function(building) {
+                           buildingSelect.append(new Option(building.text, building.id));
+                       });
+                       // Flat seçeneklerini temizle
+                       flatSelect.innerHTML = '';
+                       flatSelect.append(new Option('Mənzil seçin', ''));
+                   });
+           } else {
+               buildingSelect.innerHTML = '';
+               buildingSelect.append(new Option('Bina seçin', ''));
+               flatSelect.innerHTML = '';
+               flatSelect.append(new Option('Mənzil seçin', ''));
+           }
+       });
+   
+       // Building seçimi değiştiğinde
+       buildingSelect.addEventListener('change', function() {
+           var buildingId = this.value;
+           if (buildingId) {
+               // Building ID'sine göre daireleri almak için AJAX isteği
+               fetch("{% url 'flat-autocomplete-sec' %}?building_id=" + buildingId)
+                   .then(response => response.json())
+                   .then(data => {
+                       // Mevcut seçenekleri temizle
+                       flatSelect.innerHTML = '';
+                       flatSelect.append(new Option('Mənzil seçin', ''));
+   
+                       // Yanıttan yeni seçenekler ekle
+                       data.results.forEach(function(flat) {
+                           flatSelect.append(new Option(flat.text, flat.id));
+                       });
+                   });
+           } else {
+               flatSelect.innerHTML = '';
+               flatSelect.append(new Option('Mənzil seçin', ''));
+           }
+       });
+   });
 </script>
-
 {% endblock %}

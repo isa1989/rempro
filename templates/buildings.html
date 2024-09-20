@@ -62,7 +62,7 @@
                     {% endif %}
                     <div class="list-product-header">
                       <div> 
-                        <div class="light-box"><a data-bs-toggle="collapse" href="#collapseProduct" role="button" aria-expanded="false" aria-controls="collapseProduct"><i class="icon-close filter-close hide"></i></a></div><a class="btn btn-primary" href="{% url 'building-add' branch_id=branch_id %}"><i class="fa fa-plus"></i>Bina əlavə et</a>
+                        <div class="light-box"></i></a></div><a class="btn btn-primary" href="{% url 'building-add' branch_id=branch_id %}"><i class="fa fa-plus"></i>Bina əlavə et</a>
                       </div>
                    
                     </div>
@@ -93,13 +93,13 @@
                             <td>
                               <div class="d-flex align-items-center">
                                 <p class="f-light mb-0 me-2">{{ building.section_count }}</p>
-                                <a href="{% url 'section-list' building.id %}" class="me-2 icon-align">
+                                <a href="{% url 'section-list'  %}" class="me-2 icon-align">
                                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
                                     <path d="M1 12s3-9 11-9 11 9 11 9-3 9-11 9S1 12 1 12z"></path>
                                     <circle cx="12" cy="12" r="3"></circle>
                                   </svg>
                                 </a>
-                                <a href="{% url 'section-add' building.id %}" class="icon-align">
+                                <a href="{% url 'section-add'  %}" class="icon-align">
                                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus">
                                     <line x1="12" y1="5" x2="12" y2="19"></line>
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -110,13 +110,13 @@
                           <td>
                             <div class="d-flex align-items-center">
                               <p class="f-light mb-0 me-2">{{ building.flat_count }}</p>
-                              <a href="{% url 'flat-list' building.id %}" class="me-2 icon-align">
+                              <a href="{% url 'flat-list' %}" class="me-2 icon-align">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
                                   <path d="M1 12s3-9 11-9 11 9 11 9-3 9-11 9S1 12 1 12z"></path>
                                   <circle cx="12" cy="12" r="3"></circle>
                                 </svg>
                               </a>
-                              <a href="{% url 'flat-add' building.id %}" class="icon-align">
+                              <a href="{% url 'flat-add'  %}" class="icon-align">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus">
                                   <line x1="12" y1="5" x2="12" y2="19"></line>
                                   <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -127,13 +127,13 @@
                           <td>
                             <div class="d-flex align-items-center">
                               <p class="f-light mb-0 me-2">{{ building.users_count }}</p>
-                              <a href="{% url 'resident-list' building.id %}" class="me-2 icon-align">
+                              <a href="{% url 'all-residents' %}" class="me-2 icon-align">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
                                   <path d="M1 12s3-9 11-9 11 9 11 9-3 9-11 9S1 12 1 12z"></path>
                                   <circle cx="12" cy="12" r="3"></circle>
                                 </svg>
                               </a>
-                              <a href="{% url 'resident-add' building.id  %}" class="icon-align">
+                              <a href="{% url 'add-resident' %}" class="icon-align">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus">
                                   <line x1="12" y1="5" x2="12" y2="19"></line>
                                   <line x1="5" y1="12" x2="19" y2="12"></line>

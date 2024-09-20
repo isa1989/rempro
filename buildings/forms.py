@@ -38,14 +38,10 @@ class BuildingCreationForm(forms.Form):
 
 
 class SectionForm(forms.ModelForm):
-    class Meta:
-        model = Section
-        fields = ["building", "name"]
-
     building = forms.ModelChoiceField(
-        queryset=Building.objects.all(),
-        empty_label="Select Building",
-        widget=forms.HiddenInput(),
+        queryset=Building.objects.none(),
+        required=False,
+        widget=forms.Select(attrs={"class": "form-control select2"}),
     )
     name = forms.CharField(
         max_length=15,
@@ -54,29 +50,44 @@ class SectionForm(forms.ModelForm):
         ),
     )
 
+    class Meta:
+        model = Section
+        fields = ["building", "name"]
+
     def __init__(self, *args, **kwargs):
-        building_id = kwargs.pop("building_id", None)  # Extract building_id
+        user = kwargs.pop("user", None)
+        building_id = kwargs.pop("building_id", None)
         super().__init__(*args, **kwargs)
+        self.fields["building"].label = "Binalar"
+        self.fields["name"].label = "Blokun adı"
+        if user:
+            if user.is_superuser:
+                if user.branch.exists():
+                    self.fields["building"].queryset = Building.objects.filter(
+                        branch__in=user.branch.all()
+                    ).distinct()
+            elif user.commandant:
+                self.fields["building"].queryset = Building.objects.filter(
+                    commandant__in=[
+                        user,
+                    ]
+                )
+
+            else:
+                self.fields["building"].queryset = Building.objects.none()
 
         if building_id:
-            # Filter sections based on building_id
-            # self.fields["section"].queryset = Section.objects.filter(
-            #     building_id=building_id
-            # )
-            # Set the initial value for building field
             self.initial["building"] = building_id
             self.fields["building"].widget.attrs.update({"value": building_id})
             for field in self.fields.values():
                 field.label = ""
 
-        # self.fields["owner_document"].required = False
-
 
 class FlatForm(forms.ModelForm):
     building = forms.ModelChoiceField(
-        queryset=Building.objects.all(),
-        empty_label="Select Building",
-        widget=forms.HiddenInput(),  # Hidden field for building ID
+        queryset=Building.objects.none(),
+        required=False,
+        widget=forms.Select(attrs={"class": "form-control select2"}),
     )
 
     class Meta:
@@ -106,15 +117,24 @@ class FlatForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        building_id = kwargs.pop("building_id", None)  # Extract building_id
+        building_id = kwargs.pop("building_id", None)
+        user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
 
+        if user:
+            if user.is_superuser:
+                self.fields["building"].queryset = Building.objects.filter(
+                    branch__owner=user
+                )
+            elif user.commandant:
+                self.fields["building"].queryset = Building.objects.filter(
+                    commandant=user
+                )
+
         if building_id:
-            # Filter sections based on building_id
             self.fields["section"].queryset = Section.objects.filter(
                 building_id=building_id
             )
-            # Set the initial value for building field
             self.initial["building"] = building_id
             self.fields["building"].widget.attrs.update({"value": building_id})
 
@@ -220,9 +240,17 @@ class BranchForm(forms.ModelForm):
 
 
 class CommandantForm(UserCreationForm):
+    buildings = forms.ModelMultipleChoiceField(
+        queryset=Building.objects.all(),
+        widget=forms.SelectMultiple(attrs={"class": "form-control"}),
+        required=True,
+        label="Binalar",
+    )
+
     class Meta:
         model = User
         fields = [
+            "buildings",
             "username",
             "first_name",
             "last_name",
@@ -231,6 +259,7 @@ class CommandantForm(UserCreationForm):
             "password2",
         ]
         widgets = {
+            "buildings": forms.CheckboxSelectMultiple(attrs={"class": "form-control"}),
             "username": forms.TextInput(
                 attrs={"class": "form-control", "placeholder": "Komendant adı"}
             ),
@@ -247,8 +276,14 @@ class CommandantForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         # Extract branch_id from kwargs if present
-        self.branch_id = kwargs.pop("branch_id", None)
+        branch_id = kwargs.pop("branch_id", None)
         super().__init__(*args, **kwargs)
+        if branch_id:
+            self.fields["buildings"].queryset = Building.objects.filter(
+                branch_id=branch_id
+            )
+        else:
+            self.fields["buildings"].queryset = Building.objects.none()
         self.fields["password1"].label = "New Password"
         self.fields["password2"].label = "Confirm New Password"
         self.fields["password1"].widget = forms.PasswordInput(
@@ -271,90 +306,18 @@ class CommandantForm(UserCreationForm):
 
 
 class ResidentForm(UserCreationForm):
-    flat = forms.CharField(
-        required=False,
-        widget=forms.Select(
-            attrs={
-                "class": "form-control select2",
-            }
-        ),
-    )
-
-    class Meta:
-        model = User
-        fields = [
-            "flat",
-            "username",
-            "first_name",
-            "last_name",
-            "phone_number",
-            "email",
-            "password1",
-            "password2",
-        ]
-        widgets = {
-            "username": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "İstifadəçi"}
-            ),
-            "first_name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Adı"}
-            ),
-            "last_name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Soyadı"}
-            ),
-            "phone_number": forms.TextInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Mobil nömrəsi",
-                    "type": "tel",
-                }
-            ),
-            "email": forms.EmailInput(
-                attrs={"class": "form-control", "placeholder": "Email"}
-            ),
-        }
-
-    def __init__(self, *args, **kwargs):
-        building_id = kwargs.pop("building_id", None)
-        self.branch_id = kwargs.pop("branch_id", None)
-        request_user = kwargs.pop("request_user", None)
-        super().__init__(*args, **kwargs)
-        if building_id:
-            self.fields["flat"].queryset = Flat.objects.filter(building_id=building_id)
-        self.fields["password1"].label = "New Password"
-        self.fields["password2"].label = "Confirm New Password"
-        self.fields["password1"].widget = forms.PasswordInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "Parol yarat",
-                "autocomplete": "new-password",
-            }
-        )
-        self.fields["password2"].widget = forms.PasswordInput(
-            attrs={
-                "class": "form-control",
-                "placeholder": "Parolunuzu təsdiq edin",
-                "autocomplete": "new-password",
-            }
-        )
-        for field in self.fields.values():
-            field.help_text = None
-            field.label = ""
-
-
-class ResidentCreationForm(UserCreationForm):
     branch = forms.ModelChoiceField(
-        queryset=Branch.objects.none(),  # Başlangıçta boş bir queryset
+        queryset=Branch.objects.none(),
         required=False,
         widget=forms.Select(attrs={"class": "form-control select2"}),
     )
     building = forms.ModelChoiceField(
-        queryset=Building.objects.none(),  # Başlangıçta boş bir queryset
+        queryset=Building.objects.none(),
         required=False,
         widget=forms.Select(attrs={"class": "form-control select2"}),
     )
     flat = forms.ModelChoiceField(
-        queryset=Flat.objects.none(),  # Başlangıçta boş bir queryset
+        queryset=Flat.objects.none(),
         required=False,
         widget=forms.Select(attrs={"class": "form-control select2"}),
     )
@@ -407,17 +370,32 @@ class ResidentCreationForm(UserCreationForm):
         super().__init__(*args, **kwargs)
 
         if user:
-            # Kullanıcıya özgü verilerle queryset'leri güncelle
-            self.fields["branch"].queryset = Branch.objects.filter(users=user)
-            self.fields["building"].queryset = Building.objects.filter(
-                branch__in=user.branch.all()
-            )
-            self.fields["flat"].queryset = Flat.objects.filter(
-                building__in=Building.objects.filter(branch__in=user.branch.all())
-            )
+            if user.is_superuser:
+                self.fields["branch"].queryset = Branch.objects.filter(owner=user)
+                self.fields["building"].queryset = Building.objects.filter(
+                    branch__in=self.fields["branch"].queryset
+                )
+                self.fields["flat"].queryset = Flat.objects.filter(
+                    building__in=self.fields["building"].queryset
+                )
+            elif user.commandant:
+                buildings = Building.objects.filter(commandant=user)
+                self.fields["building"].queryset = buildings
+                self.fields["branch"].queryset = Branch.objects.filter(
+                    buildings__in=buildings
+                ).distinct()
+                # self.fields["building"].queryset = (
+                #     user.branch.first().buildings.all()
+                # )
+                self.fields["flat"].queryset = Flat.objects.filter(
+                    building__in=self.fields["building"].queryset
+                )
+            else:
+                self.fields["branch"].queryset = Branch.objects.none()
+                self.fields["building"].queryset = Building.objects.none()
+                self.fields["flat"].queryset = Flat.objects.none()
 
         self.fields["password1"].label = "Parol"
-        self.fields["password2"].label = "Parolayı Doğrula"
         self.fields["password1"].widget = forms.PasswordInput(
             attrs={
                 "class": "form-control",
@@ -513,9 +491,28 @@ class NewsForm(forms.ModelForm):
 
 
 class ExpenseForm(forms.ModelForm):
+    branch = forms.ModelChoiceField(
+        queryset=Branch.objects.none(),
+        required=False,
+        widget=forms.Select(attrs={"class": "form-control select2"}),
+    )
+    building = forms.ModelChoiceField(
+        queryset=Building.objects.none(),
+        required=False,
+        widget=forms.Select(attrs={"class": "form-control select2"}),
+    )
+
     class Meta:
         model = Expense
-        fields = ["name", "price", "outcome_date", "outcome_document", "description"]
+        fields = [
+            "branch",
+            "building",
+            "name",
+            "price",
+            "outcome_date",
+            "outcome_document",
+            "description",
+        ]
 
         widgets = {
             "name": forms.TextInput(
@@ -536,7 +533,24 @@ class ExpenseForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
+        if user:
+            if user.is_superuser:
+                self.fields["branch"].queryset = Branch.objects.filter(owner=user)
+                self.fields["building"].queryset = Building.objects.filter(
+                    branch__in=self.fields["branch"].queryset
+                )
+            elif user.commandant:
+                buildings = Building.objects.filter(commandant=user)
+                self.fields["building"].queryset = buildings
+                self.fields["branch"].queryset = Branch.objects.filter(
+                    buildings__in=buildings
+                ).distinct()
+            else:
+                self.fields["branch"].queryset = Branch.objects.none()
+                self.fields["building"].queryset = Building.objects.none()
+                # self.fields["flat"].queryset = Flat.objects.none()
 
         for field in self.fields.values():
             field.label = ""

@@ -1,3 +1,4 @@
+import re
 from django.utils import timezone
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -10,7 +11,51 @@ def validate_day(value):
         raise ValidationError("Day must be between 1 and 31.")
 
 
+class User(AbstractUser):
+    phone_number = models.CharField(
+        max_length=17,  # Adjust based on your needs
+        validators=[
+            RegexValidator(
+                regex=r"^\+?1?\d{9,15}$",
+                message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.",
+            )
+        ],
+        blank=True,  # Allow blank values
+        null=True,  # Allow null values
+    )
+    commandant = models.BooleanField(default=False)
+    resident = models.BooleanField(default=False)
+    email = models.EmailField(unique=True, blank=True, null=True)
+    groups = models.ManyToManyField(
+        Group,
+        related_name="custom_user_set",
+        blank=True,
+        help_text="The groups this user belongs to.",
+        related_query_name="user",
+    )
+
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name="custom_user_permissions_set",
+        blank=True,
+        help_text="Specific permissions for this user.",
+        related_query_name="user",
+    )
+
+    def __str__(self):
+        return self.username
+
+    def set_password(self, raw_password):
+        super().set_password(raw_password)
+
+    class Meta:
+        ordering = ["id"]
+        verbose_name = "İstifadəçilər"
+        verbose_name_plural = "İstifadəçilər"
+
+
 class Branch(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="branch")
     name = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
     email = models.EmailField(blank=True, null=True)
@@ -72,6 +117,9 @@ class Building(models.Model):
     branch = models.ForeignKey(
         Branch, on_delete=models.CASCADE, related_name="buildings"
     )
+    commandant = models.ManyToManyField(
+        User, related_name="building", blank=True, verbose_name="Komendant"
+    )
 
     class Meta:
         ordering = ["id"]
@@ -95,58 +143,9 @@ class Section(models.Model):
         return self.name
 
 
-class User(AbstractUser):
-    branch = models.ManyToManyField(Branch, related_name="users", blank=True)
-    building = models.ForeignKey(
-        Building,
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-    )
-    phone_number = models.CharField(
-        max_length=17,  # Adjust based on your needs
-        validators=[
-            RegexValidator(
-                regex=r"^\+?1?\d{9,15}$",
-                message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.",
-            )
-        ],
-        blank=True,  # Allow blank values
-        null=True,  # Allow null values
-    )
-    commandant = models.BooleanField(default=False)
-    resident = models.BooleanField(default=False)
-    groups = models.ManyToManyField(
-        Group,
-        related_name="custom_user_set",
-        blank=True,
-        help_text="The groups this user belongs to.",
-        related_query_name="user",
-    )
-
-    user_permissions = models.ManyToManyField(
-        Permission,
-        related_name="custom_user_permissions_set",
-        blank=True,
-        help_text="Specific permissions for this user.",
-        related_query_name="user",
-    )
-
-    def __str__(self):
-        return self.username
-
-    def set_password(self, raw_password):
-        super().set_password(raw_password)
-
-    class Meta:
-        ordering = ["id"]
-        verbose_name = "İstifadəçilər"
-        verbose_name_plural = "İstifadəçilər"
-
-
 class Flat(models.Model):
-    user = models.ForeignKey(
-        User, on_delete=models.SET_NULL, related_name="flats", null=True, blank=True
+    resident = models.ForeignKey(
+        User, on_delete=models.SET_NULL, related_name="flat", null=True, blank=True
     )
     building = models.ForeignKey(Building, on_delete=models.CASCADE)
     section = models.ForeignKey(Section, on_delete=models.CASCADE, verbose_name="blok")
@@ -192,12 +191,29 @@ class Expense(models.Model):
     outcome_document = models.FileField(upload_to="documents/", blank=True, null=True)
     description = models.TextField(blank=True, null=True)
 
+    building = models.ForeignKey(
+        Building,
+        on_delete=models.CASCADE,
+        related_name="expenses",
+        blank=True,
+        null=True,
+        verbose_name="Bina",
+    )
+    branch = models.ForeignKey(
+        Branch,
+        on_delete=models.CASCADE,
+        related_name="expenses",
+        blank=True,
+        null=True,
+        verbose_name="Filial",
+    )
+
     def __str__(self):
         return self.name
 
     class Meta:
-        ordering = ["id"]
-        verbose_name = "Xərclər"
+        ordering = ["-outcome_date"]
+        verbose_name = "Xərc"
         verbose_name_plural = "Xərclər"
 
 

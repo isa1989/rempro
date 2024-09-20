@@ -2,28 +2,24 @@
 {% include 'base.html' %}
 
 {% block content %}
-<!-- starts -->
+<!-- Loader starts -->
 <div class="loader-wrapper">
-    <div class="loader"> 
+    <div class="loader">
         <div class="loader4"></div>
     </div>
 </div>
-<!-- loader ends -->
+<!-- Loader ends -->
 
-<!-- tap on top starts-->
+<!-- Tap on top starts -->
 <div class="tap-top"><i data-feather="chevrons-up"></i></div>
-<!-- tap on tap ends-->
+<!-- Tap on top ends -->
 
-<!-- page-wrapper Start-->
+<!-- Page-wrapper Start -->
 <div class="page-wrapper compact-wrapper" id="pageWrapper">
-    <!-- Page Header Start-->
     {% include 'header.html' %}
-    <!-- Page Header Ends -->
 
-    <!-- Page Body Start -->
     <div class="page-body-wrapper">
         {% include 'sidebar.html' %}
-        <!-- Page Sidebar Ends -->
 
         <div class="page-body">
             <div class="container-fluid">
@@ -37,11 +33,7 @@
                                 {% for crumb in breadcrumbs %}
                                     <li class="breadcrumb-item">
                                         <a href="{{ crumb.url }}">
-                                            {% if crumb.url %}
-                                                {{ crumb.title }}
-                                            {% else %}
-                                                <span>{{ crumb.title }}</span>
-                                            {% endif %}
+                                            {{ crumb.title }}
                                         </a>
                                     </li>
                                 {% endfor %}
@@ -51,77 +43,124 @@
                 </div>
             </div>
 
-            <!-- Container-fluid starts -->
             <div class="container-fluid">
                 <div class="row"> 
                     <div class="col-12"> 
                         <div class="card"> 
                             <div class="card-body">
-                                <div class="row g-xl-5 g-3">
-                                    <div class="col-xxl-9 col-xl-8 box-col-8 position-relative">
-                                        <div class="tab-content" id="add-building-pills-tabContent">
-                                            <div class="tab-pane fade show active" id="detail-building" role="tabpanel" aria-labelledby="detail-building-tab">
-                                                <div class="sidebar-body">
-                                                    <form class="row g-2" method="post" action="{% url 'flat-add' building.id %}" enctype="multipart/form-data">
-                                                        {% csrf_token %}
-                                                        <div class="col-12">
-                                                            {{ form.as_p }}
-                                                            {% comment %} <input type="hidden" name="tenant_document" value="{{ form.tenant_document.value|default_if_none:'' }}"> {% endcomment %}
-                                                        </div>
-                                                        <div class="col-12 mt-3">
-                                                            <button class="btn btn-primary" type="submit">Saxla</button>
-                                                            <a class="btn btn-secondary" href="{% url 'buildings' %}">Ləğv et</a>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
+                                <form class="row g-2" method="post" action="{% url 'flat-add' %}" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                
+                                    <div class="col-12">
+                                        <label for="{{ form.building.id_for_label }}">Bina</label>
+                                        {{ form.building }}
+                                        {% if form.building.errors %}
+                                            <div class="invalid-feedback">{{ form.building.errors }}</div>
+                                        {% endif %}
                                     </div>
-                                </div>
+
+                                    <div class="col-12">
+                                        <label for="{{ form.section.id_for_label }}">Blok</label>
+                                        {{ form.section }}
+                                        {% if form.section.errors %}
+                                            <div class="invalid-feedback">{{ form.section.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="{{ form.name.id_for_label }}">Mənzil Adı</label>
+                                        {{ form.name }}
+                                        {% if form.name.errors %}
+                                            <div class="invalid-feedback">{{ form.name.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="{{ form.square_metres.id_for_label }}">Sahəsi</label>
+                                        {{ form.square_metres }}
+                                        {% if form.square_metres.errors %}
+                                            <div class="invalid-feedback">{{ form.square_metres.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label for="{{ form.is_rent.id_for_label }}">İcarə</label>
+                                        {{ form.is_rent }}
+                                    </div>
+
+                                    <div class="col-12" id="tenant-document-field" style="display: none;">
+                                        <label for="{{ form.tenant_document.id_for_label }}">İcarəçi sənədi</label>
+                                        {{ form.tenant_document }}
+                                        {% if form.tenant_document.errors %}
+                                            <div class="invalid-feedback">{{ form.tenant_document.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label for="{{ form.owner_document.id_for_label }}">Sahibkar sənədi</label>
+                                        {{ form.owner_document }}
+                                        {% if form.owner_document.errors %}
+                                            <div class="invalid-feedback">{{ form.owner_document.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-12 mt-3">
+                                        <button class="btn btn-primary" type="submit">Saxla</button>
+                                        <a class="btn btn-secondary" href="{% url 'buildings' %}">Ləğv et</a>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Container-fluid Ends -->
+
         </div>
 
         {% include 'footer.html' %}
-        <!-- footer start -->
     </div>
 </div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Select the is_rent checkbox and tenant_document field
-        var isRentCheckbox = document.querySelector('input[name="is_rent"]');
-        var tenantDocumentField = document.querySelector('input[name="tenant_document"]');
-        var tenantDocumentLabel = document.querySelector('label[for="id_tenant_document"]');
+        // Select elements
+        var buildingSelect = document.getElementById('id_building');
+        var sectionSelect = document.getElementById('id_section');
 
-        // Function to toggle visibility based on is_rent
-        function toggleTenantDocument() {
-            if (isRentCheckbox && tenantDocumentField) {
-                // Show or hide the tenant_document field based on is_rent
-                if (isRentCheckbox.checked) {
-                    tenantDocumentField.style.display = 'block';
-                    if (tenantDocumentLabel) {
-                        tenantDocumentLabel.style.display = 'block';
-                    }
-                } else {
-                    tenantDocumentField.style.display = 'none';
-                    if (tenantDocumentLabel) {
-                        tenantDocumentLabel.style.display = 'none';
-                    }
-                }
+        // Handle building selection
+        buildingSelect.addEventListener('change', function() {
+            var buildingId = this.value;
+            if (buildingId) {
+                // AJAX request to fetch sections based on building ID
+                fetch("{% url 'section_autocomplete' %}?building_id=" + buildingId)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Clear existing options
+                        sectionSelect.innerHTML = '';
+                        sectionSelect.append(new Option('Select a section', ''));
+
+                        // Add new options from the response
+                        data.results.forEach(function(section) {
+                            sectionSelect.append(new Option(section.text, section.id));
+                        });
+                    });
+            } else {
+                sectionSelect.innerHTML = '';
+                sectionSelect.append(new Option('Select a section', ''));
             }
+        });
+
+        // Manage visibility of tenant document field
+        var isRentCheckbox = document.querySelector('input[name="is_rent"]');
+        var tenantDocumentField = document.getElementById('tenant-document-field');
+
+        function toggleTenantDocument() {
+            tenantDocumentField.style.display = isRentCheckbox.checked ? 'block' : 'none';
         }
 
-        // Initial check
         toggleTenantDocument();
-
-        // Add event listener to update visibility on change
         if (isRentCheckbox) {
             isRentCheckbox.addEventListener('change', toggleTenantDocument);
         }
     });
 </script>
+
 {% endblock %}

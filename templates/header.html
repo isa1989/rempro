@@ -6,15 +6,23 @@
         <div class="Typeahead Typeahead--twitterUsers">
           <div class="u-posRelative"> 
             <input class="demo-input Typeahead-input form-control-plaintext w-100" type="text" placeholder="Search Riho .." name="q" title="" autofocus="">
-            <div class="spinner-border Typeahead-spinner" role="status"><span class="sr-only">Loading... </span></div><i class="close-search" data-feather="x"></i>
+            <div class="spinner-border Typeahead-spinner" role="status"><span class="sr-only">Loading... </span></div>
+            <i class="close-search" data-feather="x"></i>
           </div>
           <div class="Typeahead-menu"> </div>
         </div>
       </div>
     </form>
     <div class="header-logo-wrapper col-auto p-0">  
-      <div class="logo-wrapper"> <a href="index.html"><img class="img-fluid for-light" src="{% static 'images/logo/logo_dark.png' %}" alt="logo-light"><img class="img-fluid for-dark" src="{% static 'images/logo/logo.png' %}" alt="logo-dark"></a></div>
-      <div class="toggle-sidebar"> <i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i></div>
+      <div class="logo-wrapper">
+        <a href="index.html">
+          <img class="img-fluid for-light" src="{% static 'images/logo/logo_dark.png' %}" alt="logo-light">
+          <img class="img-fluid for-dark" src="{% static 'images/logo/logo.png' %}" alt="logo-dark">
+        </a>
+      </div>
+      <div class="toggle-sidebar">
+        <i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i>
+      </div>
     </div>
 
     <!-- Weather Display Area -->
@@ -27,17 +35,21 @@
 
     <div class="nav-right col-xxl-7 col-xl-6 col-md-7 col-8 pull-right right-header p-0 ms-auto">
       <ul class="nav-menus"> 
-        <li class="profile-nav onhover-dropdown"> 
-          <div class="media profile-media"> 
+        <li class="profile-nav">
+          <div class="media profile-media">
             <div class="media-body d-xxl-block d-none box-col-none">
-              <div class="d-flex align-items-center gap-2"> <span>{{ user_name }} </span><i class="middle fa fa-angle-down"> </i></div>
+              <div class="d-flex align-items-center gap-2">
+                <span>{{ user_name }}</span>
+                <i class="middle fa fa-angle-down"></i>
+              </div>
             </div>
           </div>
-          <ul class="profile-dropdown onhover-show-div">
+          <!-- Dropdown menu -->
+          <ul class="profile-dropdown">
             <li>
-              <form action="{% url 'logout' %}" method="post" style="display:inline;">
+              <form id="logout-form" action="{% url 'logout' %}" method="post" style="display:inline;">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-pill btn-outline-primary btn-sm">Cıxış</button>
+                <button type="submit" class="btn btn-pill btn-outline-primary btn-sm" id="logout-button">Çıxış</button>
               </form>
             </li>
           </ul>
@@ -77,7 +89,7 @@ $(document).ready(function() {
         success: function(data) {
             if (data.weather && data.weather.cod == 200) {
                 $('.weather-info').html(`
-                    <span class="temperature">${data}°C</span>
+                    <span class="temperature">${data.weather.main.temp}°C</span>
                     <img src="http://openweathermap.org/img/wn/${data.weather.weather[0].icon}@2x.png" alt="Weather icon" style="width: 50px;">
                 `);
             } else {
@@ -88,5 +100,52 @@ $(document).ready(function() {
             $('.weather-info').html('<span>Failed to fetch weather data.</span>');
         }
     });
+
+    // Toggle profile dropdown
+    $('.profile-nav').on('click', function(e) {
+        e.stopPropagation();
+        $('.profile-dropdown').toggle();
+    });
+
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.profile-nav').length) {
+            $('.profile-dropdown').hide();
+        }
+    });
 });
 </script>
+
+<!-- CSS for dropdown menu -->
+<style>
+.profile-nav {
+    position: relative;
+    cursor: pointer;
+}
+
+.profile-dropdown {
+    display: none; /* Başlangıçta gizli */
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: rgba(242, 243, 247, 0.7); /* Arka plan rengini belirleyin */
+    border: 0px solid #ddd; /* Kenar çizgisi */
+    border-radius: 4px; /* Köşe yuvarlaklığı */
+    padding: 10px;
+    z-index: 1000; /* Menü üstte görünmesi için */
+}
+
+.profile-dropdown li {
+    list-style: none;
+}
+
+.profile-dropdown button {
+    background: none;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.profile-dropdown button:hover {
+    background-color: #f0f0f0; /* Hover rengini belirleyin */
+}
+</style>

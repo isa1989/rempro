@@ -62,7 +62,7 @@
                                         <div class="tab-content" id="add-building-pills-tabContent">
                                             <div class="tab-pane fade show active" id="detail-building" role="tabpanel" aria-labelledby="detail-building-tab">
                                                 <div class="sidebar-body">
-                                                    <form class="row g-2" method="post" action="{% url 'section-add' building.id %}">
+                                                    <form class="row g-2" method="post" action="{% url 'section-add' %}">
                                                         {% csrf_token %}
                                                         <div class="col-12">
                                                             {{ form.as_p }}

@@ -122,6 +122,28 @@
         if (isRentCheckbox) {
             isRentCheckbox.addEventListener('change', toggleOutcomeDocument);
         }
+
+        // Branch and building selection logic
+        var branchSelect = document.getElementById('id_branch');
+        var buildingSelect = document.getElementById('id_building');
+
+        branchSelect.addEventListener('change', function() {
+            var branchId = this.value;
+            if (branchId) {
+                fetch("{% url 'building_autocomplete' %}?branch_id=" + branchId)
+                    .then(response => response.json())
+                    .then(data => {
+                        buildingSelect.innerHTML = '';
+                        buildingSelect.append(new Option('Bina seçin', ''));
+                        data.results.forEach(function(building) {
+                            buildingSelect.append(new Option(building.text, building.id));
+                        });
+                    });
+            } else {
+                buildingSelect.innerHTML = '';
+                buildingSelect.append(new Option('Bina seçin', ''));
+            }
+        });
     });
 </script>
 {% endblock %}

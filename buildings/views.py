@@ -44,7 +44,6 @@ from .forms import (
     NewsForm,
     CameraForm,
     BuildingCreationForm,
-    ResidentCreationForm,
     ExpenseForm,
 )
 from django.contrib.auth.decorators import login_required
@@ -53,12 +52,25 @@ from django.contrib.auth.decorators import login_required
 def flat_autocomplete(request):
     q = request.GET.get("q", "")
     building_id = request.GET.get("building_id")
-    # Filter flats by name or user's phone number, and match the building
     flats = Flat.objects.filter(
         Q(name__icontains=q) | Q(user__phone_number__icontains=q),
         building_id=building_id,
     )
     results = [{"id": flat.id, "text": flat.name} for flat in flats]
+    return JsonResponse({"results": results})
+
+
+def flat_autocomplete_sec(request):
+    building_id = request.GET.get("building_id")
+    flats = Flat.objects.filter(building_id=building_id)
+    results = [{"id": flat.id, "text": flat.name} for flat in flats]
+    return JsonResponse({"results": results})
+
+
+def section_autocomplete(request):
+    building_id = request.GET.get("building_id")
+    sections = Section.objects.filter(building_id=building_id)
+    results = [{"id": section.id, "text": section.name} for section in sections]
     return JsonResponse({"results": results})
 
 
@@ -158,20 +170,26 @@ class BranchListView(LoginRequiredMixin, ListView):
     context_object_name = "branches"
 
     def get_queryset(self):
-        # branch_id = self.request.user.branch_id
-        return Branch.objects.annotate(
-            commandant_count=Count(
-                "users", filter=Q(users__commandant=True), distinct=True
-            ),
-            building_count=Count("buildings", distinct=True),
-            camera_count=Count("cameras", distinct=True),
-        )
+        """
+        Return the queryset of branches filtered by user type.
+        """
+        user = self.request.user
+        if user.is_superuser:
+            return Branch.objects.filter(owner=user).annotate(
+                commandant_count=Count("buildings__commandant", distinct=True),
+                building_count=Count("buildings", distinct=True),
+                camera_count=Count("cameras", distinct=True),
+            )
+        else:
+            return Branch.objects.none()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Add is_superuser status to context
         context["is_superuser"] = self.request.user.is_superuser
         context["user_name"] = self.request.user.username
+        for branch in context["branches"]:
+            branch.has_buildings = branch.building_count > 0
         return context
 
 
@@ -232,7 +250,10 @@ class BranchCreateView(CreateView):
         formset = CameraFormSet(request.POST, request.FILES)
 
         if form.is_valid() and formset.is_valid():
-            branch = form.save()
+            branch = form.save(commit=False)
+            branch.owner = request.user  # Set the owner to the current user
+            branch.save()
+
             for camera_form in formset:
                 if camera_form.cleaned_data:
                     Camera.objects.create(
@@ -255,7 +276,12 @@ class CommandantListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         branch_id = self.kwargs["branch_id"]
-        return User.objects.filter(branch__in=[branch_id], commandant=True)
+        buildings = Building.objects.filter(branch_id=branch_id)
+        users = User.objects.filter(
+            building__in=buildings,
+            commandant=True,
+        ).distinct()
+        return users
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -301,19 +327,21 @@ class CommandantCreateView(LoginRequiredMixin, CreateView):
         return context
 
     def form_valid(self, form):
-        # Save the instance first to get an ID assigned
         response = super().form_valid(form)
-        # Retrieve the branch using branch_id from URL
         branch_id = self.kwargs.get("branch_id")
         branch = get_object_or_404(Branch, id=branch_id)
-        # Add the branch to the instance's many-to-many field
-        self.object.branch.add(branch)
-        # Set other fields
+
+        # Seçilen binaları komendantın binalarına ekle
+        selected_buildings = form.cleaned_data.get("buildings", [])
+        for building in selected_buildings:
+            building.commandant.add(self.object)
+
         self.object.is_staff = True
         self.object.commandant = True
-        self.object.save()  # Save the changes to the instance
+        self.object.save()
+
         messages.success(
-            self.request, f"{self.object.username} adlı komendant yaradıldı!"
+            self.request, f"{self.object.username} adlı komendant oluşturuldu!"
         )
         return response
 
@@ -346,20 +374,33 @@ class BuildingListView(LoginRequiredMixin, ListView):
     context_object_name = "buildings"
 
     def get_queryset(self):
+        user = self.request.user
         branch_id = self.kwargs.get("branch_id")
-        if not branch_id:
-            branch_id = self.request.user.branch.values_list("id", flat=True).last()
-        return Building.objects.filter(branch_id=branch_id).annotate(
+        if user.is_superuser:
+            branch_id = user.branch.values_list("id", flat=True)
+        elif user.commandant:
+            branch_id = user.building.first().branch.id
+            return Building.objects.filter(
+                branch_id=branch_id, commandant=user
+            ).annotate(
+                flat_count=Count("flat", distinct=True),
+                section_count=Count("section", distinct=True),
+                users_count=Count("flat__resident", distinct=True),
+            )
+        return Building.objects.filter(branch_id__in=branch_id).annotate(
             flat_count=Count("flat", distinct=True),
             section_count=Count("section", distinct=True),
-            users_count=Count("flat__user", distinct=True),
+            users_count=Count("flat__resident", distinct=True),
         )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
         branch_id = self.kwargs.get("branch_id")
-        if not branch_id:
-            branch_id = self.request.user.branch.values_list("id", flat=True).last()
+        if user.is_superuser:
+            branch_id = user.branch.values_list("id", flat=True).last()
+        elif user.commandant:
+            branch_id = user.building.first().branch.id
 
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("branches")},
@@ -422,8 +463,24 @@ class SectionListView(LoginRequiredMixin, ListView):
     context_object_name = "sections"
 
     def get_queryset(self):
-        building_id = self.kwargs["building_id"]
-        return Section.objects.filter(building_id=building_id)
+        user = self.request.user  # Başlangıçta boş queryset
+
+        if user.is_superuser:
+            queryset = Section.objects.filter(building__branch__owner=user)
+        elif user.commandant:
+            queryset = Section.objects.filter(
+                building__in=Building.objects.filter(commandant=user)
+            )
+
+        building_id = self.kwargs.get("building_id")
+        if building_id:
+            queryset = queryset.filter(building_id=building_id)
+
+        name = self.request.GET.get("name")
+        if name:
+            queryset = queryset.filter(name__icontains=name)
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -438,21 +495,18 @@ class SectionListView(LoginRequiredMixin, ListView):
 
 class SectionsCreateView(LoginRequiredMixin, CreateView):
     login_url = "/login/"
-    model = Section
     form_class = SectionForm
     template_name = "add_section.html"
+    success_url = reverse_lazy("section-list")
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        building_id = self.kwargs["building_id"]
-        kwargs["building_id"] = building_id
+        kwargs["user"] = self.request.user
+        kwargs["building_id"] = self.kwargs.get("building_id")
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        building_id = self.kwargs["building_id"]
-        building = get_object_or_404(Building, id=building_id)
-        context["building"] = building
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("branches")},
             {"title": "Binalar", "url": reverse("buildings")},
@@ -462,9 +516,6 @@ class SectionsCreateView(LoginRequiredMixin, CreateView):
         return context
 
     def form_valid(self, form):
-        building_id = self.kwargs["building_id"]
-        building = get_object_or_404(Building, id=building_id)
-        form.instance.building = building
         response = super().form_valid(form)
         Log.objects.create(
             action="CREATE",
@@ -477,10 +528,6 @@ class SectionsCreateView(LoginRequiredMixin, CreateView):
         messages.success(self.request, f"{self.object.name} bloku yaradıldı!")
         return response
 
-    def get_success_url(self):
-        building_id = self.kwargs["building_id"]
-        return reverse_lazy("section-list", kwargs={"building_id": building_id})
-
 
 class FlatListView(LoginRequiredMixin, ListView):
     login_url = "/login/"
@@ -491,35 +538,34 @@ class FlatListView(LoginRequiredMixin, ListView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        building_id = self.kwargs["building_id"]
-        kwargs["building_id"] = building_id
+        kwargs["user"] = self.request.user
         return kwargs
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        user = self.request.user
+        if user.is_superuser:
+            return Flat.objects.filter(building__branch__owner=user)
+        if user.commandant:
+            return Flat.objects.filter(
+                building__in=Building.objects.filter(commandant=user)
+            )
+        queryset = Flat.objects.none()
         building_id = self.kwargs.get("building_id")
-        if building_id is not None:
+        if building_id:
             queryset = queryset.filter(building_id=building_id)
 
-        # Filtering based on GET parameters
         section_id = self.request.GET.get("section")
         min_square_metres = self.request.GET.get("min_square_metres")
         max_square_metres = self.request.GET.get("max_square_metres")
         name = self.request.GET.get("name")
-
         if section_id:
             queryset = queryset.filter(section_id=section_id)
-        if min_square_metres and max_square_metres:
-            queryset = queryset.filter(
-                square_metres__gte=min_square_metres,
-                square_metres__lte=max_square_metres,
-            )
-        elif min_square_metres:
+        if min_square_metres:
             queryset = queryset.filter(square_metres__gte=min_square_metres)
-        elif max_square_metres:
+        if max_square_metres:
             queryset = queryset.filter(square_metres__lte=max_square_metres)
         if name:
-            queryset = queryset.filter(name=name)
+            queryset = queryset.filter(name__icontains=name)
 
         return queryset
 
@@ -529,12 +575,12 @@ class FlatListView(LoginRequiredMixin, ListView):
             {"title": "Ana səhifə", "url": reverse("branches")},
             {"title": "Binalar", "url": reverse("buildings")},
         ]
-        building_id = self.kwargs["building_id"]
-        building = get_object_or_404(Building, id=building_id)
-        context["building_id"] = building.id
+        # building_id = self.kwargs["building_id"]
+        # building = get_object_or_404(Building, id=building_id)
+        # context["building_id"] = building.id
         context["user_name"] = self.request.user.username
         context["is_superuser"] = self.request.user.is_superuser
-        context["sections"] = Section.objects.filter(building_id=building_id)
+        # context["sections"] = Section.objects.filter(building_id=building_id)
         return context
 
 
@@ -546,15 +592,11 @@ class FlatCreateView(LoginRequiredMixin, CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        building_id = self.kwargs["building_id"]
-        kwargs["building_id"] = building_id
+        kwargs["user"] = self.request.user
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        building_id = self.kwargs["building_id"]
-        building = get_object_or_404(Building, id=building_id)
-        context["building"] = building
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("branches")},
             {"title": "Binalar", "url": reverse("buildings")},
@@ -564,9 +606,6 @@ class FlatCreateView(LoginRequiredMixin, CreateView):
         return context
 
     def form_valid(self, form):
-        building_id = self.kwargs["building_id"]
-        building = get_object_or_404(Building, id=building_id)
-        form.instance.building = building
         response = super().form_valid(form)
         Log.objects.create(
             action="CREATE",
@@ -580,8 +619,9 @@ class FlatCreateView(LoginRequiredMixin, CreateView):
         return response
 
     def get_success_url(self):
-        building_id = self.kwargs["building_id"]
-        return reverse_lazy("flat-list", kwargs={"building_id": building_id})
+        return reverse_lazy(
+            "flat-list",
+        )
 
 
 class ServicesListView(LoginRequiredMixin, ListView):
@@ -718,7 +758,7 @@ class FlatAddServiceListView(LoginRequiredMixin, FormView):
 
         flat.services.set(form.cleaned_data["services"])
 
-        return redirect(reverse("flat-list", kwargs={"building_id": flat.building.id}))
+        return redirect(reverse("flat-list"))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -738,6 +778,19 @@ class ExpenseListView(ListView):
     context_object_name = "expenses"
     paginate_by = 20
 
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_superuser:
+            user_branches = Branch.objects.filter(owner=user)
+            return Expense.objects.filter(branch__in=user_branches).distinct()
+
+        if user.commandant:
+            user_buildings = Building.objects.filter(commandant=user)
+            return Expense.objects.filter(building__in=user_buildings).distinct()
+
+        return Expense.objects.none()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
@@ -754,6 +807,11 @@ class ExpenseCreateView(LoginRequiredMixin, CreateView):
     form_class = ExpenseForm
     template_name = "add_expense.html"
     success_url = reverse_lazy("expense-list")
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -850,6 +908,19 @@ class PaymentListView(ListView):
     context_object_name = "payments"
     paginate_by = 10
 
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_superuser:
+            user_branches = Branch.objects.filter(owner=user)
+            user_buildings = Building.objects.filter(branch__in=user_branches)
+            return Payment.objects.filter(flat__building__in=user_buildings).distinct()
+
+        if user.commandant:
+            user_buildings = Building.objects.filter(commandant=user)
+            return Payment.objects.filter(flat__building__in=user_buildings).distinct()
+            return Payment.objects.none()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
@@ -872,10 +943,34 @@ class PaymentCreateView(CreateView):
             {"title": "Ana səhifə", "url": reverse("branches")},
             {"title": "Ödənişlər", "url": reverse("payment-list")},
         ]
-        context["buildings"] = Building.objects.all()
-        context["user_name"] = self.request.user.username
-        context["is_superuser"] = self.request.user.is_superuser
+        user = self.request.user
+        if user.is_superuser:
+            # Superuser sadece kendi binalarını görmeli
+            user_branches = Branch.objects.filter(owner=user)
+            context["buildings"] = Building.objects.filter(branch__in=user_branches)
+        elif user.commandant:
+            # Komendant sadece kendi binalarını görmeli
+            context["buildings"] = Building.objects.filter(commandant=user)
+        else:
+            # Diğer kullanıcılar binaları göremez
+            context["buildings"] = Building.objects.none()
+        context["user_name"] = user.username
+        context["is_superuser"] = user.is_superuser
         return context
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        user = self.request.user
+        if user.is_superuser:
+            user_branches = Branch.objects.filter(owner=user)
+            buildings = Building.objects.filter(branch__in=user_branches)
+            form.fields["building"].queryset = buildings
+        elif user.commandant:
+            buildings = Building.objects.filter(commandant=user)
+            form.fields["building"].queryset = buildings
+        else:
+            form.fields["building"].queryset = Building.objects.none()
+        return form
 
     def get(self, request, *args, **kwargs):
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
@@ -888,7 +983,15 @@ class PaymentCreateView(CreateView):
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
-        # Set the user to the current user before saving the form
+        # Kullanıcıyı geçerli kullanıcı olarak ayarla
+        form.instance.user = self.request.user
+        messages.success(
+            self.request, f"{form.instance.flat} mənzili üçün ödəniş yaradıldı!"
+        )
+        return super().form_valid(form)
+
+    def form_valid(self, form):
+        # Kullanıcıyı geçerli kullanıcı olarak ayarla
         form.instance.user = self.request.user
         messages.success(
             self.request, f"{form.instance.flat} mənzili üçün ödəniş yaradıldı!"
@@ -962,25 +1065,47 @@ class PaymentChartView(ListView):
 class ResidentListView(ListView):
     login_url = "/login/"
     model = User
+    form = ResidentForm
     template_name = "residents.html"
     context_object_name = "residents"
 
     def get_queryset(self):
-        branch_ids = self.request.user.branch.all().values_list("id", flat=True)
-        if branch_ids:
-            queryset = User.objects.filter(branch__id__in=branch_ids, resident=True)
-        else:
-            queryset = User.objects.none()
-        return queryset
+        user = self.request.user
+        if user.is_superuser:
+            queryset = User.objects.filter(
+                flat__building__branch__owner=user
+            ).distinct()
+        if user.commandant:
+            queryset = User.objects.filter(
+                flat__building__in=Building.objects.filter(commandant=user)
+            ).distinct()
+        building_id = self.request.GET.get("building")
+        section_id = self.request.GET.get("section")
+        flatname = self.request.GET.get("flatname")
+        phone = self.request.GET.get("phone")
+        if building_id:
+            queryset = queryset.filter(flat__building_id=building_id)
+
+        if section_id:
+            queryset = queryset.filter(flat__section_id=section_id)
+        if flatname:
+            queryset = queryset.filter(flat__name=flatname)
+        if phone:
+            queryset = queryset.filter(phone_number__contains=phone)
+
+        return queryset.distinct()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        building_id = self.kwargs.get("building_id")
-        branch_id = self.kwargs.get("branch_id")
-
-        if building_id:
-            context["building"] = get_object_or_404(Building, id=building_id)
-
+        user = self.request.user
+        # building_id = self.kwargs.get("building_id")
+        # branch_id = self.kwargs.get("branch_id")
+        if user.is_superuser:
+            user_branches = Branch.objects.filter(owner=user)
+            buildings = Building.objects.filter(branch__in=user_branches)
+        if user.commandant:
+            buildings = Building.objects.filter(commandant=user)
+        context["buildings"] = buildings
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("branches")},
             {"title": "Binalar", "url": reverse("buildings")},
@@ -993,27 +1118,22 @@ class ResidentListView(ListView):
 class ResidentCreateView(CreateView):
     form_class = ResidentForm
     template_name = "add_resident.html"
-    success_url = reverse_lazy("resident-list")
+    success_url = reverse_lazy("all-residents")
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        building_id = self.kwargs.get("building_id")
-        kwargs["building_id"] = building_id
+        kwargs["user"] = self.request.user
         return kwargs
 
     def form_valid(self, form):
-        building_id = self.kwargs.get("building_id")
-        building = get_object_or_404(Building, id=building_id)
         response = super().form_valid(form)
-        user = self.object  # The saved instance
-        user.building = building
-        user.branch.set([building.branch.id])
+        user = self.object
         user.resident = True
         user.save()
         flat = form.cleaned_data.get("flat")
         try:
-            flat = Flat.objects.get(id=flat)  # Adjust if your field is different
-            flat.user = form.instance
+            flat = Flat.objects.get(id=flat.id)
+            flat.resident = form.instance
             flat.save()
         except Flat.DoesNotExist:
             messages.error(self.request, f"Flat with name {flat} does not exist.")
@@ -1023,49 +1143,8 @@ class ResidentCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["building"] = get_object_or_404(Building, id=self.kwargs["building_id"])
         context["breadcrumbs"] = [
-            {"title": "Ana səhifə", "url": reverse("buildings")},
-            {"title": "Binalar", "url": reverse("buildings")},
-        ]
-        context["user_name"] = self.request.user.username
-        context["is_superuser"] = self.request.user.is_superuser
-        return context
-
-    def get_success_url(self):
-        # Redirect to a list view or another appropriate URL after successful creation
-        building_id = self.kwargs.get("building_id")
-        return reverse_lazy("resident-list", kwargs={"building_id": building_id})
-
-
-class ResidentCustomCreateView(CreateView):
-    model = User
-    form_class = ResidentCreationForm
-    template_name = "resident_form.html"
-    success_url = reverse_lazy("all-residents")  # Adjust as needed
-
-    def form_valid(self, form):
-        # Form verilerini al
-        cleaned_data = form.cleaned_data
-        cleaned_data["branch"] = [cleaned_data["branch"].id]
-        form.cleaned_data = cleaned_data
-        response = super().form_valid(form)
-        instance = self.object
-        instance.resident = True
-        instance.save()
-
-        return response
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["user"] = self.request.user
-        return kwargs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # context["building"] = get_object_or_404(Building, id=self.kwargs["building_id"])
-        context["breadcrumbs"] = [
-            {"title": "Ana səhifə", "url": reverse("buildings")},
+            {"title": "Ana səhifə", "url": reverse("branches")},
             {"title": "Binalar", "url": reverse("buildings")},
         ]
         context["user_name"] = self.request.user.username

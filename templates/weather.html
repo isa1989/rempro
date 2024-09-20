@@ -1,3 +1,8 @@
 <div class="nav-link weather-info" href="#">
-       
+    {% if weather.cod == 200 %}
+        <a>{{ weather.main.temp }}°C</a>
+        <img src="http://openweathermap.org/img/wn/{{ weather.weather.0.icon }}@2x.png" alt="Weather icon" style="width: 50px!important;">
+    {% else %}
+        <a>Weather data not found.</a>
+    {% endif %}
 </div>

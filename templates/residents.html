@@ -3,130 +3,211 @@
 {% block content %}
 <!-- starts -->
 <div class="loader-wrapper">
-    <div class="loader"> 
-        <div class="loader4"></div>
-    </div>
+   <div class="loader">
+      <div class="loader4"></div>
+   </div>
 </div>
 <!-- loader ends-->
-
 <!-- tap on top starts-->
 <div class="tap-top"><i data-feather="chevrons-up"></i></div>
 <!-- tap on tap ends-->
-
 <!-- page-wrapper Start-->
 <div class="page-wrapper compact-wrapper" id="pageWrapper">
-    <!-- Page Header Start-->
-    {% include 'header.html' %}
-    <!-- Page Header Ends -->
-
-    <!-- Page Body Start-->
-    <div class="page-body-wrapper">
-        {% include 'sidebar.html' %}
-        <!-- Page Sidebar Start-->
-       
-        <!-- Page Sidebar Ends-->
-        <div class="page-body">
-            <div class="container-fluid">
-                <div class="page-title">
-                    <div class="row">
-                        <div class="col-6">
-                            <h4>Sakinlər</h4>
-                        </div>
-                        <div class="col-6">
-                            <ol class="breadcrumb">
-                                {% for crumb in breadcrumbs %}
-                                    <li class="breadcrumb-item">
-                                        <a href="{{ crumb.url }}">
-                                            {% if crumb.url %}
-                                                {{ crumb.title }}
-                                            {% else %}
-                                                <span>{{ crumb.title }}</span>
-                                            {% endif %}
-                                        </a>
-                                    </li>
-                                {% endfor %}
-                            </ol>
-                        </div>
-                    </div>
-                </div>
+   <!-- Page Header Start-->
+   {% include 'header.html' %}
+   <!-- Page Header Ends -->
+   <!-- Page Body Start-->
+   <div class="page-body-wrapper">
+      {% include 'sidebar.html' %}
+      <!-- Page Sidebar Start-->
+      <!-- Page Sidebar Ends-->
+      <div class="page-body">
+         <div class="container-fluid">
+            <div class="page-title">
+               <div class="row">
+                  <div class="col-6">
+                     <h4>Sakinlər</h4>
+                  </div>
+                  <div class="col-6">
+                     <ol class="breadcrumb">
+                        {% for crumb in breadcrumbs %}
+                        <li class="breadcrumb-item">
+                           <a href="{{ crumb.url }}">
+                           {% if crumb.url %}
+                           {{ crumb.title }}
+                           {% else %}
+                           <span>{{ crumb.title }}</span>
+                           {% endif %}
+                           </a>
+                        </li>
+                        {% endfor %}
+                     </ol>
+                  </div>
+               </div>
             </div>
-
-            <!-- Container-fluid starts-->
-            <div class="container-fluid">
-                <div class="row"> 
-                    <div class="col-sm-12"> 
-                        <div class="card"> 
-                            <div class="card-body">
-                                {% if messages %}
-                                <div class="alert alert-info">
-                                    {% for message in messages %}
-                                        <p>{{ message }}</p>
-                                    {% endfor %}
-                                </div>
-                                {% endif %}
-                                <div class="list-product-header">
-                                    <div> 
-                                        <a class="btn btn-primary" href="{% url 'add-custom-resident' %}"><i class="fa fa-plus"></i>Sakin əlavə et</a>
-                                      </div>
-                                </div>
-                                <div class="list-product">
-                                    <table class="table" id="project-status">
-                                        <thead> 
-                                            <tr> 
-                                                <th> <span class="f-light f-w-600">Sakinin adı</span></th>
-                                                <th> <span class="f-light f-w-600">Telefon nömrəsi</span></th>
-                                                <th> <span class="f-light f-w-600">Sakini sil</span></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody> 
-                                            {% for resident in residents %}
-                                                <tr class="product-removes">
-                                                    <td> 
-                                                        <div class="product-names">
-                                                            <p>
-                                                                <a href="{% url 'user_profile' resident.id %}">{{ resident.username }}</a>
-                                                            </p>
-                                                        </div>
-                                                    </td>
-                                                    <td> 
-                                                        <div class="product-names">
-                                                            <p>{{ resident.phone_number }}</p>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <!-- Action Buttons -->
-                                                        {% comment %} <a href="{% url 'user_profile' resident.id %}" class="btn btn-info btn-sm">Bax</a> {% endcomment %}
-                                                        {% comment %} <a href="{% url 'resident-edit' resident.id %}" class="btn btn-warning btn-sm">Edit</a> {% endcomment %}
-                                                       <form action="{% url 'resident-delete' pk=resident.id %}" method="post" style="display:inline;" onsubmit="return confirmDelete();">
-                                                            {% csrf_token %}
-                                                            <button type="submit" class="btn btn-danger btn-sm">Sil</button>
-                                                        </form> 
-                                                    </td>
-                                                </tr>
-                                            {% empty %}
-                                                <tr>
-                                                    <td colspan="4">Heç bir sakin tapılmadı.</td>
-                                                </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
+         </div>
+         <!-- Container-fluid starts-->
+         <div class="container-fluid">
+            <div class="row">
+               <div class="col-sm-12">
+                  <div class="card">
+                     <div class="card-body">
+                        {% if messages %}
+                        <div class="alert alert-info">
+                           {% for message in messages %}
+                           <p>{{ message }}</p>
+                           {% endfor %}
+                        </div>
+                        {% endif %}
+                        <div class="list-product-header">
+                           <div> 
+                              <a class="btn btn-primary" href="{% url 'add-resident' %}"><i class="fa fa-plus"></i>Sakin əlavə et</a>
+                           </div>
+                        </div>
+                        <!-- Filter Form -->
+                        <form method="get" action="{% url 'all-residents' %}">
+                           <div class="row align-items-center">
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="building">
+                                        Binanın adı:
+                                    </label>
+                                    <select id="building" name="building" class="form-control">
+                                        <option value="">Bina seçin</option>
+                                        {% for building in buildings %}
+                                            <option value="{{ building.id }}">
+                                                {{ building.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                             </div>
+                              <div class="col-md-2">
+                                 <div class="form-group">
+                                    <label for="section">Blok:</label>
+                                    <select id="section" name="section" class="form-control">
+                                       <option value="">Bütün bloklar</option>
+                                       {% for section in sections %}
+                                       <option value="{{ section.id }}" {% if request.GET.section == section.id|stringformat:"s" %}selected{% endif %}>
+                                       {{ section.name }}
+                                       </option>
+                                       {% endfor %}
+                                    </select>
+                                 </div>
+                              </div>
+                              <div class="col-md-2">
+                                 <div class="form-group">
+                                    <label for="flatname">
+                                    Mənzilin adı:</label>
+                                    <input type="text" id="flatname" name="flatname" value="{{ request.GET.flatname }}" class="form-control">
+                                 </div>
+                              </div>
+                              <div class="col-md-2">
+                                 <div class="form-group">
+                                    <label for="phone">
+                                    Mobil nömrə:</label>
+                                    <input type="text" id="phone" name="phone" value="{{ request.GET.phone }}" class="form-control">
+                                 </div>
+                              </div>
+                              
+                              <div class="col-md-1"><br>
+                                 <button type="submit" class="btn btn-primary w-100">Axtar</button>
+                              </div>
+                           </div>
+                        </form>
+                        <!-- Filter Form End -->
+                        <div class="list-product">
+                           <table class="table" id="project-status">
+                              <thead>
+                                 <tr>
+                                    <th> <span class="f-light f-w-600">Sakinin adı</span></th>
+                                    <th> <span class="f-light f-w-600">Sakinin mənzili</span></th>
+                                    <th> <span class="f-light f-w-600">Telefon nömrəsi</span></th>
+                                    <th> <span class="f-light f-w-600">Sakini sil</span></th>
+                                 </tr>
+                              </thead>
+                              <tbody>
+                                 {% for resident in residents %}
+                                 <tr class="product-removes">
+                                    <td>
+                                       <div class="product-names">
+                                          <p>
+                                             <a href="{% url 'user_profile' resident.id %}">{{ resident.username }}</a>
+                                          </p>
+                                       </div>
+                                    </td>
+                                    <td>
+                                        <div class="product-names">
+                                            <p>
+                                                {% for flat in resident.flat.all %}
+                                                    <a href="">{{ flat.name }}</a><br>
+                                                {% empty %}
+                                                    Mənzil yoxdur
+                                                {% endfor %}
+                                            </p>
+                                        </div>
+                                     </td>
+
+                                    <td>
+                                       <div class="product-names">
+                                          <p>{{ resident.phone_number }}</p>
+                                       </div>
+                                    </td>
+                                    <td>
+                                       <!-- Action Buttons -->
+                                       {% comment %} <a href="{% url 'user_profile' resident.id %}" class="btn btn-info btn-sm">Bax</a> {% endcomment %}
+                                       {% comment %} <a href="{% url 'resident-edit' resident.id %}" class="btn btn-warning btn-sm">Edit</a> {% endcomment %}
+                                       <form action="{% url 'resident-delete' pk=resident.id %}" method="post" style="display:inline;" onsubmit="return confirmDelete();">
+                                          {% csrf_token %}
+                                          <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+                                       </form>
+                                    </td>
+                                 </tr>
+                                 {% empty %}
+                                 <tr>
+                                    <td colspan="4">Heç bir sakin tapılmadı.</td>
+                                 </tr>
+                                 {% endfor %}
+                              </tbody>
+                           </table>
                         </div>
-                    </div>
-                </div>
+                     </div>
+                  </div>
+               </div>
             </div>
-            <!-- Container-fluid Ends-->
-        </div>
-        {% include 'footer.html' %}
-        <!-- footer start-->
-    </div>
+         </div>
+         <!-- Container-fluid Ends-->
+      </div>
+      {% include 'footer.html' %}
+      <!-- footer start-->
+   </div>
 </div>
-
 <script>
-function confirmDelete() {
-    return confirm("Are you sure you want to delete this resident?");
-}
-</script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var buildingSelect = document.getElementById('building');
+        var sectionSelect = document.getElementById('section');
 
+        buildingSelect.addEventListener('change', function() {
+            var buildingId = this.value;
+
+            if (buildingId) {
+                fetch("{% url 'section_autocomplete' %}?building_id=" + buildingId)
+                    .then(response => response.json())
+                    .then(data => {
+                        sectionSelect.innerHTML = '<option value="">Bütün bloklar</option>';
+                        data.results.forEach(function(section) {
+                            sectionSelect.append(new Option(section.text, section.id));
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
+            } else {
+                sectionSelect.innerHTML = '<option value="">Bütün bloklar</option>';
+            }
+        });
+    });
+    
+   function confirmDelete() {
+       return confirm("Are you sure you want to delete this resident?");
+   }
+</script>
 {% endblock %}

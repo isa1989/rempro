@@ -36,12 +36,13 @@ urlpatterns = [
         views.FlatServiceListView.as_view(),
         name="flat-services",
     ),
-    path("flats/<int:building_id>/", views.FlatListView.as_view(), name="flat-list"),
+    # path("flats/<int:building_id>/", views.FlatListView.as_view(), name="flat-list"),
     path(
-        "flat/add/<int:building_id>/",
+        "flat/add/",
         views.FlatCreateView.as_view(),
         name="flat-add",
     ),
+    path("flats/", views.FlatListView.as_view(), name="flat-list"),
     # --------------------------- BUILDINGS -----------------------------
     path("buildings/", views.BuildingListView.as_view(), name="buildings"),
     path(
@@ -61,14 +62,17 @@ urlpatterns = [
     ),
     path("create-building/", views.create_building, name="create_building"),
     path(
-        "sections/<int:building_id>/",
+        "sections/",
         views.SectionListView.as_view(),
         name="section-list",
     ),
     path(
-        "section/add/<int:building_id>/",
+        "section/add/",
         views.SectionsCreateView.as_view(),
         name="section-add",
+    ),
+    path(
+        "section-autocomplete/", views.section_autocomplete, name="section_autocomplete"
     ),
     # ----------------------Services-------------------------------
     path("services/", views.ServicesListView.as_view(), name="services"),
@@ -105,29 +109,29 @@ urlpatterns = [
     path("payments/add/", views.PaymentCreateView.as_view(), name="payment-add"),
     path("payment-chart/", views.PaymentChartView.as_view(), name="payment-chart"),
     # -------------------------- RESIDENTS -------------------------------
-    path(
-        "building/<int:building_id>/residents/",
-        views.ResidentListView.as_view(),
-        name="resident-list",
-    ),
+    # path(
+    #     "building/<int:building_id>/residents/",
+    #     views.ResidentListView.as_view(),
+    #     name="resident-list",
+    # ),
     path("residents/", views.ResidentListView.as_view(), name="all-residents"),
     path(
-        "residents/add/<int:building_id>/",
+        "residents/add/",
         views.ResidentCreateView.as_view(),
-        name="resident-add",
+        name="add-resident",
     ),
     path(
         "resident/<int:pk>/delete/",
         views.ResidentDeleteView.as_view(),
         name="resident-delete",
     ),
-    path(
-        "add-resident/",
-        views.ResidentCustomCreateView.as_view(),
-        name="add-custom-resident",
-    ),
     # -------------------------- RESIDENTS -------------------------------
     path("flat-autocomplete/", views.flat_autocomplete, name="flat-autocomplete"),
+    path(
+        "flat-autocomplete-sec/",
+        views.flat_autocomplete_sec,
+        name="flat-autocomplete-sec",
+    ),
     path(
         "autocomplete/buildings/",
         views.building_autocomplete,
