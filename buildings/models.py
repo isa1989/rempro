@@ -159,6 +159,7 @@ class Flat(models.Model):
     square_metres = models.DecimalField(
         max_digits=8, decimal_places=2, verbose_name="Sahəsi"
     )
+    is_active = models.BooleanField(default=True)
     is_rent = models.BooleanField(default=False, verbose_name="Icarə")
     tenant_document = models.FileField(
         upload_to="documents/", blank=True, null=True, verbose_name="Icarəçi sənədi"

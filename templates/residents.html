@@ -60,9 +60,7 @@
                         </div>
                         {% endif %}
                         <div class="list-product-header">
-                           <div> 
-                              <a class="btn btn-primary" href="{% url 'add-resident' %}"><i class="fa fa-plus"></i>Sakin əlavə et</a>
-                           </div>
+                           
                         </div>
                         <!-- Filter Form -->
                         <form method="get" action="{% url 'all-residents' %}">
@@ -112,6 +110,9 @@
                               
                               <div class="col-md-1"><br>
                                  <button type="submit" class="btn btn-primary w-100">Axtar</button>
+                              </div>
+                              <div class="col-md-2"><br>
+                                 <a class="btn btn-primary" href="{% url 'add-resident' %}"><i class="fa fa-plus"></i>Sakin əlavə et</a>
                               </div>
                            </div>
                         </form>

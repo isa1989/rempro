@@ -61,9 +61,7 @@
                                     </div>
                                     {% endif %}
                                     <div class="list-product-header">
-                                        <div> 
-                                          <a class="btn btn-primary" href="{% url 'flat-add' %}"><i class="fa fa-plus"></i>Mənzil əlavə et</a>
-                                        </div>
+                                      
                                         
                                       </div>
                                     <!-- Filter Form -->
@@ -71,11 +69,20 @@
                                         <div class="row align-items-center">
                                             <div class="col-md-2">
                                                 <div class="form-group">
-                                                    <label for="name">Mənzilin adı:</label>
-                                                    <input type="text" id="name" name="name" value="{{ request.GET.name }}" class="form-control">
+                                                    <label for="building">
+                                                        Binanın adı:
+                                                    </label>
+                                                    <select id="building" name="building" class="form-control">
+                                                        <option value="">Bina seçin</option>
+                                                        {% for building in buildings %}
+                                                            <option value="{{ building.id }}">
+                                                                {{ building.name }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
                                                 </div>
                                             </div>
-                                            <div class="col-md-2">
+                                              <div class="col-md-2">
                                                 <div class="form-group">
                                                     <label for="section">Blok:</label>
                                                     <select id="section" name="section" class="form-control">
@@ -88,6 +95,13 @@
                                                     </select>
                                                 </div>
                                             </div>
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <label for="name">Mənzilin adı:</label>
+                                                    <input type="text" id="name" name="name" value="{{ request.GET.name }}" class="form-control">
+                                                </div>
+                                            </div>
+                                            
                                             <div class="col-md-1">
                                                 <div class="form-group">
                                                     <label for="square_metres">Evin sahəsi:</label>
@@ -97,8 +111,18 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                   <label for="phone">
+                                                   Mobil nömrə:</label>
+                                                   <input type="text" id="phone" name="phone" value="{{ request.GET.phone }}" class="form-control">
+                                                </div>
+                                             </div>
                                             <div class="col-md-1"><br>
                                                 <button type="submit" class="btn btn-primary w-100">Axtar</button>
+                                            </div>
+                                            <div class="col-md-2"><br>
+                                                <a class="btn btn-primary" href="{% url 'flat-add' %}"><i class="fa fa-plus"></i>Mənzil əlavə et</a>
                                             </div>
                                         </div>
                                     </form>
@@ -215,16 +239,39 @@
 
     <!-- JavaScript to handle input formatting -->
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Combine min and max values into a single field when the form is submitted
-        document.querySelector('form').addEventListener('submit', function() {
-            const minSquareMetres = document.getElementById('min_square_metres').value;
-            const maxSquareMetres = document.getElementById('max_square_metres').value;
-            
-            // Set the values for the form submission
-            document.querySelector('input[name="min_square_metres"]').value = minSquareMetres;
-            document.querySelector('input[name="max_square_metres"]').value = maxSquareMetres;
+        document.addEventListener('DOMContentLoaded', function() {
+            // Min ve max değerlerini form gönderildiğinde birleştir
+            document.querySelector('form').addEventListener('submit', function() {
+                const minSquareMetres = document.getElementById('min_square_metres').value;
+                const maxSquareMetres = document.getElementById('max_square_metres').value;
+                
+                // Form gönderimi için değerleri ayarla
+                document.querySelector('input[name="min_square_metres"]').value = minSquareMetres;
+                document.querySelector('input[name="max_square_metres"]').value = maxSquareMetres;
+            });
+        
+            // Bina seçimi değiştiğinde bölüm seçimlerini güncelle
+            var buildingSelect = document.getElementById('building');
+            var sectionSelect = document.getElementById('section');
+        
+            buildingSelect.addEventListener('change', function() {
+                var buildingId = this.value;
+        
+                if (buildingId) {
+                    fetch("{% url 'section_autocomplete' %}?building_id=" + buildingId)
+                        .then(response => response.json())
+                        .then(data => {
+                            sectionSelect.innerHTML = '<option value="">Bütün bloklar</option>';
+                            data.results.forEach(function(section) {
+                                sectionSelect.append(new Option(section.text, section.id));
+                            });
+                        })
+                        .catch(error => console.error('Error:', error));
+                } else {
+                    sectionSelect.innerHTML = '<option value="">Bütün bloklar</option>';
+                }
+            });
         });
-    });
+    
     </script>
 {% endblock %}

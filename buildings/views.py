@@ -18,6 +18,8 @@ from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from buildings.utils import get_weather_data
 from django.views.generic.edit import CreateView
+from datetime import timedelta
+
 from .models import (
     Building,
     Section,
@@ -87,18 +89,70 @@ class DashboardView(View):
     template_name = "dashboard.html"
 
     def get(self, request, *args, **kwargs):
-        # Collect data for the dashboard
+        user = self.request.user
+        one_month_ago = timezone.now() - timedelta(days=30)
+        if user.is_superuser:
+            branch_count = Branch.objects.filter(owner=user).count()
+            building_count = Building.objects.filter(branch__owner=user).count()
+            section_count = Section.objects.filter(building__branch__owner=user).count()
+            flat_count = Flat.objects.filter(building__branch__owner=user).count()
+            resident_count = (
+                User.objects.filter(flat__building__branch__owner=user, resident=True)
+                .distinct()
+                .count()
+            )
+            payment_count = Payment.objects.filter(
+                flat__building__branch__owner=user
+            ).count()
+
+            total_expenses = (
+                Expense.objects.filter(outcome_date__gte=one_month_ago).aggregate(
+                    total=Sum("price")
+                )["total"]
+                or 0
+            )
+        elif user.commandant:
+            user_buildings = user.building.all()
+            branch_count = 0
+            building_count = Building.objects.filter(commandant=user).count()
+            section_count = Section.objects.filter(
+                building__in=user.building.all()
+            ).count()
+            flat_count = Flat.objects.filter(building__in=user_buildings).count()
+            resident_count = (
+                User.objects.filter(flat__building__in=user_buildings, resident=True)
+                .distinct()
+                .count()
+            )
+            payment_count = Payment.objects.filter(
+                flat__building__in=user_buildings
+            ).count()
+            total_expenses = (
+                Expense.objects.filter(
+                    building__in=user_buildings, outcome_date__gte=one_month_ago
+                ).aggregate(total=Sum("price"))["total"]
+                or 0
+            )
+        else:
+            branch_count = 0
+            building_count = 0
+            section_count = 0
+            flat_count = 0
+            resident_count = 0
+            payment_count = 0
+            total_expenses = 0
         context = {
             "page_title": "Dashboard",
             "breadcrumbs": [
                 {"title": "Ana səhifə", "url": reverse("dashboard")},
             ],
-            "branch_count": Branch.objects.count(),
-            "building_count": Building.objects.count(),
-            "section_count": Section.objects.count(),
-            "flat_count": Flat.objects.count(),
-            "resident_count": User.objects.filter(resident=True).count(),
-            "payment_count": Payment.objects.count(),
+            "branch_count": branch_count,
+            "building_count": building_count,
+            "section_count": section_count,
+            "flat_count": flat_count,
+            "resident_count": resident_count,
+            "payment_count": payment_count,
+            "total_expenses": total_expenses,
             "user_name": request.user.username,
             "is_superuser": request.user.is_superuser,
         }
@@ -532,6 +586,7 @@ class SectionsCreateView(LoginRequiredMixin, CreateView):
 class FlatListView(LoginRequiredMixin, ListView):
     login_url = "/login/"
     model = Flat
+    form = FlatForm
     template_name = "flat.html"
     context_object_name = "flats"
     paginate_by = 50
@@ -544,20 +599,19 @@ class FlatListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         user = self.request.user
         if user.is_superuser:
-            return Flat.objects.filter(building__branch__owner=user)
+            queryset = Flat.objects.filter(building__branch__owner=user).distinct()
         if user.commandant:
-            return Flat.objects.filter(
+            queryset = Flat.objects.filter(
                 building__in=Building.objects.filter(commandant=user)
-            )
-        queryset = Flat.objects.none()
-        building_id = self.kwargs.get("building_id")
-        if building_id:
-            queryset = queryset.filter(building_id=building_id)
-
+            ).distinct()
+        building_id = self.request.GET.get("building")
         section_id = self.request.GET.get("section")
         min_square_metres = self.request.GET.get("min_square_metres")
         max_square_metres = self.request.GET.get("max_square_metres")
         name = self.request.GET.get("name")
+        phone = self.request.GET.get("phone")
+        if building_id:
+            queryset = queryset.filter(building_id=building_id)
         if section_id:
             queryset = queryset.filter(section_id=section_id)
         if min_square_metres:
@@ -566,11 +620,19 @@ class FlatListView(LoginRequiredMixin, ListView):
             queryset = queryset.filter(square_metres__lte=max_square_metres)
         if name:
             queryset = queryset.filter(name__icontains=name)
-
+        if phone:
+            queryset = queryset.filter(resident__phone_number__contains=phone)
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
+        if user.is_superuser:
+            user_branches = Branch.objects.filter(owner=user)
+            buildings = Building.objects.filter(branch__in=user_branches)
+        if user.commandant:
+            buildings = Building.objects.filter(commandant=user)
+        context["buildings"] = buildings
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("branches")},
             {"title": "Binalar", "url": reverse("buildings")},
