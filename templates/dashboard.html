@@ -139,6 +139,18 @@
                     </a>
                   </div>
                </div>
+               <div class="col-md-4 mb-4">
+                  <a href="{% url 'all-residents' %}?negative_balance=true" class="d-flex align-items-center text-decoration-none text-dark">
+                    <div class="card">
+                       <div class="card-body">
+                          <h5 class="card-title">
+                             <img src="{% static 'dashboard/payment.png' %}" alt="Payments Icon" width="24"> Komunal gecikmə
+                          </h5>
+                          <p class="card-text">{{ delayed_resident }} </p>
+                       </div>
+                      </a>
+                    </div>
+                 </div>
             </div>
          </div>
          <!-- Container-fluid Ends -->

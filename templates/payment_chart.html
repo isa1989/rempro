@@ -2,95 +2,96 @@
 {% include 'base.html' %}
 {% block content %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expense Chart</title>
+    <title>Ödeme Grafiği</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <!-- loader starts-->
+    <!-- Yükleyici Başlangıcı -->
     <div class="loader-wrapper">
       <div class="loader"> 
         <div class="loader4"></div>
       </div>
     </div>
-    <!-- loader ends-->
+    <!-- Yükleyici Bitişi -->
 
-    <!-- tap on top starts-->
-    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
-    <!-- tap on tap ends-->
-
-    <!-- page-wrapper Start-->
+    <!-- Sayfa Wrapper Başlangıcı -->
     <div class="page-wrapper compact-wrapper" id="pageWrapper">
-      <!-- Page Header Start-->
         {% include 'header.html' %}
-      <!-- Page Header Ends-->
-    
-      <!-- Page Body Start-->
-      <div class="page-body-wrapper">
-        <!-- Page Sidebar Start-->
-        {% include 'sidebar.html' %}
-        <!-- Page Sidebar Ends-->
+        <div class="page-body-wrapper">
+            {% include 'sidebar.html' %}
+            <div class="page-body">
+                <div class="container-fluid">
+                    <div class="page-title">
+                        <div class="row">
+                            <div class="col-6"></div>
+                            <div class="col-6"> 
+                                <ol class="breadcrumb">
+                                    {% for crumb in breadcrumbs %}
+                                        <li class="breadcrumb-item">
+                                            <a href="{{ crumb.url }}">
+                                                {% if crumb.url %}
+                                                    {{ crumb.title }}
+                                                {% else %}
+                                                    <span>{{ crumb.title }}</span>
+                                                {% endif %}
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="page-body">
-          <div class="container-fluid">
-            <div class="page-title">
-              <div class="row">
-                <div class="col-6">
+                <!-- Grafik Alanı -->
+                <div class="container">
+                    <canvas id="expenseChart" style="width: 100%; height: 360px;"></canvas>
                 </div>
-                <div class="col-6"> 
-                  <ol class="breadcrumb">
-                      {% for crumb in breadcrumbs %}
-                          <li class="breadcrumb-item">
-                              <a href="{{ crumb.url }}">
-                                  {% if crumb.url %}
-                                      {{ crumb.title }}
-                                  {% else %}
-                                      <span>{{ crumb.title }}</span>
-                                  {% endif %}
-                              </a>
-                          </li>
-                      {% endfor %}
-                  </ol>
-                </div>
-              </div>
+                <!-- Grafik Alanı Sonu -->
             </div>
-          </div>
-
-          <!-- Container-fluid starts-->
-          <div class="container">
-            <div id="chartContainer" style="width: 100%; height: 360px;"></div>
-            <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
-          </div>
-          <!-- Container-fluid Ends-->
         </div>
-        <!-- footer start-->
-      </div>
     </div>
+    
     <script>
-        window.onload = function () {
-            var chart = new CanvasJS.Chart("chartContainer", {
-                theme: "light2",
-                title: {
-                    text: "Aylıq ödənişlər"
-                },
-                axisY: {
-                    stripLines: [{
-                        value: 10000,  // Adjust as needed
-                    }]
-                },
-                data: [{
-                    type: "line",
-                    yValueFormatString: "#,### Manat",
-                    dataPoints: {{ stepcount|safe }}
+        const ctx = document.getElementById('expenseChart').getContext('2d');
+        const expenseChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ labels|safe }},  
+                datasets: [{
+                    label: 'Aylıq Ödəmələr',
+                    data: {{ data_points|safe }},  
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 1,
+                    fill: true,
                 }]
-            });
-            chart.render();
-        }
-      </script>    
-  </body>
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Miqdar (Manat)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Aylar'
+                        }
+                    }
+                }
+            }
+        });
+    </script>    
+</body>
 </html>
 {% endblock %}

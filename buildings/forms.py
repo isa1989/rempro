@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory
+from django.core.exceptions import ValidationError
 from .models import (
     Building,
     Section,
@@ -413,6 +414,14 @@ class ResidentForm(UserCreationForm):
         for field in self.fields.values():
             field.help_text = None
             field.label = ""
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        if User.objects.filter(email=email).exists():
+            raise ValidationError(
+                "Bu e-posta ünvanı artıq mövcuddur. Başqa bir e-posta ünvanı seçin."
+            )
+        return email
 
 
 class PaymentForm(forms.ModelForm):

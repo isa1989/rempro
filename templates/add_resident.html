@@ -59,7 +59,11 @@
                                              <label for="{{ form.branch.id_for_label }}">Filial</label>
                                              {{ form.branch }}
                                              {% if form.branch.errors %}
-                                             <div class="invalid-feedback">{{ form.branch.errors }}</div>
+                                                 <div class="invalid-feedback d-block">
+                                                     {% for error in form.branch.errors %}
+                                                         <div>{{ error }}</div>
+                                                     {% endfor %}
+                                                 </div>
                                              {% endif %}
                                           </div>
                                           <div class="col-12 mt-3">
@@ -67,7 +71,11 @@
                                              <label for="{{ form.building.id_for_label }}">Bina</label>
                                              {{ form.building }}
                                              {% if form.building.errors %}
-                                             <div class="invalid-feedback">{{ form.building.errors }}</div>
+                                                 <div class="invalid-feedback d-block">
+                                                     {% for error in form.building.errors %}
+                                                         <div>{{ error }}</div>
+                                                     {% endfor %}
+                                                 </div>
                                              {% endif %}
                                           </div>
                                           <div class="col-12 mt-3">
@@ -75,7 +83,11 @@
                                              <label for="{{ form.flat.id_for_label }}">Mənzil</label>
                                              {{ form.flat }}
                                              {% if form.flat.errors %}
-                                             <div class="invalid-feedback">{{ form.flat.errors }}</div>
+                                                 <div class="invalid-feedback d-block">
+                                                     {% for error in form.flat.errors %}
+                                                         <div>{{ error }}</div>
+                                                     {% endfor %}
+                                                 </div>
                                              {% endif %}
                                           </div>
                                           <div class="col-12 mt-3">
@@ -83,7 +95,11 @@
                                              <label for="{{ form.username.id_for_label }}">İstifadəçi adı</label>
                                              {{ form.username }}
                                              {% if form.username.errors %}
-                                             <div class="invalid-feedback">{{ form.username.errors }}</div>
+                                                 <div class="invalid-feedback d-block">
+                                                     {% for error in form.username.errors %}
+                                                         <div>{{ error }}</div>
+                                                     {% endfor %}
+                                                 </div>
                                              {% endif %}
                                           </div>
                                           <div class="col-12 mt-3">
@@ -91,23 +107,39 @@
                                              <label for="{{ form.email.id_for_label }}">Email</label>
                                              {{ form.email }}
                                              {% if form.email.errors %}
-                                             <div class="invalid-feedback">{{ form.email.errors }}</div>
+                                                 <div class="invalid-feedback d-block">
+                                                     {% for error in form.email.errors %}
+                                                         <div>{{ error }}</div>
+                                                     {% endfor %}
+                                                 </div>
                                              {% endif %}
                                           </div>
                                           <div class="col-12 mt-3">
-                                             <!-- Phone Number Field -->
-                                             <label for="{{ form.phone_number.id_for_label }}">Telefon Nömrəsi</label>
-                                             {{ form.phone_number }}
+                                             <label for="phone_number">Telefon Nömrəsi</label>
+                                             <div class="input-group">
+                                                 <span class="input-group-text">+994</span>
+                                                 <input type="tel" id="phone_number" name="phone_number" class="form-control" 
+                                                        placeholder="Telefon Nömrəsi" maxlength="9" required 
+                                                        oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
+                                             </div>
                                              {% if form.phone_number.errors %}
-                                             <div class="invalid-feedback">{{ form.phone_number.errors }}</div>
+                                                 <div class="invalid-feedback d-block">
+                                                     {% for error in form.phone_number.errors %}
+                                                         <div>{{ error }}</div>
+                                                     {% endfor %}
+                                                 </div>
                                              {% endif %}
-                                          </div>
+                                         </div>
                                           <div class="col-12 mt-3">
                                              <!-- First Name Field -->
                                              <label for="{{ form.first_name.id_for_label }}">Ad</label>
                                              {{ form.first_name }}
                                              {% if form.first_name.errors %}
-                                             <div class="invalid-feedback">{{ form.first_name.errors }}</div>
+                                                 <div class="invalid-feedback d-block">
+                                                     {% for error in form.first_name.errors %}
+                                                         <div>{{ error }}</div>
+                                                     {% endfor %}
+                                                 </div>
                                              {% endif %}
                                           </div>
                                           <div class="col-12 mt-3">
@@ -115,16 +147,22 @@
                                              <label for="{{ form.last_name.id_for_label }}">Soyad</label>
                                              {{ form.last_name }}
                                              {% if form.last_name.errors %}
-                                             <div class="invalid-feedback">{{ form.last_name.errors }}</div>
+                                                 <div class="invalid-feedback d-block">
+                                                     {% for error in form.last_name.errors %}
+                                                         <div>{{ error }}</div>
+                                                     {% endfor %}
+                                                 </div>
                                              {% endif %}
                                           </div>
                                           <div class="col-12 mt-3">
                                              <label for="{{ form.password1.id_for_label }}">Parol</label>
                                              {{ form.password1 }}
                                              {% if form.password1.errors %}
-                                             <div class="invalid-feedback">
-                                                {{ form.password1.errors }}
-                                             </div>
+                                                 <div class="invalid-feedback d-block">
+                                                     {% for error in form.password1.errors %}
+                                                         <div>{{ error }}</div>
+                                                     {% endfor %}
+                                                 </div>
                                              {% endif %}
                                           </div>
                                           <div class="col-12 mt-3">
@@ -132,9 +170,11 @@
                                              <label for="{{ form.password2.id_for_label }}">Parolu təkrar yaz</label>
                                              {{ form.password2 }}
                                              {% if form.password2.errors %}
-                                             <div class="invalid-feedback">
-                                                {{ form.password2.errors }}
-                                             </div>
+                                                 <div class="invalid-feedback d-block">
+                                                     {% for error in form.password2.errors %}
+                                                         <div>{{ error }}</div>
+                                                     {% endfor %}
+                                                 </div>
                                              {% endif %}
                                           </div>
                                           <div class="col-12">

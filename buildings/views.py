@@ -104,7 +104,11 @@ class DashboardView(View):
             payment_count = Payment.objects.filter(
                 flat__building__branch__owner=user
             ).count()
-
+            delayed_resident = User.objects.filter(
+                flat__building__branch__owner=user,
+                flat__balance__lt=0,
+                resident=True,
+            ).count()
             total_expenses = (
                 Expense.objects.filter(outcome_date__gte=one_month_ago).aggregate(
                     total=Sum("price")
@@ -127,6 +131,9 @@ class DashboardView(View):
             payment_count = Payment.objects.filter(
                 flat__building__in=user_buildings
             ).count()
+            delayed_resident = User.objects.filter(
+                flat__building__in=user_buildings, resident=True
+            ).count()
             total_expenses = (
                 Expense.objects.filter(
                     building__in=user_buildings, outcome_date__gte=one_month_ago
@@ -140,6 +147,7 @@ class DashboardView(View):
             flat_count = 0
             resident_count = 0
             payment_count = 0
+            delayed_resident = 0
             total_expenses = 0
         context = {
             "page_title": "Dashboard",
@@ -152,6 +160,7 @@ class DashboardView(View):
             "flat_count": flat_count,
             "resident_count": resident_count,
             "payment_count": payment_count,
+            "delayed_resident": delayed_resident,
             "total_expenses": total_expenses,
             "user_name": request.user.username,
             "is_superuser": request.user.is_superuser,
@@ -1068,8 +1077,6 @@ class PaymentChartView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # Aggregate payments by year and month
         payment_data = (
             Payment.objects.annotate(month=ExtractMonth("date"))
             .annotate(year=ExtractYear("date"))
@@ -1077,16 +1084,14 @@ class PaymentChartView(ListView):
             .annotate(total=Sum("amount"))
             .order_by("year", "month")
         )
-
-        # Prepare data for the chart
-        stepcount = []
+        labels = []
+        data_points = []
         if payment_data:
             for data in payment_data:
-                # Create a label for each month with the year included
                 label = f"{data['month']:02d}/{data['year']}"
-                stepcount.append({"y": float(data["total"]), "label": label})
+                labels.append(label)
+                data_points.append(float(data["total"]))
 
-            # Ensure the stepcount data covers all months in the year
             start_year = payment_data[0]["year"]
             end_year = payment_data.last()["year"]
             all_months = {
@@ -1094,33 +1099,30 @@ class PaymentChartView(ListView):
                 for month in range(1, 13)
                 for year in range(start_year, end_year + 1)
             }
-            for entry in stepcount:
-                month_label = entry["label"]
-                if month_label in all_months:
-                    all_months[month_label] = entry["y"]
 
-            # Reformat stepcount to ensure all months are represented
-            stepcount = [
-                {"y": all_months[f"{month:02d}/{year}"], "label": f"{month:02d}/{year}"}
-                for month in range(1, 13)
-                for year in range(start_year, end_year + 1)
-            ]
+            for entry in zip(labels, data_points):
+                month_label, value = entry
+                all_months[month_label] = value
+            labels = list(all_months.keys())
+            data_points = list(all_months.values())
         else:
-            # Handle the case where payment_data is empty
-            start_year = 2024  # Default or current year
-            end_year = 2024
-            stepcount = [
-                {"y": 0, "label": f"{month:02d}/{year}"}
-                for month in range(1, 13)
+            start_year = timezone.now().year
+            end_year = start_year
+            labels = [
+                f"{month:02d}/{year}"
                 for year in range(start_year, end_year + 1)
+                for month in range(1, 13)
             ]
+            data_points = [0] * 12
 
         context["is_superuser"] = self.request.user.is_superuser
         context["breadcrumbs"] = [
-            {"title": "Ana səhifə", "url": reverse("branches")},
+            {"title": "Ana Sayfa", "url": reverse("branches")},
         ]
-        context["stepcount"] = stepcount
+        context["labels"] = labels
+        context["data_points"] = data_points
         context["user_name"] = self.request.user.username
+
         return context
 
 
@@ -1145,6 +1147,7 @@ class ResidentListView(ListView):
         section_id = self.request.GET.get("section")
         flatname = self.request.GET.get("flatname")
         phone = self.request.GET.get("phone")
+        negative_balance = self.request.GET.get("negative_balance")
         if building_id:
             queryset = queryset.filter(flat__building_id=building_id)
 
@@ -1154,6 +1157,8 @@ class ResidentListView(ListView):
             queryset = queryset.filter(flat__name=flatname)
         if phone:
             queryset = queryset.filter(phone_number__contains=phone)
+        if negative_balance:
+            queryset = queryset.filter(flat__balance__lt=0)
 
         return queryset.distinct()
 

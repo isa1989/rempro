@@ -13,15 +13,9 @@ def validate_day(value):
 
 class User(AbstractUser):
     phone_number = models.CharField(
-        max_length=17,  # Adjust based on your needs
-        validators=[
-            RegexValidator(
-                regex=r"^\+?1?\d{9,15}$",
-                message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.",
-            )
-        ],
-        blank=True,  # Allow blank values
-        null=True,  # Allow null values
+        max_length=13,
+        blank=True,
+        null=True,
     )
     commandant = models.BooleanField(default=False)
     resident = models.BooleanField(default=False)
