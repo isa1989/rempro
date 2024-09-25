@@ -82,24 +82,26 @@
 <!-- AJAX Script to fetch and display weather -->
 <script>
 $(document).ready(function() {
-    $.ajax({
-        url: "{% url 'get_weather' %}",
-        method: "GET",
-        dataType: "json",
-        success: function(data) {
-            if (data.weather && data.weather.cod == 200) {
-                $('.weather-info').html(`
-                    <span class="temperature">${data.weather.main.temp}°C</span>
-                    <img src="http://openweathermap.org/img/wn/${data.weather.weather[0].icon}@2x.png" alt="Weather icon" style="width: 50px;">
-                `);
-            } else {
-                $('.weather-info').html('<span>Weather data not found.</span>');
-            }
-        },
-        error: function() {
-            $('.weather-info').html('<span>Failed to fetch weather data.</span>');
+  $.ajax({
+    url: "{% url 'get_weather' %}",
+    method: "GET",
+    dataType: "json",
+    success: function(data) {
+        if (data.weather && data.weather.length > 0) {
+            let temperature = Math.round(data.main.temp); // Yuvarla
+            $('.weather-info').html(`
+                <span class="temperature">${temperature}°C</span>
+                <img src="http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="Weather icon" style="width: 50px;">
+                <span>${data.weather[0].description}</span>
+            `);
+        } else {
+            $('.weather-info').html('<span>Weather data not found.</span>');
         }
-    });
+    },
+    error: function() {
+        $('.weather-info').html('<span>Failed to fetch weather data.</span>');
+    }
+});
 
     // Toggle profile dropdown
     $('.profile-nav').on('click', function(e) {

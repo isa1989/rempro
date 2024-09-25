@@ -1599,7 +1599,6 @@ def get_weather(request):
     from .utils import get_weather_data
 
     city_id = "587084"  # Default city ID for Baku
-
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         # Handle AJAX request
         try:
