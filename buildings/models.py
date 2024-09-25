@@ -82,6 +82,7 @@ class Camera(models.Model):
 
 
 class Service(models.Model):
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name="service")
     name = models.CharField(
         max_length=255,
         verbose_name="Xidmətin adı",
@@ -96,6 +97,7 @@ class Service(models.Model):
         verbose_name="Ödəniş günü",
         validators=[validate_day],
     )
+    is_active = models.BooleanField(default=True, verbose_name="aktiv")
 
     class Meta:
         verbose_name = "Xidmətlər"
@@ -244,6 +246,11 @@ class Payment(models.Model):
     )
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     date = models.DateField(verbose_name="Tarix", help_text="Ödənişin tarixi")
+
+    def save(self, *args, **kwargs):
+        if self.service and self.flat:
+            self.amount = self.service.price * self.flat.square_metres
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Payment of {self.amount} on {self.date} for {self.flat}"

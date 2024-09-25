@@ -143,6 +143,11 @@ class FlatForm(forms.ModelForm):
 
 
 class ServiceForm(forms.ModelForm):
+    branch = forms.ModelChoiceField(
+        queryset=Branch.objects.none(),
+        required=False,
+        widget=forms.Select(attrs={"class": "form-control select2"}),
+    )
     invoice_day = forms.IntegerField(
         min_value=1,
         max_value=31,
@@ -155,7 +160,7 @@ class ServiceForm(forms.ModelForm):
 
     class Meta:
         model = Service
-        fields = ["name", "price", "invoice_day"]
+        fields = ["branch", "name", "price", "invoice_day"]
         widgets = {
             "name": forms.TextInput(
                 attrs={
@@ -173,6 +178,17 @@ class ServiceForm(forms.ModelForm):
                 }
             ),
         }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+        if user.is_superuser:
+            self.fields["branch"].queryset = Branch.objects.filter(owner=user)
+        elif user.commandant:
+            buildings = Building.objects.filter(commandant=user)
+            self.fields["branch"].queryset = Branch.objects.filter(
+                buildings__in=buildings
+            ).distinct()
 
 
 class AddServiceForm(ModelForm):

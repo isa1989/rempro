@@ -724,6 +724,11 @@ class ServiceDetailView(LoginRequiredMixin, DetailView):
     template_name = "service_detail.html"
     context_object_name = "service"
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
@@ -761,14 +766,29 @@ class ServiceCreateView(LoginRequiredMixin, CreateView):
     template_name = "add_service.html"
     success_url = reverse_lazy("services")
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
     def get_context_data(self, **kwargs):
+        user = self.request.user
         context = super().get_context_data(**kwargs)
+        if user.is_superuser:
+            context["branches"] = Branch.objects.filter(owner=user)
+        elif user.commandant:
+            buildings = Building.objects.filter(commandant=user)
+            context["branches"] = Branch.objects.filter(
+                buildings__in=buildings
+            ).distinct()
+        else:
+            context["branches"] = Branch.objects.none()
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("branches")},
             {"title": "Xidmətlər", "url": reverse("services")},
         ]
-        context["user_name"] = self.request.user.username
-        context["is_superuser"] = self.request.user.is_superuser
+        context["user_name"] = user.username
+        context["is_superuser"] = user.is_superuser
         return context
 
     def form_valid(self, form):
@@ -990,7 +1010,6 @@ class PaymentListView(ListView):
         if user.commandant:
             user_buildings = Building.objects.filter(commandant=user)
             return Payment.objects.filter(flat__building__in=user_buildings).distinct()
-            return Payment.objects.none()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1006,7 +1025,7 @@ class PaymentCreateView(CreateView):
     model = Payment
     form_class = PaymentForm
     template_name = "payment_form.html"
-    success_url = "/payments/"  # Redirect after success
+    success_url = "/payments/"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1016,14 +1035,11 @@ class PaymentCreateView(CreateView):
         ]
         user = self.request.user
         if user.is_superuser:
-            # Superuser sadece kendi binalarını görmeli
             user_branches = Branch.objects.filter(owner=user)
             context["buildings"] = Building.objects.filter(branch__in=user_branches)
         elif user.commandant:
-            # Komendant sadece kendi binalarını görmeli
             context["buildings"] = Building.objects.filter(commandant=user)
         else:
-            # Diğer kullanıcılar binaları göremez
             context["buildings"] = Building.objects.none()
         context["user_name"] = user.username
         context["is_superuser"] = user.is_superuser
@@ -1054,15 +1070,6 @@ class PaymentCreateView(CreateView):
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
-        # Kullanıcıyı geçerli kullanıcı olarak ayarla
-        form.instance.user = self.request.user
-        messages.success(
-            self.request, f"{form.instance.flat} mənzili üçün ödəniş yaradıldı!"
-        )
-        return super().form_valid(form)
-
-    def form_valid(self, form):
-        # Kullanıcıyı geçerli kullanıcı olarak ayarla
         form.instance.user = self.request.user
         messages.success(
             self.request, f"{form.instance.flat} mənzili üçün ödəniş yaradıldı!"
@@ -1335,6 +1342,11 @@ class ServiceEditView(LoginRequiredMixin, UpdateView):
     form_class = ServiceForm
     template_name = "service_edit.html"
     context_object_name = "service"
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
 
     def get_success_url(self):
         return reverse_lazy("service-detail", kwargs={"pk": self.object.pk})

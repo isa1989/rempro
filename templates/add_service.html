@@ -74,6 +74,23 @@
                                                     <div class="sidebar-body">
                                                         <form class="row g-2" method="post" action="{% url 'service-add' %}">
                                                             {% csrf_token %}
+                                                            <div class="col-12 mt-3">
+                                                                <!-- Branch Field -->
+                                                                <label for="branchSelect">Filial</label>
+                                                                <select id="branchSelect" name="branch" class="form-control" required>
+                                                                    <option value="">Filial seçin</option>
+                                                                    {% for branch in branches %}
+                                                                        <option value="{{ branch.id }}">{{ branch.name }}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                                <div class="invalid-feedback d-block">
+                                                                    {% if form.branch.errors %}
+                                                                        {% for error in form.branch.errors %}
+                                                                            <div>{{ error }}</div>
+                                                                        {% endfor %}
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
                                                             <label class="form-label col-12 m-0" for="serviceName">Xidmətin adı <span class="txt-danger"> *</span></label>
                                                             <div class="col-12 custom-input">
                                                                 <input class="form-control" id="serviceName" type="text" name="name" required>

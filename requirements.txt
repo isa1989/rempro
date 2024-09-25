@@ -8,3 +8,5 @@ tzdata==2024.1
 psycopg2
 psycopg2-binary
 requests==2.32.3
+celery==5.1.2
+redis==3.5.3
