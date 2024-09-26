@@ -32,6 +32,7 @@ from .models import (
     Log,
     News,
     Camera,
+    Charge,
 )
 from .forms import (
     BuildingForm,
@@ -863,6 +864,40 @@ class FlatAddServiceListView(LoginRequiredMixin, FormView):
         ]
         flat = get_object_or_404(Flat, id=self.kwargs["flat_id"])
         context["flat"] = flat
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
+        return context
+
+
+class ChargeListView(LoginRequiredMixin, ListView):
+    model = Charge
+    template_name = "charge_list.html"  # Create this template
+    context_object_name = "debts"
+    paginate_by = 10
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_superuser:
+            user_branches = Branch.objects.filter(owner=user)
+            user_buildings = Building.objects.filter(branch__in=user_branches)
+            return Charge.objects.filter(
+                flat__building__in=user_buildings, is_paid=False
+            ).distinct()
+
+        if user.commandant:
+            user_buildings = Building.objects.filter(commandant=user)
+            return Charge.objects.filter(
+                flat__building__in=user_buildings, is_paid=False
+            ).distinct()
+
+        return Charge.objects.none()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse("branches")},
+        ]
         context["user_name"] = self.request.user.username
         context["is_superuser"] = self.request.user.is_superuser
         return context

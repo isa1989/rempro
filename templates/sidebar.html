@@ -24,7 +24,7 @@
             <li class="sidebar-list">
                <a class="sidebar-link sidebar-title" href="{% url 'branches' %}">
                   <svg class="stroke-icon">
-                     <use href="{% static 'svg/icon-sprite.svg' %}"></use>
+                     <use href="{% static 'svg/icon-sprite.svg ' %}"></use>
                   </svg>
                   <svg class="fill-icon">
                      <use href="{% static 'svg/icon-sprite.svg#fill-home' %}"></use>
@@ -74,6 +74,17 @@
                      <use href="{% static 'svg/icon-sprite.svg#fill-home' %}"></use>
                   </svg>
                   <span class="lan-3">Xidmətlər</span>
+               </a>
+            </li>
+            <li class="sidebar-list">
+               <a class="sidebar-link sidebar-title" href="{% url 'charge-list' %}">
+                  <svg class="stroke-icon">
+                     <use href="{% static 'svg/icon-sprite.svg#stroke-home' %}"></use>
+                  </svg>
+                  <svg class="fill-icon">
+                     <use href="{% static 'svg/icon-sprite.svg#fill-home' %}"></use>
+                  </svg>
+                  <span class="lan-3">Borclar</span>
                </a>
             </li>
             <li class="sidebar-list">
@@ -191,6 +202,16 @@
                   <span class="lan-3">Xidmətlər</span>
                </a>
             </li>
+            <li class="sidebar-list">
+               <a class="sidebar-link sidebar-title" href="{% url 'charge-list' %}">
+                  <svg class="stroke-icon">
+                     <use href="{% static 'svg/icon-sprite.svg#stroke-home' %}"></use>
+                  </svg>
+                  <svg class="fill-icon">
+                     <use href="{% static 'svg/icon-sprite.svg#fill-home' %}"></use>
+                  </svg>
+                  <span class="lan-3">Borclar</span>
+               </a>
             <li class="sidebar-list">
                <a class="sidebar-link sidebar-title" href="{% url 'payment-list' %}">
                   <svg class="stroke-icon">

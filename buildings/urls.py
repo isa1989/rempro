@@ -89,6 +89,8 @@ urlpatterns = [
         views.ServiceDeleteView.as_view(),
         name="service_delete",
     ),
+    # -------------------------- Charge -------------------------------
+    path("charge/", views.ChargeListView.as_view(), name="charge-list"),
     path("service/add/", views.ServiceCreateView.as_view(), name="service-add"),
     path(
         "flat/<int:flat_id>/services/",
