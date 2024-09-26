@@ -60,25 +60,29 @@
                           <tr> 
                                 <th> <span class="f-light f-w-600">Xidmətin adı</span></th>
                                 <th> <span class="f-light f-w-600">Xidmətin qiyməti</span></th>
+                                <th> <span class="f-light f-w-600">Mənzil xidmətin qiyməti</span></th>
                                 <th> <span class="f-light f-w-600">Ödəniş vaxtı</span></th>
                           
                           </tr>
                         </thead>
                         <tbody> 
-                            {% for service in services %}
-                        <tr class="product-removes">
-                            <td> 
-                              <div class="product-names">
-                                <p>{{ service.name }}</p>
-                              </div>
-                           </td>
-                           <td> 
-                              <p class="f-light">{{ service.price }}</p>
-                            </td>
-                            <td> 
-                                <p class="f-light">{{ service.invoice_day }}</p>
-                            </td>
-                      </tr>
+                          {% for item in services_with_values %}
+                          <tr class="product-removes">
+                              <td> 
+                                <div class="product-names">
+                                  <p>{{ item.service.name }}</p>
+                                </div>
+                             </td>
+                             <td> 
+                                <p class="f-light">{{ item.service.price }}</p>
+                              </td>
+                              <td> 
+                                  <p class="f-light">{{ item.value }}</p>  <!-- Hesaplanan değeri burada gösteriyoruz -->
+                              </td>
+                              <td>
+                                  <p class="f-light">{{ item.service.invoice_day }}</p>
+                              </td>
+                          </tr>
                           {% endfor %}
                        </tbody>
                       </table>

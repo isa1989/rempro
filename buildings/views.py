@@ -819,6 +819,7 @@ class FlatServiceListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         flat_id = self.kwargs.get("flat_id")
+        flat = get_object_or_404(Flat, id=flat_id)
         context["flat"] = get_object_or_404(Flat, id=flat_id)
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse("branches")},
@@ -830,6 +831,10 @@ class FlatServiceListView(LoginRequiredMixin, ListView):
         ]
         context["user_name"] = self.request.user.username
         context["is_superuser"] = self.request.user.is_superuser
+        context["services_with_values"] = [
+            {"service": service, "value": round(service.price * flat.square_metres)}
+            for service in context["services"]
+        ]
 
         return context
 
@@ -1071,10 +1076,19 @@ class PaymentCreateView(CreateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
+        response = super().form_valid(form)
+        Log.objects.create(
+            action="CREATE",
+            model_name="Payment",
+            object_id=self.object.id,
+            user=self.request.user,
+            details=f"Ödəniş yaradıldı: {self.object.flat}-{round(self.object.amount, 1)} manat",
+            timestamp=timezone.now(),
+        )
         messages.success(
             self.request, f"{form.instance.flat} mənzili üçün ödəniş yaradıldı!"
         )
-        return super().form_valid(form)
+        return response
 
 
 class PaymentChartView(ListView):

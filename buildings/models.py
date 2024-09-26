@@ -214,6 +214,37 @@ class Expense(models.Model):
         verbose_name_plural = "Xərclər"
 
 
+class Charge(models.Model):
+    flat = models.ForeignKey(
+        Flat,
+        on_delete=models.SET_NULL,
+        related_name="fcharge",
+        verbose_name="Mənzil",
+        blank=True,
+        null=True,
+    )
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.SET_NULL,
+        related_name="scharge",
+        blank=True,
+        null=True,
+        verbose_name="Xidmət",
+    )
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Məbləğ",
+    )
+    is_paid = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_paid_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Borc"
+        verbose_name_plural = "Borclar"
+
+
 class Payment(models.Model):
     building = models.ForeignKey(
         Building,
