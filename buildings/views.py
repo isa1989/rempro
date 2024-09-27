@@ -108,7 +108,7 @@ def charge_autocomplete(request):
     return JsonResponse({"results": results})
 
 
-class DashboardView(View):
+class DashboardView(LoginRequiredMixin, View):
     login_url = "/login/"
     template_name = "dashboard.html"
 
