@@ -90,7 +90,12 @@ urlpatterns = [
         name="service_delete",
     ),
     # -------------------------- Charge -------------------------------
+    path(
+        "autocomplete/charges/", views.charge_autocomplete, name="charge-autocomplete"
+    ),
+    path("charge-detail", views.charge_detail, name="charge-detail"),
     path("charge/", views.ChargeListView.as_view(), name="charge-list"),
+    # -------------------------- Service -------------------------------
     path("service/add/", views.ServiceCreateView.as_view(), name="service-add"),
     path(
         "flat/<int:flat_id>/services/",

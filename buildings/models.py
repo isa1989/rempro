@@ -240,6 +240,9 @@ class Charge(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_paid_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"Borc {self.flat} - {self.amount}"
+
     class Meta:
         verbose_name = "Borc"
         verbose_name_plural = "Borclar"
@@ -266,22 +269,21 @@ class Payment(models.Model):
         verbose_name="Məbləğ",
         help_text="Ödənişin məbləği",
     )
-    service = models.ForeignKey(
-        Service,
+    charge = models.ForeignKey(
+        Charge,
         on_delete=models.CASCADE,
         related_name="payments",
         blank=True,
         null=True,
-        verbose_name="Xidmət",
-        help_text="Ödəmə ilə əlaqəli xidmət (əgər varsa)",
+        verbose_name="Borc",
     )
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     date = models.DateField(verbose_name="Tarix", help_text="Ödənişin tarixi")
 
-    def save(self, *args, **kwargs):
-        if self.service and self.flat:
-            self.amount = self.service.price * self.flat.square_metres
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if self.service and self.flat:
+    #         self.amount = self.service.price * self.flat.square_metres
+    #     super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Payment of {self.amount} on {self.date} for {self.flat}"

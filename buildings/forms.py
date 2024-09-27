@@ -456,7 +456,7 @@ class PaymentForm(forms.ModelForm):
 
     class Meta:
         model = Payment
-        fields = ["building", "flat", "amount", "service", "date"]
+        fields = ["building", "flat", "charge", "amount", "date"]
         widgets = {
             "building": forms.Select(
                 attrs={
@@ -464,17 +464,17 @@ class PaymentForm(forms.ModelForm):
                     "data-placeholder": "Binanı seç",
                 }
             ),
+            "charge": forms.Select(
+                attrs={
+                    "class": "form-control form-select",
+                    "data-placeholder": "Borcu seç",
+                }
+            ),
             "amount": forms.NumberInput(
                 attrs={
                     "class": "form-control",
                     "data-placeholder": "Məbləğ",
                     "step": "0.01",
-                }
-            ),
-            "service": forms.Select(
-                attrs={
-                    "class": "form-control form-select",
-                    "data-placeholder": "Xidməti seç",
                 }
             ),
             "date": forms.DateInput(
@@ -492,6 +492,12 @@ class PaymentForm(forms.ModelForm):
         for field in self.fields.values():
             field.help_text = None
             # field.label = ""
+
+    def clean_amount(self):
+        amount = self.cleaned_data.get("amount")
+        if amount is not None and amount <= 0:
+            raise ValidationError("Məbləğ müsbət olmalıdır.")
+        return amount
 
 
 class NewsForm(forms.ModelForm):

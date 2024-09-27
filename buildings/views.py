@@ -56,7 +56,7 @@ def flat_autocomplete(request):
     q = request.GET.get("q", "")
     building_id = request.GET.get("building_id")
     flats = Flat.objects.filter(
-        Q(name__icontains=q) | Q(user__phone_number__icontains=q),
+        Q(name__icontains=q) | Q(resident__phone_number__icontains=q),
         building_id=building_id,
     )
     results = [{"id": flat.id, "text": flat.name} for flat in flats]
@@ -82,6 +82,29 @@ def building_autocomplete(request):
     branch_id = request.GET.get("branch_id")
     buildings = Building.objects.filter(name__icontains=q, branch_id=branch_id)
     results = [{"id": building.id, "text": building.name} for building in buildings]
+    return JsonResponse({"results": results})
+
+
+def charge_detail(request):
+    charge_id = request.GET.get("charge_id")
+    if charge_id:
+        charge = Charge.objects.get(id=charge_id)
+        return JsonResponse({"amount": charge.amount})
+    else:
+        return JsonResponse({"amount": None})
+
+
+def charge_autocomplete(request):
+    flat_id = request.GET.get("flat_id")
+    charges = Charge.objects.filter(
+        flat_id=flat_id,
+        is_paid=False,
+    )
+    results = [
+        {"id": charge.id, "text": f"{charge.service.name} - {charge.amount}"}
+        for charge in charges
+    ]
+
     return JsonResponse({"results": results})
 
 
@@ -1112,6 +1135,13 @@ class PaymentCreateView(CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         response = super().form_valid(form)
+        charge_id = form.instance.charge.id if form.instance.charge else None
+        if charge_id:
+            Charge.objects.filter(id=charge_id).update(is_paid=True)
+        else:
+            flat = form.instance.flat
+            flat.balance += form.cleaned_data["amount"]
+            flat.save()
         Log.objects.create(
             action="CREATE",
             model_name="Payment",

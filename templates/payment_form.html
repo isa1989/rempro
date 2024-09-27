@@ -3,6 +3,7 @@
 {% block content %}
     <link href="{% static 'select2/css/select2.min.css' %}" rel="stylesheet" />
     <script src="{% static 'select2/js/select2.min.js' %}"></script>
+
     <!-- loader starts-->
     <div class="loader-wrapper">
         <div class="loader"> 
@@ -10,20 +11,20 @@
         </div>
     </div>
     <!-- loader ends-->
+
     <!-- tap on top starts-->
     <div class="tap-top"><i data-feather="chevrons-up"></i></div>
     <!-- tap on tap ends-->
+
     <!-- page-wrapper Start-->
     <div class="page-wrapper compact-wrapper" id="pageWrapper">
         <!-- Page Header Start-->
         {% include 'header.html' %}
-        <!-- Page Header Ends                              -->
+        <!-- Page Header Ends -->
+        
         <!-- Page Body Start-->
         <div class="page-body-wrapper">
             {% include 'sidebar.html' %}
-            <!-- Page Sidebar Start-->
-           
-            <!-- Page Sidebar Ends-->
             <div class="page-body">
                 <div class="container-fluid">
                     <div class="page-title">
@@ -49,6 +50,7 @@
                         </div>
                     </div>
                 </div>
+
                 <!-- Container-fluid starts-->
                 <div class="container-fluid">
                     <div class="row"> 
@@ -57,7 +59,7 @@
                                 <div class="card-body">
                                     <form method="post" action="{% url 'payment-add' %}">
                                         {% csrf_token %}
-                                        {{ form.as_p }}
+                                        {{ form.as_p }} 
                                         <a class="btn btn-secondary btn-custom" href="{% url 'payment-list' %}">Geri</a>
                                         <button type="submit" class="btn btn-primary">Saxla</button>
                                     </form>
@@ -75,65 +77,79 @@
     <!-- JavaScript to handle dynamic filtering -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const buildingSelect = document.querySelector('#id_building');
-            const flatSelect = document.querySelector('#id_flat');
+        const buildingSelect = document.querySelector('#id_building');
+        const flatSelect = document.querySelector('#id_flat');
+        const chargeSelect = document.querySelector('#id_charge');
+        const amountInput = document.querySelector('#id_amount');
 
-            buildingSelect.addEventListener('change', function() {
-                const buildingId = this.value;
+        buildingSelect.addEventListener('change', function() {
+            const buildingId = this.value;
 
-                fetch(`{% url 'payment-add' %}?building_id=${buildingId}`, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
+            fetch(`{% url 'flat-autocomplete' %}?building_id=${buildingId}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                flatSelect.innerHTML = '<option value="">Mənzili seçin</option>';
+                data.results.forEach(flat => {
+                    const option = document.createElement('option');
+                    option.value = flat.id;
+                    option.textContent = flat.text;
+                    flatSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        flatSelect.addEventListener('change', function() {
+            const flatId = this.value;
+
+            fetch(`{% url 'charge-autocomplete' %}?flat_id=${flatId}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                chargeSelect.innerHTML = '<option value="">Borcu seçin</option>';
+                data.results.forEach(charge => {
+                    const option = document.createElement('option');
+                    option.value = charge.id;
+                    option.textContent = charge.text;
+                    chargeSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        chargeSelect.addEventListener('change', function() {
+            const chargeId = this.value;
+
+            if (chargeId) {
+                fetch(`{% url 'charge-detail' %}?charge_id=${chargeId}`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 })
                 .then(response => response.json())
                 .then(data => {
-                    flatSelect.innerHTML = '<option value="">Select Flat</option>';  // Reset the select field
-                    data.flats.forEach(flat => {
-                        const option = document.createElement('option');
-                        option.value = flat.id;
-                        option.textContent = flat.name;
-                        flatSelect.appendChild(option);
-                    });
+                    amountInput.value = data.amount; // Borç miktarını yaz
+                    amountInput.setAttribute('readonly', true); // Alanı düzenlenemez yap
                 })
                 .catch(error => console.error('Error:', error));
-            });
+            } else {
+                amountInput.value = ""; // Miktarı temizle
+                amountInput.removeAttribute('readonly'); // Alanı düzenlenebilir yap
+            }
         });
 
         $(document).ready(function() {
-            var buildingSelect = $('#id_building'); // Selector for the building field
-        
-            // Initialize Select2
             $('.select2').select2({
-                placeholder: 'Select a flat',
+                placeholder: 'Borcu seçin',
                 allowClear: true,
-                ajax: {
-                    url: function(params) {
-                        // Return the URL with building_id as a query parameter
-                        return `{% url "flat-autocomplete" %}?building_id=${buildingSelect.val()}`;
-                    },
-                    dataType: 'json',
-                    delay: 250,
-                    data: function(params) {
-                        return {
-                            q: params.term // Search term
-                        };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data.results
-                        };
-                    },
-                    cache: true
-                }
             });
-        
-            // Set selected value if available
-            var selectedValue = "{{ form.flat.value|escapejs }}";
-            if (selectedValue) {
-                $('.select2').val(selectedValue).trigger('change');
+
+            var selectedChargeValue = "{{ form.charge.value|escapejs }}";
+            if (selectedChargeValue) {
+                $('#id_charge').val(selectedChargeValue).trigger('change');
             }
         });
+    });
     </script>
-    
 {% endblock %}
