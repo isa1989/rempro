@@ -89,4 +89,63 @@
         <!-- footer start -->
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select elements
+        var branchSelect = document.getElementById('id_branch');
+        var buildingSelect = document.getElementById('id_building');
+        var flatSelect = document.getElementById('id_flat');
+    
+        // Branch seçimi değiştiğinde
+        branchSelect.addEventListener('change', function() {
+            var branchId = this.value;
+            if (branchId) {
+                // Branch ID'sine göre binaları almak için AJAX isteği
+                fetch("{% url 'building_autocomplete' %}?branch_id=" + branchId)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Mevcut seçenekleri temizle
+                        buildingSelect.innerHTML = '';
+                        buildingSelect.append(new Option('Bina seçin', ''));
+    
+                        // Yanıttan yeni seçenekler ekle
+                        data.results.forEach(function(building) {
+                            buildingSelect.append(new Option(building.text, building.id));
+                        });
+                        // Flat seçeneklerini temizle
+                        flatSelect.innerHTML = '';
+                        flatSelect.append(new Option('Mənzil seçin', ''));
+                    });
+            } else {
+                buildingSelect.innerHTML = '';
+                buildingSelect.append(new Option('Bina seçin', ''));
+                flatSelect.innerHTML = '';
+                flatSelect.append(new Option('Mənzil seçin', ''));
+            }
+        });
+    
+        // Building seçimi değiştiğinde
+        buildingSelect.addEventListener('change', function() {
+            var buildingId = this.value;
+            if (buildingId) {
+                // Building ID'sine göre daireleri almak için AJAX isteği
+                fetch("{% url 'flat-autocomplete-sec' %}?building_id=" + buildingId)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Mevcut seçenekleri temizle
+                        flatSelect.innerHTML = '';
+                        flatSelect.append(new Option('Mənzil seçin', ''));
+    
+                        // Yanıttan yeni seçenekler ekle
+                        data.results.forEach(function(flat) {
+                            flatSelect.append(new Option(flat.text, flat.id));
+                        });
+                    });
+            } else {
+                flatSelect.innerHTML = '';
+                flatSelect.append(new Option('Mənzil seçin', ''));
+            }
+        });
+    });
+ </script>
 {% endblock %}

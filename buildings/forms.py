@@ -39,6 +39,11 @@ class BuildingCreationForm(forms.Form):
 
 
 class SectionForm(forms.ModelForm):
+    branch = forms.ModelChoiceField(
+        queryset=Branch.objects.none(),
+        required=False,
+        widget=forms.Select(attrs={"class": "form-control select2"}),
+    )
     building = forms.ModelChoiceField(
         queryset=Building.objects.none(),
         required=False,
@@ -53,7 +58,7 @@ class SectionForm(forms.ModelForm):
 
     class Meta:
         model = Section
-        fields = ["building", "name"]
+        fields = ["branch", "building", "name"]
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user", None)
@@ -67,12 +72,17 @@ class SectionForm(forms.ModelForm):
                     self.fields["building"].queryset = Building.objects.filter(
                         branch__in=user.branch.all()
                     ).distinct()
+                    self.fields["branch"].queryset = Branch.objects.filter(owner=user)
             elif user.commandant:
                 self.fields["building"].queryset = Building.objects.filter(
                     commandant__in=[
                         user,
                     ]
                 )
+                buildings = Building.objects.filter(commandant=user)
+                self.fields["branch"].queryset = Branch.objects.filter(
+                    buildings__in=buildings
+                ).distinct()
 
             else:
                 self.fields["building"].queryset = Building.objects.none()

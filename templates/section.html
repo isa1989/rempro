@@ -69,15 +69,20 @@
                     <div class="list-product">
                       <table class="table" id="project-status">
                         <thead> 
-                          
                           <tr> 
-                            <th> <span class="f-light f-w-600">Binanın adı</span></th>
-                                 <th> <span class="f-light f-w-600">Blokun adı</span></th>
+                            <th><span class="f-light f-w-600">Filialın adı</span></th>
+                            <th><span class="f-light f-w-600">Binanın adı</span></th>
+                            <th><span class="f-light f-w-600">Blokun adı</span></th>
                            </tr>
                         </thead>
                         <tbody> 
                             {% for section in sections %}
                           <tr class="product-removes">
+                            <td> 
+                              <div class="product-names">
+                                <p>{{ section.building.branch.name }}</p>
+                              </div>
+                            </td>
                              <td> 
                               <div class="product-names">
                                 <p>{{ section.building.name }}</p>
