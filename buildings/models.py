@@ -65,7 +65,7 @@ class Branch(models.Model):
 
 
 class Camera(models.Model):
-    url = models.URLField(verbose_name="Kamera linki")
+    url = models.CharField(max_length=255, verbose_name="Kamera linki")
     description = models.CharField(
         max_length=255, blank=True, null=True, verbose_name="Kamera məzmunu"
     )

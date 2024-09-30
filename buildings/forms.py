@@ -216,7 +216,7 @@ class CameraForm(forms.ModelForm):
         model = Camera
         fields = ["url", "description"]
         widgets = {
-            "url": forms.URLInput(attrs={"class": "form-control"}),
+            "url": forms.TextInput(attrs={"class": "form-control"}),
             "description": forms.TextInput(attrs={"class": "form-control"}),
         }
 
@@ -224,6 +224,14 @@ class CameraForm(forms.ModelForm):
         # Extract branch_id from kwargs if present
         self.branch_id = kwargs.pop("branch_id", None)
         super().__init__(*args, **kwargs)
+
+    def clean_url(self):
+        url = self.cleaned_data.get("url")
+        if not url.startswith("rtsp://"):
+            raise forms.ValidationError(
+                "Düzgün RTSP URL daxil edin. URL 'rtsp://' ilə başlamalıdır."
+            )
+        return url
 
 
 class CameraFormSet(forms.BaseInlineFormSet):
