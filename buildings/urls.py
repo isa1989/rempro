@@ -147,7 +147,7 @@ urlpatterns = [
     # -------------------------- LOGS -------------------------------
     path("logs/", views.LogListView.as_view(), name="log_list"),
     # -------------------------- NEWS -------------------------------
-    path("news", views.NewsListView.as_view(), name="news-list"),
+    path("news/", views.NewsListView.as_view(), name="news-list"),
     path("news-create/", views.NewsCreateView.as_view(), name="news-create"),
     path("news/<int:pk>/", views.NewsDetailView.as_view(), name="news-detail"),
     path("news/<int:pk>/edit/", views.NewsUpdateView.as_view(), name="news-edit"),

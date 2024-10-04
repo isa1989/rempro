@@ -66,7 +66,7 @@ class SectionForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["building"].label = "Binalar"
         self.fields["name"].label = "Blokun adı"
-        if user:
+        if user.is_authenticated:
             if user.is_superuser:
                 if user.branch.exists():
                     self.fields["building"].queryset = Building.objects.filter(
@@ -132,7 +132,7 @@ class FlatForm(forms.ModelForm):
         user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
 
-        if user:
+        if user.is_authenticated:
             if user.is_superuser:
                 self.fields["building"].queryset = Building.objects.filter(
                     branch__owner=user
@@ -404,7 +404,7 @@ class ResidentForm(UserCreationForm):
         user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
 
-        if user:
+        if user.is_authenticated:
             if user.is_superuser:
                 self.fields["branch"].queryset = Branch.objects.filter(owner=user)
                 self.fields["building"].queryset = Building.objects.filter(
@@ -541,7 +541,7 @@ class NewsForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
-        if user:
+        if user.is_authenticated:
             if user.is_superuser:
                 branches = Branch.objects.filter(owner=user)
                 self.fields["building"].queryset = Building.objects.filter(
@@ -602,7 +602,7 @@ class ExpenseForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
-        if user:
+        if user.is_authenticated:
             if user.is_superuser:
                 self.fields["branch"].queryset = Branch.objects.filter(owner=user)
                 self.fields["building"].queryset = Building.objects.filter(

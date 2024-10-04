@@ -926,7 +926,8 @@ class ChargeListView(LoginRequiredMixin, ListView):
         return context
 
 
-class ExpenseListView(ListView):
+class ExpenseListView(LoginRequiredMixin, ListView):
+    login_url = "/login/"
     model = Expense
     template_name = "expense_list.html"
     context_object_name = "expenses"
@@ -1371,7 +1372,8 @@ class NewsListView(ListView):
         return context
 
 
-class NewsCreateView(CreateView):
+class NewsCreateView(LoginRequiredMixin, CreateView):
+    login_url = "/login/"
     model = News
     form_class = NewsForm
     template_name = "news_form.html"
