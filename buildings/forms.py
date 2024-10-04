@@ -519,9 +519,15 @@ class PaymentForm(forms.ModelForm):
 
 
 class NewsForm(forms.ModelForm):
+    building = forms.ModelChoiceField(
+        queryset=Building.objects.none(),
+        required=False,
+        widget=forms.Select(attrs={"class": "form-control select2"}),
+    )
+
     class Meta:
         model = News
-        fields = ["title", "content"]
+        fields = ["building", "title", "content"]
 
         widgets = {
             "title": forms.TextInput(
@@ -533,7 +539,19 @@ class NewsForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
+        if user:
+            if user.is_superuser:
+                branches = Branch.objects.filter(owner=user)
+                self.fields["building"].queryset = Building.objects.filter(
+                    branch__in=branches
+                )
+            elif user.commandant:
+                buildings = Building.objects.filter(commandant=user)
+                self.fields["building"].queryset = buildings
+            else:
+                self.fields["building"].queryset = Building.objects.none()
 
         for field in self.fields.values():
             field.label = ""

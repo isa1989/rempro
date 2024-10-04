@@ -314,6 +314,12 @@ class Log(models.Model):
 
 
 class News(models.Model):
+    building = models.ForeignKey(
+        Building,
+        on_delete=models.CASCADE,
+        related_name="news",
+        verbose_name="Bina",
+    )
     title = models.CharField(max_length=200)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
