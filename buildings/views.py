@@ -1346,6 +1346,18 @@ class LogListView(ListView):
     ordering = ["-timestamp"]
     paginate_by = 20
 
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_superuser:
+            user_branches = Branch.objects.filter(owner=user)
+            queryset = Log.objects.filter(branch__in=user_branches)
+            return queryset
+
+        if user.commandant:
+            queryset = Log.objects.filter(commandant=user)
+            return queryset
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [

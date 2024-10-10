@@ -1,5 +1,6 @@
 import os
 from celery import Celery
+from celery.schedules import crontab
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "rempro.settings")
 
@@ -10,9 +11,9 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
-    "add-every-30-seconds": {
-        "task": "buildings.tasks.add",
-        "schedule": 30.0,  # Her 30 saniyede bir çalışır
-        "args": (16, 16),  # Görev parametreleri
+    "process-service-invoices-daily": {
+        "task": "buildings.tasks.process_service_invoices",
+        "schedule": crontab(hour=8, minute=0),
+        "args": (),
     },
 }
