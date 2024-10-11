@@ -1,0 +1,103 @@
+{% load static %}
+{% include 'base.html' %}
+
+{% block content %}
+<!-- starts -->
+<div class="loader-wrapper">
+    <div class="loader"> 
+        <div class="loader4"></div>
+    </div>
+</div>
+<!-- loader ends -->
+
+<!-- tap on top starts-->
+<div class="tap-top"><i data-feather="chevrons-up"></i></div>
+<!-- tap on tap ends-->
+
+<!-- page-wrapper Start-->
+<div class="page-wrapper compact-wrapper" id="pageWrapper">
+    <!-- Page Header Start-->
+    {% include 'header.html' %}
+    <!-- Page Header Ends -->
+
+    <!-- Page Body Start -->
+    <div class="page-body-wrapper">
+        {% include 'sidebar.html' %}
+        <!-- Page Sidebar Ends -->
+
+        <div class="page-body">
+            <div class="container-fluid">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-6">
+                            <h4>Yeni Garaj Əlavə Et</h4>
+                        </div>
+                        <div class="col-6">
+                            <ol class="breadcrumb">
+                                {% for crumb in breadcrumbs %}
+                                    <li class="breadcrumb-item">
+                                        <a href="{{ crumb.url }}">{{ crumb.title }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Container-fluid starts -->
+            <div class="container-fluid">
+                <div class="row"> 
+                    <div class="col-12"> 
+                        <div class="card"> 
+                            <div class="card-body">
+                                <div class="row g-xl-5 g-3">
+                                    <div class="col-xxl-9 col-xl-8 box-col-8 position-relative">
+                                        <div class="tab-content" id="add-garage-pills-tabContent">
+                                            <div class="tab-pane fade show active" id="detail-garage" role="tabpanel" aria-labelledby="detail-garage-tab">
+                                                <div class="sidebar-body">
+                                                    <form class="row g-2" method="post" action="{% url 'garage-add' %}">
+                                                        {% csrf_token %}
+                                                        <div class="col-12">
+                                                            <label for="number" class="form-label">Garaj Nömrəsi</label>
+                                                            <input type="text" class="form-control" id="number" name="number" required>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <label for="owner" class="form-label">Sahibi</label>
+                                                            <select class="form-select" id="owner" name="owner" required>
+                                                                {% for user in users %}
+                                                                    <option value="{{ user.id }}">{{ user.username }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <label for="car_plates" class="form-label">Maşın Nömrələri</label>
+                                                            <select multiple class="form-select" id="car_plates" name="car_plates">
+                                                                {% for plate in car_plates %}
+                                                                    <option value="{{ plate.id }}">{{ plate }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-12 mt-3">
+                                                            <button class="btn btn-primary" type="submit">Saxla</button>
+                                                            <a class="btn btn-secondary" href="{% url 'garage-list' %}">Ləğv et</a>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Container-fluid Ends -->
+        </div>
+
+        {% include 'footer.html' %}
+        <!-- footer start -->
+    </div>
+</div>
+{% endblock %}

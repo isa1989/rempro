@@ -33,6 +33,8 @@ from .models import (
     News,
     Camera,
     Charge,
+    Garage,
+    CarPlate,
 )
 from .forms import (
     BuildingForm,
@@ -1337,6 +1339,44 @@ class ResidentDeleteView(LoginRequiredMixin, DeleteView):
             self.request, f"{self.object.username} adlı sakin əlavə silindi!"
         )
         return response
+
+
+class GarageListView(LoginRequiredMixin, ListView):
+    login_url = "/login/"
+    model = Garage
+    template_name = "garage_list.html"  # Kendi şablonunu buraya ekle
+    context_object_name = "garages"
+
+    def get_queryset(self):
+        return Garage.objects.filter(owner=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse_lazy("branches")},
+            {"title": "Xidmətlər", "url": reverse_lazy("all-residents")},
+        ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
+        return context
+
+
+class GarageCreateView(CreateView):
+    model = Garage
+    fields = ["number", "owner", "car_plates"]
+    template_name = "garage_form.html"
+    success_url = reverse_lazy("garage-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse_lazy("branches")},
+            {"title": "Xidmətlər", "url": reverse_lazy("all-residents")},
+        ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
+        context["car_plates"] = CarPlate.objects.all()
+        return context
 
 
 class LogListView(ListView):

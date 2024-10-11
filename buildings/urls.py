@@ -144,6 +144,9 @@ urlpatterns = [
         views.building_autocomplete,
         name="building_autocomplete",
     ),
+    # -------------------------- GARAGE -------------------------------
+    path("garages/", views.GarageListView.as_view(), name="garage-list"),
+    path("garages/add/", views.GarageCreateView.as_view(), name="garage-add"),
     # -------------------------- LOGS -------------------------------
     path("logs/", views.LogListView.as_view(), name="log_list"),
     # -------------------------- NEWS -------------------------------

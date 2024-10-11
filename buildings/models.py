@@ -280,11 +280,6 @@ class Payment(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     date = models.DateField(verbose_name="Tarix", help_text="Ödənişin tarixi")
 
-    # def save(self, *args, **kwargs):
-    #     if self.service and self.flat:
-    #         self.amount = self.service.price * self.flat.square_metres
-    #     super().save(*args, **kwargs)
-
     def __str__(self):
         return f"Payment of {self.amount} on {self.date} for {self.flat}"
 
@@ -292,6 +287,25 @@ class Payment(models.Model):
         ordering = ["-date"]
         verbose_name = "Ödəniş"
         verbose_name_plural = "Ödəniş"
+
+
+class CarPlate(models.Model):
+    name = models.CharField(max_length=200)
+    plate = models.CharField(max_length=50, blank=True, null=True)
+
+    def __str__(self):
+        return self.plate
+
+
+class Garage(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="garrage")
+    number = models.CharField(max_length=10, blank=True, null=True)
+    car_plates = models.ManyToManyField(
+        CarPlate, related_name="garrage", blank=True, verbose_name="Maşın nömrəsi"
+    )
+
+    def __str__(self):
+        return self.number
 
 
 class Log(models.Model):
