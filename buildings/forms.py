@@ -12,6 +12,8 @@ from .models import (
     News,
     Camera,
     Expense,
+    CarPlate,
+    Garage,
 )
 from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm
@@ -622,3 +624,34 @@ class ExpenseForm(forms.ModelForm):
         for field in self.fields.values():
             field.label = ""
             field.help_text = None
+
+
+class GarageForm(forms.ModelForm):
+    class Meta:
+        model = Garage
+        fields = ["number", "building"]
+        widgets = {
+            "number": forms.TextInput(attrs={"class": "form-control"}),
+            "building": forms.Select(attrs={"class": "form-control"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["number"].label = "Qaraj Nömrəsi"
+        self.fields["building"].label = "Bina"
+
+
+class CarPlateForm(forms.ModelForm):
+    class Meta:
+        model = CarPlate
+        fields = ["name", "plate", "garage"]
+        widgets = {
+            "garage": forms.Select(attrs={"class": "form-control"}),
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "plate": forms.TextInput(attrs={"class": "form-control"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["plate"].label = "Maşın Nömrəsi"
+        self.fields["garage"].label = "Qaraj"

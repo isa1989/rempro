@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <!-- Loader Starts -->
+    <div class="loader-wrapper">
+        <div class="loader"> 
+            <div class="loader4"></div>
+        </div>
+    </div>
+    <!-- Loader Ends -->
+
+    <!-- Tap on Top Starts -->
+    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
+    <!-- Tap on Top Ends -->
+
+    <!-- Page Wrapper Start -->
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+        <!-- Page Header Start -->
+        {% include 'header.html' %}
+        <!-- Page Header Ends -->
+
+        <!-- Page Body Start -->
+        <div class="page-body-wrapper">
+            {% include 'sidebar.html' %}
+
+            <div class="page-body">
+                <div class="container-fluid">
+                    <div class="page-title">
+                        <div class="row">
+                            <div class="col-6">
+                                <h4>Qaraj Detalları</h4>
+                            </div>
+                            <div class="col-6">
+                                <ol class="breadcrumb">
+                                    {% for crumb in breadcrumbs %}
+                                        <li class="breadcrumb-item">
+                                            <a href="{{ crumb.url }}">
+                                                {% if crumb.url %}
+                                                    {{ crumb.title }}
+                                                {% else %}
+                                                    <span>{{ crumb.title }}</span>
+                                                {% endif %}
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Container-fluid starts -->
+                <div class="container-fluid">
+                    <div class="row"> 
+                        <div class="col-12"> 
+                            <div class="card"> 
+                                <div class="card-body">
+                                    <div class="garage-details">
+                                        <h2>{{ garage.number }}</h2><br>
+                                        <p><strong>Garaj Nömrəsi:</strong> {{ garage.number }}</p>
+                                        <p><strong>Maşın Nömrələri:</strong></p>
+                                        <ul>
+                                            {% for car_plate in garage.car_plates.all %}
+                                                <li>{{ car_plate.plate }} - {{ car_plate.name }}</li>
+                                            {% empty %}
+                                                <li>Heç bir maşın yoxdur.</li>
+                                            {% endfor %}
+                                        </ul>
+                                        <a class="btn btn-secondary btn-custom" href="{% url 'garage-list' %}">Geri</a>
+                                        <a class="btn btn-primary btn-custom" href="{% url 'garage-edit' garage.id %}">Dəyiş</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Container-fluid Ends -->
+            </div>
+            {% include "footer.html" %}
+            <!-- Footer Start -->
+        </div>
+    </div>
+{% endblock %}

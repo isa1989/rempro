@@ -144,8 +144,17 @@ urlpatterns = [
         views.building_autocomplete,
         name="building_autocomplete",
     ),
+    # -------------------------- CAR PLATE -------------------------------
+    path(
+        "carplates/",
+        views.CarPlateListView.as_view(),
+        name="carplate-list",
+    ),
+    path("carplates/add/", views.CarPlateAddView.as_view(), name="carplate-add"),
     # -------------------------- GARAGE -------------------------------
     path("garages/", views.GarageListView.as_view(), name="garage-list"),
+    path("garage/<int:pk>/", views.GarageDetailView.as_view(), name="garage-detail"),
+    path("garage/edit/<int:pk>/", views.GarageEditView.as_view(), name="garage-edit"),
     path("garages/add/", views.GarageCreateView.as_view(), name="garage-add"),
     # -------------------------- LOGS -------------------------------
     path("logs/", views.LogListView.as_view(), name="log_list"),

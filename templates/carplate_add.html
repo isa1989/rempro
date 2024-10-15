@@ -1,0 +1,67 @@
+{% load static %}
+{% include 'base.html' %}
+
+{% block content %}
+    <!-- Loader -->
+    <div class="loader-wrapper">
+        <div class="loader">
+            <div class="loader4"></div>
+        </div>
+    </div>
+    <!-- Loader Ends -->
+
+    <!-- Tap on Top -->
+    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
+    <!-- Tap on Top Ends -->
+
+    <!-- Page Wrapper -->
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+        <!-- Page Header -->
+        {% include 'header.html' %}
+        <!-- Page Header Ends -->
+
+        <div class="page-body-wrapper">
+            {% include 'sidebar.html' %}
+            <div class="page-body">
+                <div class="container-fluid">
+                    <div class="page-title">
+                        <div class="row">
+                            <div class="col-6">
+                                <h4>Yeni Maşın Nömrəsi Əlavə Et</h4>
+                            </div>
+                            <div class="col-6">
+                                <ol class="breadcrumb">
+                                    {% for crumb in breadcrumbs %}
+                                        <li class="breadcrumb-item">
+                                            <a href="{{ crumb.url }}">{{ crumb.title }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Container-fluid starts -->
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <form method="post" action="{% url 'carplate-add' %}">
+                                            {% csrf_token %}
+                                            {{ form.as_p }}
+                                            <button type="submit" class="btn btn-primary">Save</button>
+                                            <a href="{% url 'carplate-list' %}" class="btn btn-secondary">Cancel</a>
+                                        </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Container-fluid Ends -->
+            </div>
+            {% include "footer.html" %}
+        </div>
+    </div>
+{% endblock %}

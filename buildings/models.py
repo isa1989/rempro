@@ -289,23 +289,29 @@ class Payment(models.Model):
         verbose_name_plural = "Ödəniş"
 
 
+class Garage(models.Model):
+    building = models.ForeignKey(Building, on_delete=models.CASCADE)
+    number = models.CharField(max_length=10, blank=True, null=True)
+
+    def __str__(self):
+        return self.number
+
+    class Meta:
+        verbose_name = "Qaraj"
+        verbose_name_plural = "Qarajlar"
+
+
 class CarPlate(models.Model):
     name = models.CharField(max_length=200)
     plate = models.CharField(max_length=50, blank=True, null=True)
+    garage = models.ForeignKey(Garage, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.plate
 
-
-class Garage(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="garrage")
-    number = models.CharField(max_length=10, blank=True, null=True)
-    car_plates = models.ManyToManyField(
-        CarPlate, related_name="garrage", blank=True, verbose_name="Maşın nömrəsi"
-    )
-
-    def __str__(self):
-        return self.number
+    class Meta:
+        verbose_name = "Maşın nömrəsi"
+        verbose_name_plural = "Maşın nömrələri"
 
 
 class Log(models.Model):

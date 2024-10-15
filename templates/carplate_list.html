@@ -1,0 +1,89 @@
+{% load static %}
+{% include 'base.html' %}
+
+{% block content %}
+    <!-- Loader -->
+    <div class="loader-wrapper">
+        <div class="loader">
+            <div class="loader4"></div>
+        </div>
+    </div>
+    <!-- Loader Ends -->
+
+    <!-- Tap on Top -->
+    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
+    <!-- Tap on Top Ends -->
+
+    <!-- Page Wrapper -->
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+        <!-- Page Header -->
+        {% include 'header.html' %}
+        <!-- Page Header Ends -->
+
+        <div class="page-body-wrapper">
+            {% include 'sidebar.html' %}
+            <div class="page-body">
+                <div class="container-fluid">
+                    <div class="page-title">
+                        <div class="row">
+                            <div class="col-6">
+                                <h4>Maşın Nömrələri</h4>
+                            </div>
+                            <div class="col-6">
+                                <ol class="breadcrumb">
+                                    {% for crumb in breadcrumbs %}
+                                        <li class="breadcrumb-item">
+                                            <a href="{{ crumb.url }}">{{ crumb.title }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Container-fluid starts -->
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="list-product-header">
+                                        <div>
+                                            <a class="btn btn-primary" href="{% url 'carplate-add'  %}"><i class="fa fa-plus"></i> Maşın Nömrəsi Əlavə Et</a>
+                                        </div>
+                                    </div>
+                                    <div class="list-product">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th><span class="f-light f-w-600">Ad</span></th>
+                                                    <th><span class="f-light f-w-600">Maşın Nömrəsi</span></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for plate in carplates %}
+                                                
+                                                    <tr>
+                                                        <td>{{ plate.name }}</td>
+                                                        <td>{{ plate.plate }}</td>
+                                                    </tr>
+                                                {% empty %}
+                                                    <tr>
+                                                        <td colspan="1">Heç bir maşın nömrəsi tapılmadı.</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Container-fluid Ends -->
+            </div>
+            {% include "footer.html" %}
+        </div>
+    </div>
+{% endblock %}

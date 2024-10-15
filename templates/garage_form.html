@@ -58,26 +58,7 @@
                                                 <div class="sidebar-body">
                                                     <form class="row g-2" method="post" action="{% url 'garage-add' %}">
                                                         {% csrf_token %}
-                                                        <div class="col-12">
-                                                            <label for="number" class="form-label">Garaj Nömrəsi</label>
-                                                            <input type="text" class="form-control" id="number" name="number" required>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <label for="owner" class="form-label">Sahibi</label>
-                                                            <select class="form-select" id="owner" name="owner" required>
-                                                                {% for user in users %}
-                                                                    <option value="{{ user.id }}">{{ user.username }}</option>
-                                                                {% endfor %}
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <label for="car_plates" class="form-label">Maşın Nömrələri</label>
-                                                            <select multiple class="form-select" id="car_plates" name="car_plates">
-                                                                {% for plate in car_plates %}
-                                                                    <option value="{{ plate.id }}">{{ plate }}</option>
-                                                                {% endfor %}
-                                                            </select>
-                                                        </div>
+                                                        {{ form.as_p }}
                                                         <div class="col-12 mt-3">
                                                             <button class="btn btn-primary" type="submit">Saxla</button>
                                                             <a class="btn btn-secondary" href="{% url 'garage-list' %}">Ləğv et</a>

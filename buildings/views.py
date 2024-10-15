@@ -48,8 +48,10 @@ from .forms import (
     ResidentForm,
     NewsForm,
     CameraForm,
+    CarPlateForm,
     BuildingCreationForm,
     ExpenseForm,
+    GarageForm,
 )
 from django.contrib.auth.decorators import login_required
 
@@ -1344,11 +1346,20 @@ class ResidentDeleteView(LoginRequiredMixin, DeleteView):
 class GarageListView(LoginRequiredMixin, ListView):
     login_url = "/login/"
     model = Garage
-    template_name = "garage_list.html"  # Kendi şablonunu buraya ekle
+    template_name = "garage_list.html"
     context_object_name = "garages"
 
     def get_queryset(self):
-        return Garage.objects.filter(owner=self.request.user)
+        user = self.request.user
+        if user.is_superuser:
+            return Garage.objects.filter(building__branch__owner=user).annotate(
+                car_plate_count=Count("carplate")
+            )
+        elif user.commandant:
+            return Garage.objects.filter(
+                building__in=Building.objects.filter(commandant=user)
+            ).annotate(car_plate_count=Count("carplate"))
+        return Garage.objects.none()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1361,9 +1372,36 @@ class GarageListView(LoginRequiredMixin, ListView):
         return context
 
 
+class GarageDetailView(LoginRequiredMixin, DetailView):
+    model = Garage
+    template_name = "garage_detail.html"
+    context_object_name = "garage"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form"] = BranchForm(instance=self.object)
+        context["is_superuser"] = self.request.user.is_superuser
+        context["user_name"] = self.request.user.username
+        return context
+
+
+class GarageEditView(LoginRequiredMixin, UpdateView):
+    model = Garage
+    form_class = GarageForm
+    template_name = "garage_edit.html"
+    success_url = reverse_lazy("garage-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form"] = GarageForm(instance=self.object)
+        context["is_superuser"] = self.request.user.is_superuser
+        context["user_name"] = self.request.user.username
+        return context
+
+
 class GarageCreateView(CreateView):
     model = Garage
-    fields = ["number", "owner", "car_plates"]
+    form_class = GarageForm
     template_name = "garage_form.html"
     success_url = reverse_lazy("garage-list")
 
@@ -1371,11 +1409,53 @@ class GarageCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {"title": "Ana səhifə", "url": reverse_lazy("branches")},
-            {"title": "Xidmətlər", "url": reverse_lazy("all-residents")},
+            {"title": "Qaraj əlavə et", "url": reverse_lazy("garage-add")},
         ]
         context["user_name"] = self.request.user.username
         context["is_superuser"] = self.request.user.is_superuser
-        context["car_plates"] = CarPlate.objects.all()
+        return context
+
+
+class CarPlateListView(LoginRequiredMixin, ListView):
+    login_url = "/login/"
+    model = CarPlate
+    template_name = "carplate_list.html"
+    context_object_name = "carplates"
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser:
+            return CarPlate.objects.filter(garage__building__branch__owner=user)
+        elif user.commandant:
+            return CarPlate.objects.filter(garage__building__commandant=user)
+        return CarPlate.objects.none()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse_lazy("branches")},
+            {"title": "Qarajlar", "url": reverse_lazy("garage-list")},
+        ]
+        context["garage_id"] = self.kwargs.get(
+            "garage_id"
+        )  # Pass the garage ID to the context
+        return context
+
+
+class CarPlateAddView(LoginRequiredMixin, CreateView):
+    model = CarPlate
+    form_class = CarPlateForm
+    template_name = "carplate_add.html"
+    success_url = reverse_lazy("carplate-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse_lazy("branches")},
+            {"title": "Maşın Nömrələri", "url": reverse_lazy("carplate-list")},
+        ]
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
         return context
 
 

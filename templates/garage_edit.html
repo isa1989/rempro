@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <!-- Loader Starts -->
+    <div class="loader-wrapper">
+        <div class="loader"> 
+            <div class="loader4"></div>
+        </div>
+    </div>
+    <!-- Loader Ends -->
+
+    <!-- Tap on Top Starts -->
+    <div class="tap-top"><i data-feather="chevrons-up"></i></div>
+    <!-- Tap on Top Ends -->
+
+    <!-- Page Wrapper Start -->
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+        <!-- Page Header Start -->
+        {% include 'header.html' %}
+        <!-- Page Header Ends -->
+
+        <!-- Page Body Start -->
+        <div class="page-body-wrapper">
+            {% include 'sidebar.html' %}
+
+            <div class="page-body">
+                <div class="container-fluid">
+                    <div class="page-title">
+                        <div class="row">
+                            <div class="col-6">
+                                <h4>Qarajı Dəyiş</h4>
+                            </div>
+                            <div class="col-6">
+                                <ol class="breadcrumb">
+                                    {% for crumb in breadcrumbs %}
+                                        <li class="breadcrumb-item">
+                                            <a href="{{ crumb.url }}">
+                                                {% if crumb.url %}
+                                                    {{ crumb.title }}
+                                                {% else %}
+                                                    <span>{{ crumb.title }}</span>
+                                                {% endif %}
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Container-fluid starts -->
+                <div class="container-fluid">
+                    <div class="row"> 
+                        <div class="col-12"> 
+                            <div class="card"> 
+                                <div class="card-body">
+                                    <form class="row g-2" method="post" action="{% url 'garage-edit' garage.id %}">
+                                        {% csrf_token %}
+                                        {{ form.as_p }}
+                                        <div class="col-12 mt-3">
+                                            <button class="btn btn-primary" type="submit">Dəyiş</button>
+                                            <a class="btn btn-secondary" href="{% url 'garage-list' %}">Ləğv et</a>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Container-fluid Ends -->
+            </div>
+            {% include "footer.html" %}
+            <!-- Footer Start -->
+        </div>
+    </div>
+{% endblock %}

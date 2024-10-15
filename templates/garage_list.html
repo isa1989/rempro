@@ -3,9 +3,9 @@
 {% block content %}
     <!-- Loader -->
     <div class="loader-wrapper">
-      <div class="loader"> 
-        <div class="loader4"></div>
-      </div>
+        <div class="loader"> 
+            <div class="loader4"></div>
+        </div>
     </div>
     <!-- Loader Ends -->
 
@@ -15,83 +15,97 @@
 
     <!-- Page Wrapper -->
     <div class="page-wrapper compact-wrapper" id="pageWrapper">
-      <!-- Page Header -->
-      {% include 'header.html' %}
-      <!-- Page Header Ends -->
+        <!-- Page Header -->
+        {% include 'header.html' %}
+        <!-- Page Header Ends -->
 
-      <!-- Page Body -->
-      <div class="page-body-wrapper">
-        {% include 'sidebar.html' %}
-        <div class="page-body">
-          <div class="container-fluid">
-            <div class="page-title">
-              <div class="row">
-                <div class="col-6">
-                  <h4>Qarajlar</h4>
-                </div>
-                <div class="col-6">
-                  <ol class="breadcrumb">
-                      {% for crumb in breadcrumbs %}
-                          <li class="breadcrumb-item">
-                              <a href="{{ crumb.url }}">{{ crumb.title }}</a>
-                          </li>
-                      {% endfor %}
-                  </ol>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Container-fluid starts -->
-          <div class="container-fluid">
-            <div class="row"> 
-              <div class="col-sm-12"> 
-                <div class="card"> 
-                  <div class="card-body">
-                    {% if messages %}
-                        <div class="alert alert-info">
-                            {% for message in messages %}
-                                <p>{{ message }}</p>
-                            {% endfor %}
+        <!-- Page Body -->
+        <div class="page-body-wrapper">
+            {% include 'sidebar.html' %}
+            <div class="page-body">
+                <div class="container-fluid">
+                    <div class="page-title">
+                        <div class="row">
+                            <div class="col-6">
+                                <h4>Qarajlar</h4>
+                            </div>
+                            <div class="col-6">
+                                <ol class="breadcrumb">
+                                    {% for crumb in breadcrumbs %}
+                                        <li class="breadcrumb-item">
+                                            <a href="{{ crumb.url }}">{{ crumb.title }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ol>
+                            </div>
                         </div>
-                    {% endif %}
-                    <div class="list-product-header">
-                      <div> 
-                        <a class="btn btn-primary" href="{% url 'garage-add' %}"><i class="fa fa-plus"></i>Garaj əlavə et</a>
-                      </div>
                     </div>
-                    <div class="list-product">
-                      <table class="table" id="garage-status">
-                        <thead>
-                          <tr>
-                            <th><span class="f-light f-w-600">Garaj Nömrəsi</span></th>
-                            <th><span class="f-light f-w-600">Sahibi</span></th>
-                            <th><span class="f-light f-w-600">Maşın Nömrələri</span></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {% for garage in garages %}
-                          <tr class="garage-removes">
-                            <td><a href="{% url 'garage-detail' garage.id %}">{{ garage.number }}</a></td>
-                            <td><p class="f-light">{{ garage.owner.username }}</p></td>
-                            <td>
-                              {% for plate in garage.car_plates.all %}
-                                <p class="f-light">{{ plate }}</p>
-                              {% endfor %}
-                            </td>
-                          </tr>
-                          {% endfor %}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
                 </div>
-              </div>
+
+                <!-- Container-fluid starts -->
+                <div class="container-fluid">
+                    <div class="row"> 
+                        <div class="col-sm-12"> 
+                            <div class="card"> 
+                                <div class="card-body">
+                                    {% if messages %}
+                                        <div class="alert alert-info">
+                                            {% for message in messages %}
+                                                <p>{{ message }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="list-product-header">
+                                        <div> 
+                                            <a class="btn btn-primary" href="{% url 'garage-add' %}">
+                                                <i class="fa fa-plus"></i> Garaj əlavə et
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="list-product">
+                                        <table class="table" id="garage-status">
+                                            <thead>
+                                                <tr>
+                                                    <th><span class="f-light f-w-600">Qaraj Nömrəsi</span></th>
+                                                    <th><span class="f-light f-w-600">Maşın Nömrələri</span></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                              {% for garage in garages %}
+                                              <tr class="garage-removes">
+                                                  <td>
+                                                    <a href="{% url 'garage-detail' garage.id %}">{{ garage.number }}</a></td>                                                 
+                                                  <td>
+                                                      <div class="d-flex align-items-center">
+                                                          <p class="f-light mb-0 me-2">{{ garage.car_plate_count }}</p>
+                                                          <a href="{% url 'carplate-list' %}" class="me-2 icon-align">
+                                                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
+                                                                  <path d="M1 12s3-9 11-9 11 9 11 9-3 9-11 9S1 12 1 12z"></path>
+                                                                  <circle cx="12" cy="12" r="3"></circle>
+                                                              </svg>
+                                                          </a>
+                                                          <a href="{% url 'carplate-add' %}" class="icon-align">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus">
+                                                              <line x1="12" y1="5" x2="12" y2="19"></line>
+                                                              <line x1="5" y1="12" x2="19" y2="12"></line>
+                                                            </svg>
+                                                          </a>
+                                                      </div>
+                                                  </td>
+                                              </tr>
+                                              {% endfor %}
+                                              
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Container-fluid Ends -->
             </div>
-          </div>
-          <!-- Container-fluid Ends -->
+            {% include "footer.html" %}
         </div>
-        {% include "footer.html" %}
-      </div>
     </div>
 {% endblock %}

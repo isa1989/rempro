@@ -13,6 +13,7 @@ from .models import (
     Camera,
     Charge,
     Garage,
+    CarPlate,
 )
 
 
@@ -75,3 +76,4 @@ admin.site.register(Payment)
 admin.site.register(News)
 admin.site.register(Charge)
 admin.site.register(Garage)
+admin.site.register(CarPlate)
