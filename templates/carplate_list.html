@@ -59,6 +59,7 @@
                                                 <tr>
                                                     <th><span class="f-light f-w-600">Ad</span></th>
                                                     <th><span class="f-light f-w-600">Maşın Nömrəsi</span></th>
+                                                    <th><span class="f-light f-w-600">Sil</span></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -67,7 +68,14 @@
                                                     <tr>
                                                         <td>{{ plate.name }}</td>
                                                         <td>{{ plate.plate }}</td>
+                                                        <td>
+                                                        <form action="{% url 'carplate-delete' pk=plate.id %}" method="post" style="display:inline;" onsubmit="return confirmDelete();">
+                                                                {% csrf_token %}
+                                                                <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+                                                            </form>
+                                                        </td>
                                                     </tr>
+                                                    
                                                 {% empty %}
                                                     <tr>
                                                         <td colspan="1">Heç bir maşın nömrəsi tapılmadı.</td>

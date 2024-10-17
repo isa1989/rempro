@@ -151,6 +151,11 @@ urlpatterns = [
         name="carplate-list",
     ),
     path("carplates/add/", views.CarPlateAddView.as_view(), name="carplate-add"),
+    path(
+        "carplate/<int:pk>/delete/",
+        views.CarPlateDeleteView.as_view(),
+        name="carplate-delete",
+    ),
     # -------------------------- GARAGE -------------------------------
     path("garages/", views.GarageListView.as_view(), name="garage-list"),
     path("garage/<int:pk>/", views.GarageDetailView.as_view(), name="garage-detail"),

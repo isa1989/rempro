@@ -1426,8 +1426,6 @@ class CarPlateListView(LoginRequiredMixin, ListView):
         user = self.request.user
         if user.is_superuser:
             return CarPlate.objects.filter(garage__building__branch__owner=user)
-        elif user.commandant:
-            return CarPlate.objects.filter(garage__building__commandant=user)
         return CarPlate.objects.none()
 
     def get_context_data(self, **kwargs):
@@ -1436,9 +1434,9 @@ class CarPlateListView(LoginRequiredMixin, ListView):
             {"title": "Ana səhifə", "url": reverse_lazy("branches")},
             {"title": "Qarajlar", "url": reverse_lazy("garage-list")},
         ]
-        context["garage_id"] = self.kwargs.get(
-            "garage_id"
-        )  # Pass the garage ID to the context
+        context["garage_id"] = self.kwargs.get("garage_id")
+        context["user_name"] = self.request.user.username
+        context["is_superuser"] = self.request.user.is_superuser
         return context
 
 
@@ -1459,6 +1457,35 @@ class CarPlateAddView(LoginRequiredMixin, CreateView):
         return context
 
 
+class CarPlateDeleteView(LoginRequiredMixin, DeleteView):
+    login_url = "/login/"
+    model = CarPlate
+    context_object_name = "carplate"
+    success_url = reverse_lazy("carplate-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"title": "Ana səhifə", "url": reverse_lazy("branches")},
+            {"title": "Araba Plakaları", "url": reverse_lazy("carplate-list")},
+        ]
+        return context
+
+    def form_valid(self, form):
+        object = self.get_object()
+        response = super().form_valid(form)
+        Log.objects.create(
+            action="DELETE",
+            model_name="CarPlate",
+            object_id=object.id,
+            user=self.request.user,
+            details=f"Maşın nömrəsi silindi: {self.object.plate}",
+            timestamp=timezone.now(),
+        )
+        messages.success(self.request, f"{self.object.plate} silindi!")
+        return response
+
+
 class LogListView(ListView):
     model = Log
     template_name = "log_list.html"
@@ -1470,9 +1497,13 @@ class LogListView(ListView):
         user = self.request.user
 
         if user.is_superuser:
-            user_branches = Branch.objects.filter(owner=user)
-            queryset = Log.objects.filter(branch__in=user_branches)
-            return queryset
+            # user_branches = Branch.objects.filter(owner=user)
+            # queryset = Log.objects.filter(branch__in=user_branches)
+            return (
+                Log.objects.filter(user__branch__owner=user)
+                .distinct()
+                .order_by("-timestamp")
+            )
 
         if user.commandant:
             queryset = Log.objects.filter(commandant=user)
