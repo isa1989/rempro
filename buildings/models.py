@@ -350,3 +350,21 @@ class News(models.Model):
     class Meta:
         verbose_name = "Xəbərlər"
         verbose_name_plural = "Xəbərlər"
+
+
+class Notification(models.Model):
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="notifications"
+    )
+
+    def __str__(self):
+        return f"{self.title} - {self.user.username} ({self.timestamp})"
+
+    class Meta:
+        ordering = ["-timestamp"]
+        verbose_name = "Bildiriş"
+        verbose_name_plural = "Bildirişlər"
