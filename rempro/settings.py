@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "django_select2",
     "buildings",
     "rest_framework",
+    "rest_framework_simplejwt",
 ]
 
 
@@ -60,9 +61,11 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+CSRF_COOKIE_SECURE = False
+
 AUTHENTICATION_BACKENDS = [
     "buildings.backends.CustomBackend",
-    "django.contrib.auth.backends.ModelBackend",  # Default backend
+    "django.contrib.auth.backends.ModelBackend",
 ]
 ROOT_URLCONF = "rempro.urls"
 AUTH_USER_MODEL = "buildings.User"
@@ -113,7 +116,10 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
-    ]
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
 }
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

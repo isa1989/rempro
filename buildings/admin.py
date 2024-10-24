@@ -14,6 +14,7 @@ from .models import (
     Charge,
     Garage,
     CarPlate,
+    Notification,
 )
 
 
@@ -77,3 +78,4 @@ admin.site.register(News)
 admin.site.register(Charge)
 admin.site.register(Garage)
 admin.site.register(CarPlate)
+admin.site.register(Notification)
